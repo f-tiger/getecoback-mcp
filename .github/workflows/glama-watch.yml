@@ -1,0 +1,63 @@
+# Watches for the Glama listing to go live.
+#
+# The sandbox this repo is maintained from cannot reach glama.ai (egress
+# proxy), and Glama reviews public submissions by hand, so "is it approved yet"
+# is otherwise a question only a human refreshing a page can answer. A runner
+# has full network, so it checks daily and opens an issue the moment the badge
+# URL starts resolving — which is the exact thing awesome-mcp-servers PR #12245
+# is waiting on.
+#
+# It opens the issue once: if an open issue with the same title exists, it stays
+# quiet rather than filing a duplicate every morning.
+name: Watch Glama listing
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "37 7 * * *"
+
+permissions:
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    env:
+      BADGE: https://glama.ai/mcp/servers/f-tiger/getecoback-mcp/badges/score.svg
+      PAGE: https://glama.ai/mcp/servers/f-tiger/getecoback-mcp
+      TITLE: "Glama listing is live — add the badge to awesome-mcp-servers PR #12245"
+    steps:
+      - name: Probe the badge URL
+        id: probe
+        run: |
+          code=$(curl -s -o /dev/null -L --max-time 25 -w "%{http_code}" "$BADGE" || echo 000)
+          echo "badge HTTP $code"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+
+      - name: File an issue when it resolves
+        if: steps.probe.outputs.code == '200'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          existing=$(gh issue list --state open --search "$TITLE" --json title --jq 'length')
+          if [ "$existing" != "0" ]; then
+            echo "already reported"; exit 0
+          fi
+          gh issue create --title "$TITLE" --body "$(cat <<'BODY'
+The Glama badge URL now resolves, so the listing is public.
+
+Remaining step: add this line to the end of the entry in the
+`add-getecoback-raumklima-mcp` branch of `f-tiger/awesome-mcp-servers`, which
+updates PR #12245 in place and clears the `missing-glama` label.
+
+```markdown
+[![f-tiger/getecoback-mcp MCP server](https://glama.ai/mcp/servers/f-tiger/getecoback-mcp/badges/score.svg)](https://glama.ai/mcp/servers/f-tiger/getecoback-mcp)
+```
+
+Opened automatically by `.github/workflows/glama-watch.yml`.
+BODY
+)"
+
+      - name: Still pending
+        if: steps.probe.outputs.code != '200'
+        run: echo "Not listed yet (HTTP ${{ steps.probe.outputs.code }}) — will check again tomorrow."
