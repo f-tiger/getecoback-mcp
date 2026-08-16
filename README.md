@@ -27,12 +27,15 @@ claude mcp add --transport http getecoback https://getecoback.com/mcp/v1
 **Or run it yourself** — `src/` is the server, over stdio, with **zero dependencies**:
 
 ```
-npx getecoback-mcp
+npx github:f-tiger/getecoback-mcp
 ```
 
 ```json
-{ "mcpServers": { "getecoback": { "command": "npx", "args": ["-y", "getecoback-mcp"] } } }
+{ "mcpServers": { "getecoback": { "command": "npx", "args": ["-y", "github:f-tiger/getecoback-mcp"] } } }
 ```
+
+(The shorter `npx getecoback-mcp` starts working once the package is published to
+npm; the GitHub form above needs nothing and works today.)
 
 Setup notes for other clients: <https://getecoback.com/mcp.html> ·
 discovery: [`/.well-known/mcp.json`](https://getecoback.com/.well-known/mcp.json)

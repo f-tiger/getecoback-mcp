@@ -1,0 +1,35 @@
+# Publishes the package to npm.
+#
+# npm requires the FIRST publish to use a classic token: trusted publishing
+# (OIDC) can only be configured on a package that already exists. So this
+# workflow works both ways — the npm CLI detects an OIDC environment and uses
+# it, and falls back to NPM_TOKEN when there is none. That means: add the
+# secret once for the first release, then configure the trusted publisher on
+# npmjs.com and the secret becomes unnecessary.
+name: Publish to npm
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write   # required for OIDC trusted publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest   # trusted publishing does not support self-hosted runners
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+      # Trusted publishing needs npm >= 11.5.1; the bundled npm may be older.
+      - run: npm install -g npm@latest
+      - name: Verify the package works before publishing it
+        run: npm test
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
