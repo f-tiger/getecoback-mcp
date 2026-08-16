@@ -22,3 +22,25 @@ jobs:
         with:
           node-version: "22"
       - run: npm test
+
+  # Glama builds the image and checks the server starts and answers an
+  # introspection request. That check now runs here too, so a broken container
+  # fails on our side instead of silently dropping the directory listing.
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t getecoback-mcp:ci .
+      - name: Introspect exactly as a directory would
+        run: |
+          out=$(printf '%s\n' \
+            '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' \
+            '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' \
+            | docker run -i --rm getecoback-mcp:ci)
+          echo "$out" | head -c 400; echo
+          echo "$out" | grep -q '"serverInfo"' || { echo "::error::no serverInfo in initialize response"; exit 1; }
+          n=$(echo "$out" | tail -1 | grep -o '"name":"[a-z_]*"' | wc -l)
+          echo "tools advertised: $n"
+          [ "$n" -eq 9 ] || { echo "::error::expected 9 tools, got $n"; exit 1; }
+          echo "OK container introspection"
