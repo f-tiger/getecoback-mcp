@@ -31,6 +31,7 @@ jobs:
       PAGE: https://glama.ai/mcp/servers/f-tiger/getecoback-mcp
       TITLE: "Glama listing is live — add the badge to awesome-mcp-servers PR #12245"
     steps:
+      - uses: actions/checkout@v4
       - name: Probe the badge URL
         id: probe
         run: |
@@ -47,20 +48,7 @@ jobs:
           if [ "$existing" != "0" ]; then
             echo "already reported"; exit 0
           fi
-          gh issue create --title "$TITLE" --body "$(cat <<'BODY'
-The Glama badge URL now resolves, so the listing is public.
-
-Remaining step: add this line to the end of the entry in the
-`add-getecoback-raumklima-mcp` branch of `f-tiger/awesome-mcp-servers`, which
-updates PR #12245 in place and clears the `missing-glama` label.
-
-```markdown
-[![f-tiger/getecoback-mcp MCP server](https://glama.ai/mcp/servers/f-tiger/getecoback-mcp/badges/score.svg)](https://glama.ai/mcp/servers/f-tiger/getecoback-mcp)
-```
-
-Opened automatically by `.github/workflows/glama-watch.yml`.
-BODY
-)"
+          gh issue create --title "$TITLE" --body-file .github/glama-live-issue.md
 
       - name: Still pending
         if: steps.probe.outputs.code != '200'
