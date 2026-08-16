@@ -1,0 +1,24 @@
+# Runs the port's tests, including the parity check against the hosted server
+# at getecoback.com/mcp/v1. That check is the reason this workflow exists: the
+# logic here is a copy of what runs in a Cloudflare Worker in another
+# repository, and a copy that quietly drifts would hand users different numbers
+# than the website publishes. Daily, so drift surfaces without a push.
+name: Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "41 5 * * *"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm test

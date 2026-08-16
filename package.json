@@ -1,0 +1,37 @@
+{
+  "name": "getecoback-mcp",
+  "version": "1.1.0",
+  "description": "MCP server for indoor climate and household energy in Germany/EU: BTU sizing, window-seal length, heatwave outlook, running costs, heating watts, dew point, balcony-storage subsidies, and search over 133 guides.",
+  "type": "module",
+  "bin": {
+    "getecoback-mcp": "src/server.mjs"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\"",
+    "sync": "node sync.mjs"
+  },
+  "keywords": [
+    "mcp",
+    "modelcontextprotocol",
+    "btu",
+    "hvac",
+    "klimaanlage",
+    "heizung",
+    "energie",
+    "germany"
+  ],
+  "license": "CC-BY-4.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/f-tiger/getecoback-mcp.git"
+  },
+  "homepage": "https://getecoback.com/mcp.html"
+}

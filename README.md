@@ -9,11 +9,12 @@ Listed in the official
 [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=hvac-btu-heat-klimaanlage)
 as `io.github.f-tiger/hvac-btu-heat-klimaanlage`.
 
-This repository is a **mirror**. The single source of truth is
-[getecoback.com](https://getecoback.com) — the tool table below is not hand-written;
-`sync.mjs` rebuilds it from the live server's `tools/list` every day.
+The tool table below is not hand-written: `sync.mjs` rebuilds it from the live server's
+`tools/list` every day.
 
 ## Connect
+
+**Hosted** — nothing to install, no auth, no personal data:
 
 ```
 claude mcp add --transport http getecoback https://getecoback.com/mcp/v1
@@ -23,8 +24,23 @@ claude mcp add --transport http getecoback https://getecoback.com/mcp/v1
 { "mcpServers": { "getecoback": { "type": "http", "url": "https://getecoback.com/mcp/v1" } } }
 ```
 
-No auth, no install, no personal data, streamable HTTP. Setup notes for other clients:
-<https://getecoback.com/mcp.html> · discovery: [`/.well-known/mcp.json`](https://getecoback.com/.well-known/mcp.json)
+**Or run it yourself** — `src/` is the server, over stdio, with **zero dependencies**:
+
+```
+npx getecoback-mcp
+```
+
+```json
+{ "mcpServers": { "getecoback": { "command": "npx", "args": ["-y", "getecoback-mcp"] } } }
+```
+
+Setup notes for other clients: <https://getecoback.com/mcp.html> ·
+discovery: [`/.well-known/mcp.json`](https://getecoback.com/.well-known/mcp.json)
+
+The two versions are kept honest by a **parity test**: `npm test` calls every deterministic
+tool both locally and on the hosted endpoint and fails if a single character differs. It
+runs on every push and daily — this code is a port of logic that runs in a Cloudflare
+Worker, and ports drift silently.
 
 ## Tools
 
