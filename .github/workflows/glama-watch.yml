@@ -12,7 +12,11 @@
 name: Watch Glama listing
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
+  # Also run whenever this file changes, so an edit to the watcher proves itself
+  # immediately instead of waiting for tomorrow's schedule.
+  push:
+    paths: [".github/workflows/glama-watch.yml"]
   schedule:
     - cron: "37 7 * * *"
 
