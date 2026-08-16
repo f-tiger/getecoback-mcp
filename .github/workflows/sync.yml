@@ -1,0 +1,33 @@
+# Keeps the README's tool table in step with the live server. A mirror that
+# drifts from what it documents is the first thing a directory reviewer
+# notices, so this runs daily and commits only when something actually changed.
+name: Sync from live server
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 5 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node sync.mjs
+      - name: Commit if changed
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "getecoback-sync"
+            git config user.email "noreply@getecoback.com"
+            git add -A
+            git commit -m "sync: tool table from live server"
+            git push
+          else
+            echo "nothing to sync"
+          fi
