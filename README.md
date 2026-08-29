@@ -1,6 +1,6 @@
 # EcoBack Raumklima — MCP server
 
-<!-- count -->9<!-- /count --> tools for **indoor climate and household energy in Germany/EU**: how many BTU a
+<!-- count -->10<!-- /count --> tools for **indoor climate and household energy in Germany/EU**: how many BTU a
 room needs, how long a portable-AC window seal has to be, whether a heatwave is coming,
 what a device costs to run, when it is safe to ventilate, and which balcony-storage
 subsidies exist. Plus full-text search and retrieval over 133 guides.
@@ -50,6 +50,7 @@ Worker, and ports drift silently.
 | Tool | What it answers |
 |---|---|
 <!-- tools:start -->
+| `geraet_wahl` | Which device family solves a given indoor-climate problem (too hot, damp/mould, too cold, stale air), with the honest physics, the right size for the room and the matching guide. The decision layer above btu_empfehlung/heizleistung_watt. |
 | `btu_empfehlung` | Recommended cooling capacity in BTU for a room, with the matching device class: how many BTU do I need for X m²? Same formula as the calculator on getecoback.com (340 BTU/m² × sun factor), for Germany and Europe. |
 | `fensterabdichtung_laenge` | Required window-seal length for a portable air conditioner from the sash measurements (perimeter = 2×(width+height)), plus the off-the-shelf size that fits. Covers tilt-and-turn and roof windows. |
 | `hitzewelle_vorschau` | Live heatwave outlook for Germany: highest temperature over the next three days across Berlin, Frankfurt and Munich (open-meteo), flagged from 28 °C and 32 °C. |
@@ -65,7 +66,7 @@ Worker, and ports drift silently.
 
 - **Same arithmetic as the published calculators.** Each tool mirrors a calculator that
   runs on the website, so an assistant's answer and the page a reader lands on cannot
-  disagree. A CI job calls all <!-- count -->9<!-- /count --> tools against production daily and
+  disagree. A CI job calls all <!-- count -->10<!-- /count --> tools against production daily and
   asserts each returns the value the published calculator shows.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
