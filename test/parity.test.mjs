@@ -26,8 +26,8 @@ const CASES = [
   ["klimaanlage_stromkosten", { watt: 1000, stunden_pro_tag: 8, strompreis_euro_kwh: 0.3, tage: 30, auslastung: 0.65 }],
   ["heizleistung_watt", { qm: 30, daemmung: "schlecht", strompreis_euro_kwh: 0.35 }],
   ["taupunkt_lueften", { aussen_temp_c: 18, aussen_luftfeuchte_prozent: 60, innen_temp_c: 16 }],
-  ["balkonspeicher_foerderung", { bundesland: "Sachsen", preis_eur: 800, zuschuss_eur: 300 }],
-  ["balkonspeicher_foerderung", {}],
+  ...['zu_heiss','zu_kalt','stickige_luft'].map(problem=>['geraet_wahl',{problem,qm:20}]),
+  ...[{}, {purpose:'damage'}, {humidity:'normal'}, {humidity:'high',temperature:'cold'}, {purpose:'laundry',humidity:'high',temperature:'warm'}, {humidity:'high',temperature:'warm'}, {purpose:'invalid'}].map(args=>['geraet_wahl',{problem:'feucht_schimmel',...args}]),
 ];
 
 // Tools whose answers depend on live data or a live index.
@@ -41,6 +41,7 @@ async function remoteCall(name, args) {
   const res = await fetch(REMOTE, {
     method: "POST",
     headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
+    signal: AbortSignal.timeout(20000),
     body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name, arguments: args } }),
   });
   if (!res.ok) throw new Error(`remote HTTP ${res.status}`);
@@ -110,4 +111,12 @@ test("every tool declares a bilingual description and a schema", () => {
     assert.ok(t.description.includes("—"), `${t.name} description is not bilingual`);
     assert.equal(t.inputSchema.type, "object");
   }
+});
+
+// Fail as soon as a tool is added or retired; matching counts cannot detect drift.
+test('local advertised tool names match the hosted contract', async()=>{
+ const res=await fetch(REMOTE,{method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(20000),body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/list',params:{}})});
+ assert.equal(res.status,200);const data=await res.json();assert.equal(data.error,undefined);
+ assert.deepEqual(TOOLS.map(x=>x.name).sort(),data.result.tools.map(x=>x.name).sort());
+ assert.equal((await callTool('balkonspeicher_foerderung',{})).isError,true,'Retired advice must not reappear');
 });

@@ -2,8 +2,7 @@
 
 <!-- count -->9<!-- /count --> tools for **indoor climate and household energy in Germany/EU**: how many BTU a
 room needs, how long a portable-AC window seal has to be, whether a heatwave is coming,
-what a device costs to run, when it is safe to ventilate, and which balcony-storage
-subsidies exist. Plus full-text search and retrieval over 133 guides.
+what a device costs to run, when it is safe to ventilate, and which next step fits a room-climate problem. Plus full-text search and retrieval over 133 guides.
 
 Listed in the official
 [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=hvac-btu-heat-klimaanlage)
@@ -98,3 +97,15 @@ Documentation: **CC BY 4.0** — free to use with attribution to
 [getecoback.com](https://getecoback.com). `sync.mjs` is additionally MIT. See [LICENSE](LICENSE).
 
 Not engineering, legal or subsidy advice.
+
+## Tool-contract recovery (2026-11-07)
+
+The stdio port now follows the current hosted nine-tool contract, including
+`geraet_wahl` and its measurement-first moisture decisions. The retired
+`balkonspeicher_foerderung` advice is no longer advertised or executed.
+The copied routing rules come from `sites/getecoback/src/worker.js` and its
+`site/assets/moisture-decision.mjs` at agi-site commit b340e4d.
+Tests compare every advertised tool name and deterministic decision response
+against the hosted endpoint, including invalid and unknown measurement states.
+The local package version is 1.1.1; `server.json` describes the existing hosted
+registry entry, version 1.3.2. Updating this mirror does not create a second entry.
