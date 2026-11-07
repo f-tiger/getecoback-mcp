@@ -10,7 +10,7 @@ import { createInterface } from "node:readline";
 import { TOOLS, callTool } from "./tools.mjs";
 
 const PROTOCOL_VERSION = "2025-06-18";
-const SERVER_INFO = { name: "getecoback-raumklima", version: "1.1.0" };
+const SERVER_INFO = { name: "getecoback-raumklima", version: "1.1.1" };
 
 function send(msg) {
   process.stdout.write(JSON.stringify(msg) + "\n");

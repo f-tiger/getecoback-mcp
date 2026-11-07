@@ -1,7 +1,7 @@
 {
   "name": "getecoback-mcp",
-  "version": "1.1.0",
-  "description": "MCP server for indoor climate and household energy in Germany/EU: BTU sizing, window-seal length, heatwave outlook, running costs, heating watts, dew point, balcony-storage subsidies, and search over 133 guides.",
+  "version": "1.1.1",
+  "description": "MCP server for indoor climate and household energy in Germany/EU: BTU sizing, window-seal length, heatwave outlook, running costs, heating watts, dew point, measurement-first device decisions, and search over 133 guides.",
   "type": "module",
   "bin": {
     "getecoback-mcp": "src/server.mjs"

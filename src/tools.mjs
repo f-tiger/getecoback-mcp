@@ -25,6 +25,21 @@ function de(n, digits) {
 
 export const TOOLS = [
   {
+    name: "geraet_wahl",
+    description: "Welches Gerät löst mein Raumklima-Problem? — Choose a next step for heat, damp/mould, cold or stale air. For damp rooms, measure first, investigate damage and compare cold-room or laundry conditions before buying; floor area alone cannot size a dehumidifier. Same decision rules as the website.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        problem: { type: "string", enum: ["zu_heiss", "feucht_schimmel", "zu_kalt", "stickige_luft"], description: "Das Problem — the problem: zu_heiss = room too hot, feucht_schimmel = damp air / condensation / mould risk, zu_kalt = room too cold (no fixed heating), stickige_luft = stale air / odours" },
+        qm: { type: "number", description: "Raumfläche in m² — room floor area in square metres (4–120). Default: 20. Used for heating/cooling only, never to infer dehumidifier litres/day." },
+        purpose: { type: "string", enum: ["room", "laundry", "damage"], description: "Nur bei feucht_schimmel: room = Raumluft, laundry = Wäsche trocknen, damage = nasse Wand, Leck oder sichtbarer Schimmel. Default: room. No remote diagnosis." },
+        humidity: { type: "string", enum: ["unknown", "normal", "high"], description: "Nur bei feucht_schimmel: unknown = ungemessen/unsicher (Default), normal = meist 40–60 % oder darunter, high = wiederholt über 60 %. Orientierung, keine Schimmelfrei-Garantie." },
+        temperature: { type: "string", enum: ["unknown", "warm", "cold"], description: "Nur bei feucht_schimmel: unknown = ungemessen (Default), warm = mindestens 15 °C, cold = unter 15 °C. 15 °C ist ein Vergleichssignal, keine allgemeine Betriebsgrenze." },
+      },
+      required: ["problem"],
+    },
+  },
+  {
     name: "btu_empfehlung",
     description:
       "Empfohlene Kühlleistung (BTU) für einen Raum, mit passender Geräteklasse. — Recommended cooling capacity in BTU for a room, with the matching device class: how many BTU do I need for X m²? Same formula as the calculator on getecoback.com (340 BTU/m² × sun factor), for Germany and Europe.",
@@ -99,20 +114,6 @@ export const TOOLS = [
         innen_temp_c: { type: "number", description: "Innen-/Kellertemperatur in °C (Wände werden 2 °C kühler gerechnet)" },
       },
       required: ["aussen_temp_c", "aussen_luftfeuchte_prozent", "innen_temp_c"],
-    },
-  },
-  {
-    name: "balkonspeicher_foerderung",
-    description:
-      "Balkonkraftwerk-/Speicher-Förderung in Deutschland (Stand 08/2026) und wie ein Zuschuss die Amortisation verkürzt. — German subsidies for plug-in balcony solar and storage: which state programmes exist, the ~100 € storage bonus, the apply-BEFORE-buying rule most programmes enforce, and the payback arithmetic with and without a grant. No federal purchase premium — only the VAT exemption.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        bundesland: { type: "string", description: "Bundesland, z. B. 'Sachsen' oder 'Berlin' — German federal state (optional)" },
-        preis_eur: { type: "number", description: "Kaufpreis des Speichers/Sets in € (optional)" },
-        zuschuss_eur: { type: "number", description: "Erwarteter Zuschuss in € (optional, Default 0)" },
-        ersparnis_eur_jahr: { type: "number", description: "Jährliche Stromersparnis in € (optional, Default 100)" },
-      },
     },
   },
   {
@@ -208,8 +209,78 @@ function scoreEntry(entry, tokens, phrase) {
   return score;
 }
 
+// A bounded buying guide, not a moisture diagnosis or a product test.
+function decideMoisture({purpose,humidity,temperature}) {
+  if(!['room','laundry','damage'].includes(purpose)||!['unknown','normal','high'].includes(humidity)||!['unknown','warm','cold'].includes(temperature))throw new RangeError('Invalid choice');
+  if(purpose==='damage')return 'cause';
+  if(humidity==='unknown')return 'measure';
+  if(humidity==='normal'&&purpose==='room')return 'wait';
+  if(temperature==='unknown')return 'measure';
+  if(temperature==='cold')return 'cold';
+  return purpose==='laundry'?'laundry':'compare';
+}
+const MOISTURE_CHOICES = {
+  purpose: ["room", "laundry", "damage"],
+  humidity: ["unknown", "normal", "high"],
+  temperature: ["unknown", "warm", "cold"],
+};
+
+function mcpMoistureOutcome(args) {
+  const choices = {};
+  for (const [key, values] of Object.entries(MOISTURE_CHOICES)) {
+    const value = Object.hasOwn(args, key) ? args[key] : values[0];
+    if (!values.includes(value)) throw new RangeError("Invalid moisture choice");
+    choices[key] = value;
+  }
+  return decideMoisture(choices);
+}
+
+const MOISTURE_NEXT_STEPS = {
+  measure: "Erst messen, dann entscheiden. Notiere an mehreren typischen Tagen Temperatur und relative Feuchte, auch vor und nach dem Lüften oder Wäschetrocknen. Nutze ein vorhandenes Hygrometer. Aus den bisherigen Angaben folgt noch kein Entfeuchterkauf.",
+  wait: "Vorerst keinen Entfeuchter ableiten. 40–60 % sind ein allgemeiner Wohnraum-Orientierungsbereich, keine Schimmelfrei-Garantie. Beobachte kalte Oberflächen und den Verlauf. Bei sehr trockener Luft nicht zusätzlich entfeuchten; prüfe Lüftung und Feuchtequellen.",
+  cause: "Die Feuchtequelle zuerst klären. Ein Entfeuchter beseitigt weder ein Leck noch bauliche Feuchte oder vorhandenen Schimmel. Dokumentiere das Problem und lasse die Ursache fachlich prüfen; informiere bei einer Mietwohnung den Vermieter. Ein Gerätekauf ersetzt diese Klärung nicht.\nUrsachen und Grenzen: https://getecoback.com/guide/luftentfeuchter-gegen-schimmel.html",
+  cold: "Kalte Räume: Leistung bei deiner Temperatur vergleichen. Unter 15 °C ist ein Vergleichssignal, keine feste Abschaltgrenze. Verdichtergeräte können noch arbeiten, aber weniger Wasser entziehen. Prüfe Herstellerdaten bei deiner Temperatur und Feuchte; vergleiche Adsorptionsgeräte auch nach Strombedarf. Ein kalter Keller rechtfertigt keine pauschale Kaufempfehlung.\nKellerbedingungen und Bauart: https://getecoback.com/guide/luftentfeuchter-keller.html",
+  laundry: "Zuerst Kosten pro gleich trockener Ladung vergleichen. Nutze gemessene kWh bis zum gleichen Trocknungsgrad und berücksichtige Kaufpreis, Platz und Zeit. Ein vorhandener Wärmepumpentrockner kann günstiger sein als ein zusätzlicher Kauf. Ein Entfeuchter kann sinnvoll sein, wenn zugleich Raumfeuchte abgeführt werden muss.\nKostenvergleich: https://getecoback.com/waeschetrockner-oder-luftentfeuchter.html#laundry-check",
+  compare: "Kandidaten gezielt prüfen. Wenn erhöhte Feuchte trotz passender Lüftung wiederkehrt und keine bauliche Ursache vorliegt, kannst du ein Gerät mit Hygrostat prüfen. Vergleiche Raumvolumen, Feuchtelast, Geräusch und Leistung bei der gemessenen Temperatur. Das ist keine automatische Größenfreigabe oder Produktempfehlung.",
+};
+
+
 export async function callTool(name, args) {
   const a = args || {};
+  if (name === "geraet_wahl") {
+    const qm = Math.max(4, Math.min(120, Number(a.qm) || 20));
+    const qp = qm <= 12 ? 10 : qm <= 17 ? 15 : qm <= 22 ? 20 : qm <= 27 ? 25 : qm <= 35 ? 30 : 40;
+    // Heating/cooling retain their sizing rules; moisture uses the shared
+    // measurement-first decision, never a floor-area-to-litres ladder.
+    let text;
+    if (a.problem === "zu_heiss") {
+      const btu = Math.round((qm * 340) / 500) * 500;
+      text = `Für "Raum zu heiß" ist die einzige Gerätefamilie, die netto kühlt, die mobile Klimaanlage mit Abluftschlauch (Wärme muss den Raum verlassen; Luftkühler/Ventilatoren kühlen nur die Person, nicht den Raum).\n` +
+        `Faustregel für ${qm} m²: ca. ${btu.toLocaleString("de-DE")} BTU. Ohne dichte Fensterabdichtung verliert jeder Monoblock den Großteil seiner Wirkung.\n` +
+        `Geräteklasse & Modelle: https://getecoback.com/guide/klimaanlage-${qp}-qm.html\n` +
+        `Feinrechnung (Decke, Personen, Sonne): Tool btu_empfehlung oder https://getecoback.com/guide/btu-rechner.html`;
+    } else if (a.problem === "feucht_schimmel") {
+      let outcome;
+      try { outcome = mcpMoistureOutcome(a); } catch {
+        return { content: [{ type: "text", text: "Ungültige Auswahl: purpose muss room, laundry oder damage sein; humidity unknown, normal oder high; temperature unknown, warm oder cold. Fehlende Angaben bleiben unbekannt." }], isError: true };
+      }
+      text = MOISTURE_NEXT_STEPS[outcome] +
+        "\nRaumfläche allein bestimmt weder Liter/Tag noch die richtige Bauart. Nennleistung ist keine Alltagsgarantie; prüfe Herstellerdaten für die tatsächlichen Bedingungen." +
+        "\nEntscheidungshilfe und Quellen (der Link enthält keine Eingaben): https://getecoback.com/guide/luftentfeuchter-ratgeber.html#eb-moisture-choice" +
+        "\nOrientierung, keine Ferndiagnose. Die Website zeigt vorhandene Vergleichskandidaten für Deutschland; prüfe Modell, Markt und Einsatzbedingungen selbst.";
+    } else if (a.problem === "zu_kalt") {
+      const wl = Math.round(qm * 60), wh = Math.round(qm * 100);
+      text = `Für "Raum zu kalt ohne feste Heizung" sind Infrarot-/Elektropaneele mit Thermostat die installationsfreie Familie (Zusatz-/Übergangsheizung; als alleinige Winterheizung ist eine Wärmepumpe wirtschaftlicher — Strom-Direktheizung macht aus 1 kWh Strom genau 1 kWh Wärme).\n` +
+        `Faustregel für ${qm} m² (gedämmter Raum): ${wl.toLocaleString("de-DE")}–${wh.toLocaleString("de-DE")} W.\n` +
+        `Geräteklasse & Modelle: https://getecoback.com/guide/heizung-${qp}-qm.html\n` +
+        `Feinrechnung: Tool heizleistung_watt`;
+    } else {
+      text = `Für "stickige Luft / Gerüche" ist die ehrliche Reihenfolge: erst richtig lüften (kostet nichts), dann je nach Ursache Luftreiniger (Partikel/Pollen) oder Luftentfeuchter (wenn die Ursache Feuchte ist — Muffgeruch ist oft ein Feuchteproblem).\n` +
+        `Einordnung Reiniger vs. Entfeuchter: https://getecoback.com/guide/luftentfeuchter-oder-luftreiniger.html\n` +
+        `Richtig lüften: https://getecoback.com/guide/richtig-lueften-bei-hitze.html`;
+    }
+    return ok(text + `\n${DISCLOSURE}`);
+  }
 
   if (name === "btu_empfehlung") {
     const qm = Math.max(4, Math.min(120, Number(a.qm) || 20));
@@ -300,40 +371,6 @@ export async function callTool(name, args) {
         : `Jetzt nicht lüften: Der Taupunkt liegt über der gerechneten Wandtemperatur (${de(ti - 2, 1)} °C) — die warme Außenluft würde an den kühlen Wänden kondensieren und die Feuchte erhöhen.`) +
       `\nGerechnet wird mit Wänden 2 °C unter Raumtemperatur. Im Sommer sind das oft die frühen Morgenstunden.\n` +
       `Hintergrund & Check im Browser: ${SITE}/guide/keller-lueften-sommer.html\n${DISCLOSURE}`);
-  }
-
-  if (name === "balkonspeicher_foerderung") {
-    const LAND = {
-      "mecklenburg-vorpommern": "Mecklenburg-Vorpommern hat ein Landesprogramm (Größenordnung 300–500 €).",
-      "sachsen": "Sachsen fördert speziell Mietende — befristetes Programm, Größenordnung 300–500 €.",
-      "hamburg": "Hamburg hat ein Landesprogramm (Größenordnung 300–500 €).",
-      "berlin": "Berlin fördert an den Bezug von Sozialleistungen geknüpft (Größenordnung 300–500 €).",
-    };
-    const raw = String(a.bundesland || "").trim().toLowerCase()
-      .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
-      .replace(/\s+/g, "-");
-    const key = raw === "mv" ? "mecklenburg-vorpommern" : raw;
-    const landLine = key
-      ? (LAND[key] || `Für ${a.bundesland}: kein landesweites Programm bekannt (Stand 08/2026).`)
-      : "Landesprogramme gibt es u. a. in Mecklenburg-Vorpommern, Sachsen (Mietende, befristet), Hamburg und Berlin (an Sozialleistungen geknüpft) — Größenordnung 300–500 €.";
-    let calc = "";
-    const preis = Number(a.preis_eur);
-    if (isFinite(preis) && preis > 0) {
-      const zuschuss = Math.max(0, Math.min(preis, Number(a.zuschuss_eur) || 0));
-      const sparen = Math.max(10, Number(a.ersparnis_eur_jahr) || 100);
-      const ohne = preis / sparen;
-      const mit = (preis - zuschuss) / sparen;
-      calc = `\nAmortisation bei ${sparen.toFixed(0)} € Ersparnis/Jahr: ohne Zuschuss ca. ${de(ohne, 1)} Jahre` +
-        (zuschuss > 0 ? `, mit ${zuschuss.toFixed(0)} € Zuschuss ca. ${de(mit, 1)} Jahre. Der Zuschuss ändert nichts am Nutzen pro Jahr — er verkürzt nur die Zeit bis zur schwarzen Null.` : ".");
-    }
-    return ok(
-      `Balkonkraftwerk-/Speicher-Förderung in Deutschland (Stand 08/2026):\n` +
-      `Bundesweit gibt es KEINE Kaufprämie — nur die Mehrwertsteuer-Befreiung, die im Preis bereits enthalten ist.\n` +
-      `${landLine}\n` +
-      `Dazu rund 20 kommunale Programme (u. a. Leipzig, Dresden, Chemnitz) mit 100–500 €; einige zahlen ca. +100 € extra, wenn ein Speicher dazukommt.\n` +
-      `Wichtigste Regel: ERST Antrag stellen, DANN kaufen — eine Rechnung von vor der Bewilligung kippt den Zuschuss in fast allen Programmen.${calc}\n` +
-      `Fördertöpfe sind begrenzt und ändern sich unterjährig — verbindlich ist nur die Richtlinie des eigenen Programms (Kommune/Stadtwerke prüfen).\n` +
-      `Details & Rechenweg: ${SITE}/guide/balkonspeicher-foerderung.html\n${DISCLOSURE}`);
   }
 
   if (name === "ratgeber_suche") {
