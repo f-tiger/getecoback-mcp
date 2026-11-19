@@ -1,0 +1,53 @@
+{
+  "checked": "2026-11-12",
+  "products": [
+    {
+      "id": "bosch-d4000-eu",
+      "name": "Bosch Dry 4000",
+      "variant": "D4000-EU · Artikel 7733703558",
+      "status": "verified",
+      "source": "https://www.bosch-homecomfort.com/de/de/ocs/wohngebaeude/dry-4000-20990506-p/",
+      "source_label": "Bosch Deutschland: D4000-EU"
+    },
+    {
+      "id": "meaco-two-12",
+      "name": "MeacoDry Arete Two 12L",
+      "variant": "Arete Two 12L · nicht One oder Two 20L",
+      "status": "verified",
+      "source": "https://www.meaco.de/produkt/luftentfeuchter-meaco-arete-two-12-l/",
+      "source_label": "Meaco.de: deutsche Anbieter- und Datenseite"
+    },
+    {
+      "id": "stadler-lukas",
+      "name": "Stadler Form Lukas",
+      "variant": "Lukas weiss L-031E · nicht Lukas little oder Pro",
+      "status": "verified",
+      "source": "https://www.stadlerform.com/de-de/luftentfeuchter/lukas-weiss-l-031e",
+      "source_label": "Stadler Form Deutschland: Lukas"
+    },
+    {
+      "id": "comfee-mddf20",
+      "name": "Comfee MDDF-20DEN7",
+      "variant": "MDDF-20DEN7 · ohne WF",
+      "status": "verified",
+      "source": "https://www.feelcomfee.com/de/produkte/klimatisieren-heizen/mddf-20den7",
+      "source_label": "Comfee Deutschland: MDDF-20DEN7"
+    },
+    {
+      "id": "meaco-one-20",
+      "name": "MeacoDry Arete One 20L",
+      "variant": "Arete One 20L · nicht Two oder One 25L",
+      "status": "verified",
+      "source": "https://www.meaco.com/products/meacodry-arete-one-20l-dehumidifier-and-air-purifier",
+      "source_label": "Meaco UK: Arete One 20L"
+    },
+    {
+      "id": "meaco-one-25",
+      "name": "MeacoDry Arete One 25L",
+      "variant": "Arete One 25L · nicht Two 25L",
+      "status": "verified",
+      "source": "https://www.meaco.com/products/meacodry-arete-one-25l-dehumidifier-and-air-purifier",
+      "source_label": "Meaco UK: Arete One 25L"
+    }
+  ]
+}

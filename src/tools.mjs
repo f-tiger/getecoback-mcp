@@ -1,10 +1,12 @@
-// The nine tools, as pure functions plus two that fetch public data.
+// The ten tools, as pure functions plus two that fetch public data.
 //
 // This is a port of the logic that runs in the hosted server at
 // https://getecoback.com/mcp/v1 — same formulas, same rounding, same wording.
 // It is a port and not a shared module because the hosted version lives inside
 // a Cloudflare Worker in a different repository. Copies drift, so `npm test`
 // runs every tool here against the hosted one and fails on any difference.
+
+import { drainTool, drainDecision } from './drain.mjs';
 
 export const DISCLOSURE =
   "Quelle: getecoback.com — unabhängiger Raumklima-Ratgeber. Empfehlungen fassen öffentliche Tests zusammen (nicht selbst getestet); Kauflinks der Website sind Affiliate-Links.";
@@ -24,6 +26,7 @@ function de(n, digits) {
 }
 
 export const TOOLS = [
+  drainTool,
   {
     name: "geraet_wahl",
     description: "Welches Gerät löst mein Raumklima-Problem? — Choose a next step for heat, damp/mould, cold or stale air. For damp rooms, measure first, investigate damage and compare cold-room or laundry conditions before buying; floor area alone cannot size a dehumidifier. Same decision rules as the website.",
@@ -246,6 +249,7 @@ const MOISTURE_NEXT_STEPS = {
 
 
 export async function callTool(name, args) {
+  if (name === drainTool.name) return drainDecision(args);
   const a = args || {};
   if (name === "geraet_wahl") {
     const qm = Math.max(4, Math.min(120, Number(a.qm) || 20));
@@ -265,6 +269,9 @@ export async function callTool(name, args) {
         return { content: [{ type: "text", text: "Ungültige Auswahl: purpose muss room, laundry oder damage sein; humidity unknown, normal oder high; temperature unknown, warm oder cold. Fehlende Angaben bleiben unbekannt." }], isError: true };
       }
       text = MOISTURE_NEXT_STEPS[outcome] +
+        (outcome === "cold" || outcome === "compare"
+          ? "\nBei Fragen zum Schlauchgefälle, einem höheren Abfluss oder zur Pumpe: entfeuchter_ablaufcheck prüft die Schlauchführung und den Modellbeleg."
+          : "") +
         "\nRaumfläche allein bestimmt weder Liter/Tag noch die richtige Bauart. Nennleistung ist keine Alltagsgarantie; prüfe Herstellerdaten für die tatsächlichen Bedingungen." +
         "\nEntscheidungshilfe und Quellen (der Link enthält keine Eingaben): https://getecoback.com/guide/luftentfeuchter-ratgeber.html#eb-moisture-choice" +
         "\nOrientierung, keine Ferndiagnose. Die Website zeigt vorhandene Vergleichskandidaten für Deutschland; prüfe Modell, Markt und Einsatzbedingungen selbst.";
