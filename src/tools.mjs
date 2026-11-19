@@ -1,4 +1,4 @@
-// The ten tools, as pure functions plus two that fetch public data.
+// EcoBack MCP tools. The 90-task suite shares source with the hosted service.
 //
 // This is a port of the logic that runs in the hosted server at
 // https://getecoback.com/mcp/v1 — same formulas, same rounding, same wording.
@@ -6,6 +6,7 @@
 // a Cloudflare Worker in a different repository. Copies drift, so `npm test`
 // runs every tool here against the hosted one and fails on any difference.
 
+import {expandedTools, expandedCall, isExpandedTool} from './eco-suite/src/mcp-expanded.mjs';
 import { drainTool, drainDecision } from './drain.mjs';
 
 export const DISCLOSURE =
@@ -145,6 +146,7 @@ export const TOOLS = [
       required: ["pfad"],
     },
   },
+  ...expandedTools,
 ];
 
 const HEAT_CITIES = [
@@ -249,6 +251,7 @@ const MOISTURE_NEXT_STEPS = {
 
 
 export async function callTool(name, args) {
+  if (isExpandedTool(name)) return expandedCall(name, args);
   if (name === drainTool.name) return drainDecision(args);
   const a = args || {};
   if (name === "geraet_wahl") {

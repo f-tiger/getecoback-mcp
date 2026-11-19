@@ -1,0 +1,108 @@
+{
+  "reviewed": "2026-10-31",
+  "scope": "tado° V3+ und frühere Generationen; keine Übertragung auf tado° X oder andere Marken",
+  "models": [
+    {
+      "id": "unknown",
+      "label": "Modell noch nicht gewählt"
+    },
+    {
+      "id": "tado-v3",
+      "label": "tado° V3+ / frühere Generation"
+    },
+    {
+      "id": "tado-x",
+      "label": "tado° X"
+    },
+    {
+      "id": "other",
+      "label": "Andere Marke / Modell unklar"
+    }
+  ],
+  "sources": {
+    "guide": {
+      "title": "tado°: Kompatibilitätsleitfaden (V3+ und frühere Generationen)",
+      "url": "https://cdn.brandfolder.io/607DGEMS/at/gwgwf72nvb2fcctkqzgk9w/0131_A_SRT_Compatibility_Guide_DE.pdf"
+    },
+    "overview": {
+      "title": "tado°: Ventile und Adapter im Überblick",
+      "url": "https://support.tado.com/de/articles/3482335"
+    },
+    "m28": {
+      "title": "tado°: M28 × 1,5 und passende Stiftverlängerung",
+      "url": "https://support.tado.com/de/articles/3405520"
+    },
+    "ra": {
+      "title": "tado°: Danfoss RA, 23-mm-Klemmanschluss",
+      "url": "https://support.tado.com/de/articles/3405517"
+    },
+    "oventrop": {
+      "title": "tado°: Oventrop M30 × 1,0",
+      "url": "https://support.tado.com/de/articles/3405491"
+    },
+    "x": {
+      "title": "tado° X: eigene Kompatibilität prüfen",
+      "url": "https://help.tado.com/de/"
+    },
+    "routine": {
+      "title": "Verbraucherzentrale: Thermostat einstellen und wechseln",
+      "url": "https://www.verbraucherzentrale.de/wissen/energie/heizen-und-warmwasser/heizkosten-sparen-thermostat-richtig-einstellen-und-wechseln-7940"
+    }
+  },
+  "cases": [
+    {
+      "id": "heimeier-m30",
+      "label": "Heimeier · M30 × 1,5",
+      "status": "direct",
+      "title": "In der Herstellerliste ohne Adapter geführt",
+      "detail": "Gilt für den dort gezeigten thermostatischen Heimeier-Anschluss M30 × 1,5. Ventil und Bild in der Liste abgleichen; die Gewindegröße allein reicht nicht als Nachweis.",
+      "source": "guide",
+      "page": 5
+    },
+    {
+      "id": "herz-m28",
+      "label": "Herz 7230/7235/7260/7262 · M28 × 1,5",
+      "status": "adapter",
+      "title": "M28-Adapter und passende Stiftverlängerung prüfen",
+      "detail": "Die aufgeführten Herz-Ausführungen benötigen laut tado° einen M28 × 1,5-Adapter. Die korrekte Stiftverlängerung ist Teil der Prüfung. „Herz Mini“ oder die Marke allein identifizieren das Ventil nicht.",
+      "source": "m28",
+      "page": 5
+    },
+    {
+      "id": "danfoss-ra",
+      "label": "Danfoss RA · 23-mm-Klemme mit Kerben",
+      "status": "adapter",
+      "title": "RA-Adapter prüfen; RAV und RAVL sind andere Anschlüsse",
+      "detail": "Nur für den identifizierten RA-Anschluss. Eine ähnlich aussehende Klemme ist kein Nachweis. Montageanleitung und Lieferumfang der konkreten Packung abgleichen.",
+      "source": "ra",
+      "page": 3
+    },
+    {
+      "id": "oventrop-uni-l",
+      "label": "Oventrop Uni L / Uni DH · M30 × 1,0",
+      "status": "adapter",
+      "title": "Separaten M30 × 1,0-Adapter einplanen",
+      "detail": "Diese Gewindesteigung ist nicht M30 × 1,5. Laut Herstellerhilfe ist der benötigte Adapter nicht im tado°-Lieferumfang enthalten. Exakte Ausführung vor Bestellung abgleichen.",
+      "source": "oventrop",
+      "page": 7
+    },
+    {
+      "id": "oventrop-uni-lv",
+      "label": "Oventrop Uni LV · 30,5-mm-Klemme",
+      "status": "adapter",
+      "title": "Uni LV ist kein Uni L: andere Adapterfamilie",
+      "detail": "Die Herstellerliste führt Uni LV mit einer 30,5-mm-Klemme und einem separat zu beschaffenden Adapter. Nicht den M30 × 1,0-Adapter für Uni L übernehmen.",
+      "source": "guide",
+      "page": 6
+    },
+    {
+      "id": "manual-rtl",
+      "label": "Manuelles Ventil oder RTL-Begrenzer",
+      "status": "stop",
+      "title": "Kein passender Anwendungsfall für diesen Thermostatkopf",
+      "detail": "Die tado°-Unterlagen schließen manuelle Ventile und Rücklauftemperaturbegrenzer aus. Ein Kopfwechsel ist keine Umrüstung des Ventils; Fachbetrieb und Zuständigkeit klären.",
+      "source": "guide",
+      "page": 1
+    }
+  ]
+}

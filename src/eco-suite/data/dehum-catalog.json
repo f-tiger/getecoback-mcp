@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "checked": "2026-11-12",
+  "max_age_days": 90,
+  "pages": [
+    "luftentfeuchter-ratgeber",
+    "luftentfeuchter-keller",
+    "waesche-trocknen-wohnung"
+  ],
+  "products": [
+    {
+      "id": "bosch-d4000-eu",
+      "name": "Bosch Dry 4000",
+      "variant": "D4000-EU · Artikel 7733703558",
+      "reason": "Drei Betriebsmodi statt vieler Einstellungen",
+      "facts": "Auto-, Nacht- und Wäschemodus; 2,5-Liter-Tank und kontinuierlicher Ablauf laut Bosch.",
+      "limit": "Die beworbenen bis zu 16 L/Tag sind keine Zusage für deinen Raum. Vergleichbare Entzugs- und Stromwerte bei 10 °C / 60 % sind hier nicht belegt.",
+      "source": "https://www.bosch-homecomfort.com/de/de/ocs/wohngebaeude/dry-4000-20990506-p/",
+      "source_label": "Bosch Deutschland: D4000-EU",
+      "status": "verified",
+      "query": "Bosch Dry 4000 D4000-EU Luftentfeuchter"
+    },
+    {
+      "id": "meaco-two-12",
+      "name": "MeacoDry Arete Two 12L",
+      "variant": "Arete Two 12L · nicht One oder Two 20L",
+      "reason": "App-Steuerung und kleinerer Tank",
+      "facts": "App, 2,5-Liter-Tank und kontinuierlicher Ablauf. Die verlinkte deutsche Anbieterseite nennt 5,40 L/Tag und 136 W bei 20 °C / 60 % RH.",
+      "limit": "Am 12.11.2026 war dieses Modell dort als ausverkauft markiert. Das sagt nichts über andere Händler aus. Liefertermin, Stecker und genaue Modellvariante prüfen; keine Energie-Rangliste aus unterschiedlichen Quellen.",
+      "source": "https://www.meaco.de/produkt/luftentfeuchter-meaco-arete-two-12-l/",
+      "source_label": "Meaco.de: deutsche Anbieter- und Datenseite",
+      "status": "verified",
+      "query": "MeacoDry Arete Two 12L Luftentfeuchter"
+    },
+    {
+      "id": "stadler-lukas",
+      "name": "Stadler Form Lukas",
+      "variant": "Lukas weiss L-031E · nicht Lukas little oder Pro",
+      "reason": "Schwenkfunktion und Wäschemodus",
+      "facts": "4,2-Liter-Tank, vier Stufen, App und 100-cm-Drainageschlauch laut Hersteller. HEPA-Filter ist optional.",
+      "limit": "Die Betriebsgrenze bis 5 °C belegt keine bestimmte Leistung im kalten Keller. Die genannten 260 W sind kein gemessener Verbrauch pro Wäscheladung.",
+      "source": "https://www.stadlerform.com/de-de/luftentfeuchter/lukas-weiss-l-031e",
+      "source_label": "Stadler Form Deutschland: Lukas",
+      "status": "verified",
+      "query": "Stadler Form Lukas L-031E Luftentfeuchter"
+    },
+    {
+      "id": "comfee-mddf20",
+      "name": "Comfee MDDF-20DEN7",
+      "variant": "MDDF-20DEN7 · ohne WF",
+      "reason": "Feuchteregelung mit Timer",
+      "facts": "3-Liter-Tank, Feuchtigkeitskontrolle, Timer und Auto-Restart laut deutscher Produktseite.",
+      "limit": "Nicht mit MDDF-20DEN7-WF verwechseln. Vergleichbare Entzugs- und Stromwerte bei 10 °C / 60 % sind hier nicht belegt.",
+      "source": "https://www.feelcomfee.com/de/produkte/klimatisieren-heizen/mddf-20den7",
+      "source_label": "Comfee Deutschland: MDDF-20DEN7",
+      "status": "verified",
+      "query": "Comfee MDDF-20DEN7",
+      "asin": "B07KJX6RDK"
+    },
+    {
+      "id": "meaco-one-20",
+      "name": "MeacoDry Arete One 20L",
+      "variant": "Arete One 20L · nicht Two oder One 25L",
+      "reason": "Leistungsdaten unter konkreten Raumbedingungen",
+      "facts": "Die UK-Herstellerdaten nennen 8,5 L/Tag bei 20 °C / 60 % und 3,4 L/Tag bei 10 °C / 60 % RH.",
+      "limit": "UK-Daten bestätigen weder deutschen Stecker noch Lieferumfang oder Verfügbarkeit. Die Nennkapazität ist keine Wäsche-Trocknungszeit.",
+      "source": "https://www.meaco.com/products/meacodry-arete-one-20l-dehumidifier-and-air-purifier",
+      "source_label": "Meaco UK: Arete One 20L",
+      "status": "verified",
+      "query": "MeacoDry Arete One 20L"
+    },
+    {
+      "id": "meaco-one-25",
+      "name": "MeacoDry Arete One 25L",
+      "variant": "Arete One 25L · nicht Two 25L",
+      "reason": "Weitere Kapazitätsvariante derselben Baureihe",
+      "facts": "UK-Herstellerseite mit 4,8-Liter-Tank und Modellunterlagen zur 25L-Variante.",
+      "limit": "25L ist kein pauschaler Vorteil gegenüber 20L. Entzug bei denselben Raumbedingungen, Platzbedarf und konkretes deutsches Angebot abgleichen.",
+      "source": "https://www.meaco.com/products/meacodry-arete-one-25l-dehumidifier-and-air-purifier",
+      "source_label": "Meaco UK: Arete One 25L",
+      "status": "verified",
+      "query": "MeacoDry Arete One 25L"
+    }
+  ]
+}
