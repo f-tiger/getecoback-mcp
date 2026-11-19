@@ -11,6 +11,8 @@
 // moves between the two calls.
 
 import { spawn } from "node:child_process";
+import {once} from "node:events";
+import {createInterface} from "node:readline";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { TOOLS, callTool } from "../src/tools.mjs";
@@ -64,15 +66,18 @@ function localText(res) {
 
 // --- protocol ---------------------------------------------------------------
 
-test("stdio server answers initialize and tools/list", async () => {
+test("stdio server answers initialize and tools/list", {timeout: 10000}, async () => {
   const child = spawn(process.execPath, ["src/server.mjs"], { stdio: ["pipe", "pipe", "inherit"] });
   const lines = [];
-  child.stdout.on("data", (b) => lines.push(...b.toString().trim().split("\n").filter(Boolean)));
+  const reader = createInterface({input:child.stdout});
+  reader.on("line", line => lines.push(line));
+  const exited = once(child,"close");
   child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: {} }) + "\n");
   child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }) + "\n");
   child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "btu_empfehlung", arguments: { qm: 20 } } }) + "\n");
-  await new Promise((r) => setTimeout(r, 700));
-  child.kill();
+  child.stdin.end();
+  const [status] = await exited;
+  assert.equal(status,0);
 
   const msgs = lines.map((l) => JSON.parse(l));
   const init = msgs.find((m) => m.id === 1);
@@ -135,5 +140,17 @@ test("drainage choices preserve exact model evidence and structured results", as
     const local = await callTool("entfeuchter_ablaufcheck", args);
     const hosted = await remoteCall("entfeuchter_ablaufcheck", args);
     assert.deepEqual(local, hosted);
+  }
+});
+
+test("all 90 added tools have hosted and stdio parity on the documented examples", async () => {
+  const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
+  assert.equal(expandedDefinitions.length,90);
+  for (let position=0; position<expandedDefinitions.length; position+=4) {
+    await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
+      const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);
+      assert.equal(local.isError,false,name);
+      assert.deepEqual(local.structuredContent,remote.structuredContent,name);
+    }));
   }
 });

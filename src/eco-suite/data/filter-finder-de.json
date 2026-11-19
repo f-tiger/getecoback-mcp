@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "market": "DE",
+  "updated": "2026-11-15",
+  "items": [
+    {
+      "brand": "Levoit",
+      "models": [
+        "Core 300S"
+      ],
+      "source_url": "https://levoit.de/products/levoit-core-300-und-core-300s-ersatzfilter-hepa-filter",
+      "name": "Levoit Standard Ersatzfilter für Core 300(S) Luftreiniger",
+      "part_number": "",
+      "variant": "Standardfilter",
+      "id": "levoit-core-300s",
+      "market": "DE",
+      "checked_at": "2026-11-15",
+      "last_good_checked_at": "2026-11-15",
+      "last_attempt_at": "2026-11-15",
+      "status": "verified",
+      "note": "Hier nur Core 300S ohne Pro-Zusatz und die Option Standardfilter. Spezialfilter und andere Modellzusätze separat prüfen.",
+      "compatibility_statement": "Nur kompatibel mit den Levoit Core 300 und Core 300S (Pro) Luftreinigern.",
+      "approved_description_sha256": "f98ee8b772e9c1658efe8604863a8fc653b7ce8f27c95ff4f81b871058361cbf"
+    },
+    {
+      "brand": "Beurer",
+      "models": [
+        "LR 401"
+      ],
+      "source_url": "https://www.beurer.com/de/p/69309/",
+      "name": "LR 400/401/405 Filter",
+      "part_number": "69309",
+      "variant": "Ersatzfilter 69309",
+      "id": "beurer-lr401",
+      "market": "DE",
+      "checked_at": "2026-11-15",
+      "last_good_checked_at": "2026-11-15",
+      "last_attempt_at": "2026-11-15",
+      "status": "verified",
+      "note": "Hier nur LR 401. Die Ersatzfilterseite nennt LR 400 und LR 401 ausdrücklich; der Titel allein wird nicht als Nachweis für LR 405 verwendet. Nicht mit dem LR-500-Filter gleichsetzen.",
+      "compatibility_statement": "Der Ersatzfilter ist für den Gebrauch mit den Beurer Luftreinigern LR 400 und LR 401.",
+      "approved_description_sha256": "8cd6c659df4c4e6619614d2e19677d84edc1d86b97b3ae0521fcb1fdf3d2c16f"
+    }
+  ]
+}

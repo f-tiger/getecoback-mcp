@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "market": "DE",
+  "checked": "2026-11-12",
+  "max_age_days": 90,
+  "sources": {
+    "oskar": {
+      "title": "Stadler Form: Oskar O-020",
+      "url": "https://www.stadlerform.com/de-de/luftbefeuchter/oskar-weiss-o-020-0"
+    },
+    "oskar_manual": {
+      "title": "Oskar: EU-Anleitung, DE S. 10–15",
+      "url": "https://www.stadlerform.com/media/ed/93/91/1712837853/stadler-form-oskar-manual-eu.pdf"
+    },
+    "oskar_filter": {
+      "title": "Stadler Form: Filter O-030",
+      "url": "https://www.stadlerform.com/de-de/luftbefeuchter-zubehoer/luftbefeuchter-filter-2-er-pack-o-030"
+    },
+    "lb200": {
+      "title": "Beurer: LB 200, Art. 10069",
+      "url": "https://www.beurer.com/de/p/10069/"
+    },
+    "lb200_manual": {
+      "title": "LB 200: Anleitung 2026, DE S. 7–11",
+      "url": "https://res.cloudinary.com/beurer/image/upload/v1772130462/stibo-live/10069_LB200_2026-02-12_03_IM1_BEU.pdf"
+    },
+    "lb200_filter": {
+      "title": "Beurer: Ersatzfilter 110005",
+      "url": "https://www.beurer.com/de/p/110005/"
+    },
+    "lb55": {
+      "title": "Beurer: LB 55, Art. 68605",
+      "url": "https://www.beurer.com/de/p/68605/"
+    },
+    "lb55_manual": {
+      "title": "LB 55: Anleitung 2026, DE S. 5–10",
+      "url": "https://res.cloudinary.com/beurer/image/upload/v1785407071/stibo-live/68605_LB55_2026-06-01_09_IM1_BEU.pdf"
+    },
+    "lb55_pads": {
+      "title": "Beurer: Kalkpads 163141",
+      "url": "https://www.beurer.com/de/p/163141/"
+    },
+    "uba": {
+      "title": "Umweltbundesamt: Heizen und Feuchte an kalten Wänden",
+      "url": "https://www.umweltbundesamt.de/umwelttipps-fuer-den-alltag/richtiges-heizen-schuetzt-das-klima-den-geldbeutel"
+    },
+    "epa": {
+      "title": "US EPA: Use and Care of Home Humidifiers",
+      "url": "https://www.epa.gov/indoor-air-quality-iaq/use-and-care-home-humidifiers"
+    },
+    "oskar_identity": {
+      "title": "Stadler Form: Modell- und Farbkennungen, Übersicht 2025 S. 2",
+      "url": "https://www.stadlerform.com/media/df/e8/d1/1750152809/stadler-form-product-overview-international-2025-de.pdf"
+    },
+    "oskar_little": {
+      "title": "Stadler Form: Oskar little weiß O-060",
+      "url": "https://www.stadlerform.com/de-de/luftbefeuchter/oskar-little-weiss-o-060"
+    },
+    "oskar_little_manual": {
+      "title": "Oskar little: EU-Anleitung, DE S. 10–14",
+      "url": "https://www.stadlerform.com/media/85/64/6d/1712837923/stadler-form-oskar-little-manual-eu.pdf"
+    }
+  },
+  "products": [
+    {
+      "id": "oskar-o020",
+      "name": "Stadler Form Oskar weiß O-020",
+      "query": "Stadler Form Oskar O-020 weiß",
+      "status": "verified",
+      "role": "Verdunster mit einfachen Zielstufen",
+      "technology": "Verdunstung",
+      "power_w": [
+        6,
+        18
+      ],
+      "controls": "Hygrostat mit 40, 45, 50 oder 55 % sowie Dauerbetrieb; zwei Lüfterstufen. Zielstufe wählen und mit einem separaten Hygrometer prüfen.",
+      "care": "Täglich frisches Wasser; Wasserbehälter alle drei Tage reinigen. Zwei Filtermatten: Wechsel nach zwei Monaten einplanen, bei Bedarf früher. Weitere Reinigung und Entkalkung nach Anleitung.",
+      "parts": "O-030: Zweierpack passender Filtermatten. Die Anleitung nennt beim Wechselhinweis zwei Monate, im Pflegetext 2–3 Monate; wir planen mit dem früheren Zeitpunkt.",
+      "limit": "O-020 bezeichnet Weiß in der Herstellerübersicht 2025; die verlinkte Shopseite kann eine andere Farbe vorauswählen. Nicht Oskar little oder big. Händlerpakete können Hygiene Tabs oder Water Cube enthalten; Farbe, Artikelnummer und Zubehör abgleichen.",
+      "sources": [
+        "oskar",
+        "oskar_manual",
+        "oskar_filter",
+        "oskar_identity"
+      ]
+    },
+    {
+      "id": "beurer-lb200",
+      "name": "Beurer LB 200",
+      "query": "Beurer LB 200 10069",
+      "status": "verified",
+      "role": "Verdunster mit Anzeige und Filtertrocknung",
+      "technology": "Verdunstung",
+      "power_w": [
+        17,
+        17
+      ],
+      "controls": "Digitale Feuchteanzeige, Zielwerte 40, 50 oder 60 % und Automatikmodus. Achtung: Leuchtet kein Zielwert, arbeitet das Gerät laut Anleitung bis 70 %; das bedeutet nicht „aus“.",
+      "care": "Restwasser nach der Anwendung entleeren, Filter trocknen. Filter wöchentlich abspülen; Anleitung empfiehlt wöchentliches Entkalken. Die dreistündige Filtertrocknung ersetzt keine Reinigung.",
+      "parts": "Original-Ersatzfilter 110005 (110.005). Spätestens nach sechs Monaten wechseln, früher bei Verformung, Verfärbung oder starker Verschmutzung; Wechselanzeige nach 1.440 Betriebsstunden.",
+      "limit": "Artikel 10069. Zielwert passend zum Raum wählen; 60 oder 70 % sind keine pauschalen Wohnraum-Empfehlungen. Restfeuchte unter dem Filterhalter manuell trocknen.",
+      "sources": [
+        "lb200",
+        "lb200_manual",
+        "lb200_filter"
+      ]
+    },
+    {
+      "id": "beurer-lb55",
+      "name": "Beurer LB 55",
+      "query": "Beurer LB 55 68605",
+      "status": "verified",
+      "role": "Dampf als bewusste Alternative",
+      "technology": "Dampf",
+      "power_w": [
+        365,
+        365
+      ],
+      "controls": "Zwei Dampfstufen mit 200 oder 400 ml/h. Kein einstellbares Feuchteziel. Raumfeuchte mit einem separaten Hygrometer kontrollieren und die Dampfstufe selbst wählen.",
+      "care": "Geräteinneres, Tank und Dampfteil wöchentlich reinigen. Kalkpad mindestens wöchentlich prüfen/reinigen; je nach Wasserhärte ersetzen, spätestens nach der Befeuchtungssaison.",
+      "parts": "Passende Kalkpads: 163141 (163.141). Packungsgröße beim Händler prüfen; ein Pad ist kein Ersatz für die Entkalkung des Geräts.",
+      "limit": "Artikel 68605. Heißer Dampf und heißes Wasser: außer Reichweite von Kindern aufstellen. Vor der Reinigung ausstecken und abkühlen lassen. Die 365 W Nennleistung im Kostenplan berücksichtigen.",
+      "sources": [
+        "lb55",
+        "lb55_manual",
+        "lb55_pads"
+      ]
+    },
+    {
+      "id": "oskar-little-o060",
+      "name": "Stadler Form Oskar little weiß O-060",
+      "query": "Stadler Form Oskar little O-060 weiß",
+      "status": "verified",
+      "checked": "2026-11-18",
+      "role": "Verdunster mit manueller Stufenwahl",
+      "technology": "Verdunstung",
+      "power_w": [
+        6,
+        15
+      ],
+      "controls": "Zwei Leistungsstufen. Die EU-Anleitung beschreibt keinen einstellbaren Feuchtezielwert: Raumfeuchte separat messen und den Betrieb selbst anpassen. Nicht mit der Zielwertregelung des Oskar O-020 gleichsetzen.",
+      "care": "Täglich frisches kaltes Leitungswasser; Wasserbehälter alle drei Tage reinigen. Bei mehrtägiger Pause entleeren; je nach Wasserhärte entkalken. Einen Filterwechsel nach spätestens zwei Monaten einplanen, bei Bedarf früher. Abweichende Pflegeintervalle in der Produkt-FAQ verlängern diese Planung nicht.",
+      "parts": "Ein Filter pro Wechsel; O-030 enthält zwei passende Filtermatten. Die Produktseite nennt spätestens zwei Monate, die EU-Anleitung 2–3 Monate; hier gilt der frühere Planungstermin.",
+      "limit": "O-060 bezeichnet Weiß in der Herstellerübersicht 2025. Nicht Oskar O-020 oder Oskar big. Die aktuelle Produktseite nennt Hygiene Tabs, die EU-Anleitung Water Cube: Lieferumfang und Pflege anhand der mitgelieferten Anleitung prüfen; Zubehör nicht ungeprüft austauschen.",
+      "sources": [
+        "oskar_little",
+        "oskar_little_manual",
+        "oskar_filter",
+        "oskar_identity"
+      ]
+    }
+  ]
+}

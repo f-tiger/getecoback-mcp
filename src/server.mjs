@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Stdio MCP server. Run it directly:  npx github:f-tiger/getecoback-mcp
-// The same ten tools are also served over HTTP at https://getecoback.com/mcp/v1
+// The same tools are also served over HTTP at https://getecoback.com/mcp/v1
 // if you would rather not run anything locally.
 //
 // No SDK dependency on purpose: this is a small, auditable JSON-RPC loop over
@@ -10,7 +10,7 @@ import { createInterface } from "node:readline";
 import { TOOLS, callTool } from "./tools.mjs";
 
 const PROTOCOL_VERSION = "2025-06-18";
-const SERVER_INFO = { name: "getecoback-raumklima", version: "1.2.0" };
+const SERVER_INFO = { name: "getecoback-raumklima", version: "1.3.0" };
 
 function send(msg) {
   process.stdout.write(JSON.stringify(msg) + "\n");

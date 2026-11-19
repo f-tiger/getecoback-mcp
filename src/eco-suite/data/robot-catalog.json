@@ -1,0 +1,151 @@
+{
+  "market": "DE",
+  "checked": "2026-11-12",
+  "max_age_days": 90,
+  "method": "Herstellerunterlagen, keine eigenen Reinigungstests. Modelle mit Absaugstation bzw. Tankstation; keine Festwasser-Versionen. Modellsuchen sind weder Preis- noch Verfügbarkeitsnachweis.",
+  "sources": {
+    "dreame-product": {
+      "title": "L10s Ultra Gen 2: deutsche Produktseite",
+      "url": "https://de.dreametech.com/products/l10s-ultra-gen-2",
+      "checked": "2026-11-12",
+      "status": "verified"
+    },
+    "dreame-manual": {
+      "title": "Gen 2: deutsches Handbuch (PDF, S. 29–55)",
+      "url": "https://cdn.shopify.com/s/files/1/0669/4387/7400/files/R2469A-_A-_-A02.pdf",
+      "checked": "2026-11-12",
+      "status": "verified"
+    },
+    "dreame-parts": {
+      "title": "Gen 2: Herstellerliste für Ersatzfilter",
+      "url": "https://de.dreametech.com/products/filter-2-fur-dreame-l10sproultra-x30ultra-x40ultracomplete-x40master-l10sultragen2-l40ultra",
+      "checked": "2026-11-12",
+      "status": "verified"
+    },
+    "roborock-product": {
+      "title": "Saros 10R: Funktionen und Fußnoten",
+      "url": "https://de.roborock.com/pages/roborock-saros-10r",
+      "checked": "2026-11-12",
+      "status": "verified"
+    },
+    "roborock-manual": {
+      "title": "Saros 10R: deutsches Handbuch (PDF, B3 und D)",
+      "url": "https://support.roborock.com/hc/de/article_attachments/46144394789529",
+      "checked": "2026-11-12",
+      "status": "verified"
+    },
+    "roborock-parts": {
+      "title": "Saros 10R: passende Staubbeutel, 6 Stück",
+      "url": "https://de.roborock.com/products/roborock-staubbeutel-6st-fuer-q-revo",
+      "checked": "2026-11-12",
+      "status": "verified"
+    },
+    "d10-product": {
+      "title": "D10 Plus Gen 2: deutsche Produktseite",
+      "url": "https://de.dreametech.com/products/d10-plus-gen-2",
+      "checked": "2026-11-12",
+      "status": "verified"
+    },
+    "d10-manual": {
+      "title": "D10 Plus Gen 2: deutsches Handbuch (PDF, S. 39, 43–46, 55)",
+      "url": "https://dreametech.zendesk.com/hc/de/article_attachments/51078573935513",
+      "checked": "2026-11-12",
+      "status": "verified"
+    },
+    "d10-parts": {
+      "title": "D10 Plus Gen 2: passende Staubbeutel, 3 Stück",
+      "url": "https://de.dreametech.com/products/staubbeutel-3-fur-dreame-l10s-plus-s10-plus-d10-plus-gen2",
+      "checked": "2026-11-12",
+      "status": "verified"
+    }
+  },
+  "products": [
+    {
+      "id": "dreame-d10-plus-gen2",
+      "name": "Dreame D10 Plus Gen 2",
+      "query": "Dreame D10 Plus Gen 2",
+      "model": "RLD32GD",
+      "status": "verified",
+      "checked": "2026-11-12",
+      "mopping": true,
+      "role": "Absaugstation, Wischpad von Hand pflegen",
+      "facts": "Für Haushalte, die automatisch saugen, das optionale Wischpad aber selbst pflegen möchten. Der Hersteller nennt 96,3 mm Gerätehöhe. Die Station entleert Staub; sie wäscht keinen Mopp. Eine automatische Moppanhebung fehlt.",
+      "height_mm": 96.3,
+      "threshold": {
+        "single_mm": 20,
+        "single_operator": "lte",
+        "double_mm": null,
+        "source": "d10-product"
+      },
+      "threshold_note": "Bis zu 20 mm laut Dreame-Labortest; die tatsächliche Leistung hängt von der Wohnsituation ab. Keine gesonderte Doppelschwellen-Angabe belegt. Kantenform, Abstand und Boden daher zusätzlich prüfen.",
+      "dock": "Aufstellgrafik S. 39: mehr als 0,5 m auf jeder Seite und mehr als 1,5 m vor der Station frei halten. Das ist deutlich mehr seitlicher Platz als beim L10s Ultra Gen 2. Deckel zum Beutelwechsel erreichbar lassen.",
+      "floor": "Wischmodul von Hand anbringen und entfernen. Keine automatische Moppanhebung; Teppiche im Wischbetrieb aussparen. Das Handbuch empfiehlt die Wischfunktion nicht für Teppiche. Für Hartboden erst die Pflegefreigabe prüfen.",
+      "care": "Nach dem Wischen das Modul abnehmen, das Pad waschen und trocknen. Beim Laden oder Nichtgebrauch das Modul entfernen und Restwasser ausgießen. In den Tank gehören laut Anleitung keine Reinigungs- oder Desinfektionsmittel.",
+      "variant": "D10 Plus Gen 2, Roboter RLD32GD mit Absaugstation RCDD0202. Die deutsche Anleitung nennt für diese Station 220–240 V, 50–60 Hz. Nicht D10 Plus ohne Gen 2, D10s Plus oder L10s Ultra Gen 2.",
+      "parts": "Das verlinkte 3er-Staubbeutelpaket nennt D10 Plus Gen 2 ausdrücklich. Filter, Bürsten und Wischpad separat nach dieser Modellgeneration prüfen. Ein kompatibler Beutel bestätigt nicht die Passform anderer Teile; Wechselintervalle hängen von der Nutzung ab.",
+      "sources": [
+        "d10-product",
+        "d10-manual",
+        "d10-parts"
+      ]
+    },
+    {
+      "id": "dreame-l10s-ultra-gen2",
+      "name": "Dreame L10s Ultra Gen 2",
+      "query": "Dreame L10s Ultra Gen 2",
+      "model": "RLL32SE",
+      "status": "verified",
+      "checked": "2026-11-12",
+      "mopping": true,
+      "role": "Saugen und Wischen mit Tankpflege",
+      "facts": "Für die Vorauswahl bei Hartboden und einzelnen Teppichen: Der Hersteller nennt 97,2 mm Gerätehöhe und 10,5 mm Moppanhebung. Diese Hubhöhe ist keine Freigabe für jeden Teppich.",
+      "threshold": {
+        "single_mm": 20,
+        "single_operator": "lte",
+        "double_mm": null,
+        "source": "dreame-product"
+      },
+      "threshold_note": "Bis zu 20 mm laut internen Hersteller-Labortests. Daraus folgt keine Garantie für scharfkantige, rutschige oder mehrstufige Übergänge. Eine gesonderte Doppelschwellen-Angabe wird hier nicht belegt.",
+      "height_mm": 97.2,
+      "dock": "Handbuch S. 39: 1,5 m vor der Basisstation und 5 cm auf jeder Seite freihalten. Zusätzlich Platz zum Entnehmen der Tanks lassen. Die Empfehlung für Fliesen oder Marmor soll Wasserflecken auf Holz und Teppich vermeiden.",
+      "floor": "Teppichmodus in der App bewusst wählen, empfindliche oder hohe Teppiche bei Unsicherheit aussparen. Vor Nassreinigung die Freigabe des Bodenherstellers prüfen. Moppanhebung ist keine Garantie für einen trockenen Teppich.",
+      "care": "Schmutzwasserbehälter nach jeder Nutzung reinigen; Bürste und Filter nach Wartungsplan kontrollieren. Nur zugelassene Reinigungslösung verwenden. Moppwäsche und Trocknung ersetzen die Tankpflege nicht.",
+      "variant": "Gen 2 mit Tankstation; Handbuch: Roboter RLL32SE. Nicht L10s Ultra ohne Gen 2, L10s Pro Ultra Heat oder Gen 3. TriCut-Bürste und Wasseranschluss-Kit sind separat erhältlich.",
+      "parts": "Die verlinkten Ersatzfilter nennen L10s Ultra Gen 2 ausdrücklich. Für Staubbeutel, Wischpads und Bürsten jeweils die eigene Kompatibilitätsliste prüfen; eine Gen-3-Angabe genügt nicht. Verfügbarkeit ist nicht zugesichert.",
+      "sources": [
+        "dreame-product",
+        "dreame-manual",
+        "dreame-parts"
+      ]
+    },
+    {
+      "id": "roborock-saros-10r",
+      "name": "Roborock Saros 10R",
+      "query": "Roborock Saros 10R",
+      "model": "S91COP",
+      "status": "verified",
+      "checked": "2026-11-12",
+      "mopping": true,
+      "role": "Flache Bauhöhe und schwierige Übergänge prüfen",
+      "facts": "Die deutsche Produktseite nennt 7,98 cm Gerätehöhe und ein anhebbares Chassis. Interessant als Prüfoption bei niedrigen Möbeln und Schwellen; die tatsächliche Durchfahrt braucht mehr als einen einzelnen Höhenwert.",
+      "threshold": {
+        "single_mm": null,
+        "single_operator": null,
+        "double_mm": 40,
+        "source": "roborock-product"
+      },
+      "threshold_note": "Maximal 4 cm bei Doppelschwellen laut deutscher Produktseite. Fußnote 10: interne Roborock-Tests, Ergebnis abhängig von Umgebungsfaktoren. Das bedeutet keine einzelne 4-cm-Kante. Ein separater Einzelschwellenwert wird hier nicht bestätigt.",
+      "height_mm": 79.8,
+      "dock": "Handbuch B3: mindestens 75 cm Höhe, 40 cm seitliche Ausdehnung und 120 cm Tiefe als Aufstellbereich, auf hartem, ebenem Boden an der Wand. Das sind Platzvorgaben, keine Stationsabmessungen und nicht 120 cm zusätzlich vor der Station.",
+      "floor": "Automatisches Ablegen der Mopps vor Teppichreinigung bzw. reinem Saugen muss in der Roborock-App aktiviert werden. Teppiche bei Bedarf als Sperrzone festlegen; Nassreinigung nur bei passender Bodenfreigabe.",
+      "care": "Filter, Hauptbürsten, Schmutzwassertank und Waschbereich bleiben Pflegeaufgaben. Das Handbuch nennt für den gewaschenen Filter mindestens 24 Stunden Trocknung. Vor Wartung ausschalten und Netzstecker ziehen.",
+      "variant": "Saros 10R mit Tankstation, Handbuchmodell S91COP und Station EWFD28HRR. Nicht Saros 10 oder Saros 20; die Variante mit Wasseranschluss hat eigene Aufstellvorgaben.",
+      "parts": "Das verlinkte 6er-Staubbeutelpaket nennt Saros 10R ausdrücklich. Für Mopps, Filter und DuoDivide-Bürsten die 10R-Kompatibilität einzeln prüfen; der ähnliche Name Saros 10 reicht nicht aus.",
+      "sources": [
+        "roborock-product",
+        "roborock-manual",
+        "roborock-parts"
+      ]
+    }
+  ]
+}

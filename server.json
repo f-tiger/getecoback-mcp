@@ -1,9 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.f-tiger/hvac-btu-heat-klimaanlage",
-  "description": "getecoback.com: dehumidifier drain and pump checks by model, humidity, BTU and running costs (DE).",
+  "description": "getecoback.com: 100 home tools for moisture, cooling, heating, energy costs and device fit (DE).",
   "websiteUrl": "https://getecoback.com/mcp.html",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "remotes": [
     {
       "type": "streamable-http",
