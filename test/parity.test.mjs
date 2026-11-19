@@ -15,6 +15,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { TOOLS, callTool } from "../src/tools.mjs";
 
+const CI_HEADERS = { "content-type": "application/json", accept: "application/json, text/event-stream", "user-agent": "getecoback-ci/mirror-parity" };
 const REMOTE = process.env.MCP_URL || "https://getecoback.com/mcp/v1";
 
 // Deterministic tools: same input must give a byte-identical answer.
@@ -40,7 +41,7 @@ const SHAPE_ONLY = [
 async function remoteCall(name, args) {
   const res = await fetch(REMOTE, {
     method: "POST",
-    headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
+    headers: CI_HEADERS,
     signal: AbortSignal.timeout(20000),
     body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name, arguments: args } }),
   });
@@ -53,7 +54,8 @@ async function remoteCall(name, args) {
   }
   const json = JSON.parse(payload);
   if (json.error) throw new Error(JSON.stringify(json.error));
-  return json.result.content.map((c) => c.text).join("\n");
+  assert.equal(json.error, undefined);
+  return json.result;
 }
 
 function localText(res) {
@@ -92,7 +94,7 @@ for (const [name, args] of CASES) {
   test(`parity: ${name} ${JSON.stringify(args)}`, async () => {
     const [mine, theirs] = await Promise.all([
       callTool(name, args).then(localText),
-      remoteCall(name, args),
+      remoteCall(name, args).then(localText),
     ]);
     assert.equal(mine, theirs, `local and hosted answers differ for ${name}`);
   });
@@ -115,8 +117,23 @@ test("every tool declares a bilingual description and a schema", () => {
 
 // Fail as soon as a tool is added or retired; matching counts cannot detect drift.
 test('local advertised tool names match the hosted contract', async()=>{
- const res=await fetch(REMOTE,{method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(20000),body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/list',params:{}})});
+ const res=await fetch(REMOTE,{method:'POST',headers:CI_HEADERS,signal:AbortSignal.timeout(20000),body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/list',params:{}})});
  assert.equal(res.status,200);const data=await res.json();assert.equal(data.error,undefined);
  assert.deepEqual(TOOLS.map(x=>x.name).sort(),data.result.tools.map(x=>x.name).sort());
  assert.equal((await callTool('balkonspeicher_foerderung',{})).isError,true,'Retired advice must not reappear');
+});
+
+test("drainage choices preserve exact model evidence and structured results", async () => {
+  const cases = [
+    {drain: "level_or_uphill", model: "meaco-one-20"},
+    {drain: "downhill", model: "stadler-lukas", moisture: "persistently_high"},
+    {drain: "no_drain", model: "meaco-two-12"},
+    {drain: "unknown", moisture: "damage"},
+    {drain: "unknown", model: "unlisted-model"},
+  ];
+  for (const args of cases) {
+    const local = await callTool("entfeuchter_ablaufcheck", args);
+    const hosted = await remoteCall("entfeuchter_ablaufcheck", args);
+    assert.deepEqual(local, hosted);
+  }
 });

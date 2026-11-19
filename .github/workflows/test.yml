@@ -38,9 +38,13 @@ jobs:
             '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' \
             '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' \
             | docker run -i --rm getecoback-mcp:ci)
-          echo "$out" | head -c 400; echo
-          echo "$out" | grep -q '"serverInfo"' || { echo "::error::no serverInfo in initialize response"; exit 1; }
-          n=$(echo "$out" | tail -1 | grep -o '"name":"[a-z_]*"' | wc -l)
-          echo "tools advertised: $n"
-          [ "$n" -eq 9 ] || { echo "::error::expected 9 tools, got $n"; exit 1; }
+          jq -se '
+            any(.[]; .id == 1 and (.result.serverInfo.name | type == "string" and length > 0))
+          ' <<< "$out" > /dev/null || { echo "::error::invalid initialize response"; exit 1; }
+          jq -se '
+            map(select(.id == 2)) | first | .result.tools | map(.name) |
+            length == 10 and (unique | length == 10) and
+            all(.[]; type == "string" and length > 0) and
+            (index("entfeuchter_ablaufcheck") != null)
+          ' <<< "$out" > /dev/null || { echo "::error::expected ten unique tools including entfeuchter_ablaufcheck"; exit 1; }
           echo "OK container introspection"

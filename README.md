@@ -1,11 +1,11 @@
 # EcoBack Raumklima — MCP server
 
-<!-- count -->9<!-- /count --> tools for **indoor climate and household energy in Germany/EU**: how many BTU a
+<!-- count -->10<!-- /count --> tools for **indoor climate and household energy in Germany/EU**: how many BTU a
 room needs, how long a portable-AC window seal has to be, whether a heatwave is coming,
-what a device costs to run, when it is safe to ventilate, and which next step fits a room-climate problem. Plus full-text search and retrieval over 133 guides.
+what a device costs to run, whether a dehumidifier can drain uphill and which moisture checks to make. The tools also search and retrieve published guides.
 
 Listed in the official
-[MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=hvac-btu-heat-klimaanlage)
+[MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fhvac-btu-heat-klimaanlage/versions/latest)
 as `io.github.f-tiger/hvac-btu-heat-klimaanlage`.
 
 The tool table below is not hand-written: `sync.mjs` rebuilds it from the live server's
@@ -13,7 +13,7 @@ The tool table below is not hand-written: `sync.mjs` rebuilds it from the live s
 
 ## Connect
 
-**Hosted** — nothing to install, no auth, no personal data:
+**Hosted endpoint** (no package installation or account required):
 
 ```
 claude mcp add --transport http getecoback https://getecoback.com/mcp/v1
@@ -33,9 +33,6 @@ npx github:f-tiger/getecoback-mcp
 { "mcpServers": { "getecoback": { "command": "npx", "args": ["-y", "github:f-tiger/getecoback-mcp"] } } }
 ```
 
-(The shorter `npx getecoback-mcp` starts working once the package is published to
-npm; the GitHub form above needs nothing and works today.)
-
 Setup notes for other clients: <https://getecoback.com/mcp.html> ·
 discovery: [`/.well-known/mcp.json`](https://getecoback.com/.well-known/mcp.json)
 
@@ -49,6 +46,7 @@ Worker, and ports drift silently.
 | Tool | What it answers |
 |---|---|
 <!-- tools:start -->
+| `entfeuchter_ablaufcheck` | Check a German basement dehumidifier’s hose route, pump or tank options and cite evidence for the exact model. |
 | `geraet_wahl` | Choose a next step for heat, damp/mould, cold or stale air. For damp rooms, measure first, investigate damage and compare cold-room or laundry conditions before buying; floor area alone cannot size a dehumidifier. Same decision rules as the website. |
 | `btu_empfehlung` | Recommended cooling capacity in BTU for a room, with the matching device class: how many BTU do I need for X m²? Same formula as the calculator on getecoback.com (340 BTU/m² × sun factor), for Germany and Europe. |
 | `fensterabdichtung_laenge` | Required window-seal length for a portable air conditioner from the sash measurements (perimeter = 2×(width+height)), plus the off-the-shelf size that fits. Covers tilt-and-turn and roof windows. |
@@ -60,19 +58,25 @@ Worker, and ports drift silently.
 | `ratgeber_lesen` | Reads the cleaned Markdown of a published guide, with reviewed source links, assumptions and limits. Long excerpts are explicitly marked and link the full text. Pass an exact canonical path or URL from ratgeber_suche, without query or fragment. |
 <!-- tools:end -->
 
+## Can a MeacoDry Arete One 20L drain uphill into a sink?
+
+A gravity hose requires a continuous drop. Meaco lists a separate pump for this model. Check the German package contents and the permitted lift before buying, or empty the tank. [German drainage decision and model sources](https://getecoback.com/guide/luftentfeuchter-keller.html#ablauf-vor-kauf).
+
+```json
+{"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"entfeuchter_ablaufcheck","arguments":{"drain":"level_or_uphill","model":"meaco-one-20"}}}
+```
+
 ## What makes the answers safe to quote
 
 - **Same arithmetic as the published calculators.** Each tool mirrors a calculator that
   runs on the website, so an assistant's answer and the page a reader lands on cannot
-  disagree. A CI job calls all <!-- count -->9<!-- /count --> tools against production daily and
+  disagree. A CI job calls all <!-- count -->10<!-- /count --> tools against production daily and
   asserts each returns the value the published calculator shows.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
 - **Honest about what it is not.** Product recommendations summarise public tests; nothing
-  is lab-tested here, and the tools say so. Subsidy figures are magnitudes with a date,
-  never a promise — programme budgets empty mid-year.
-- **No personal data, no auth, no cookies.** The server stores the tool name and arguments
-  for adoption counting, nothing about the caller.
+  is lab-tested here. Each source identifies the model and purchase conditions it covers.
+- **Hosted privacy.** The drainage and moisture decisions store a fixed result code rather than household inputs. Other tools retain bounded parameters and limited client metadata. See the [privacy notice](https://getecoback.com/datenschutz.html). The stdio drainage calculation runs locally.
 
 ## Also machine-readable
 
@@ -98,14 +102,10 @@ Documentation: **CC BY 4.0** — free to use with attribution to
 
 Not engineering, legal or subsidy advice.
 
-## Tool-contract recovery (2026-11-07)
+## Hosted and local versions
 
-The stdio port now follows the current hosted nine-tool contract, including
-`geraet_wahl` and its measurement-first moisture decisions. The retired
-`balkonspeicher_foerderung` advice is no longer advertised or executed.
-The copied routing rules come from `sites/getecoback/src/worker.js` and its
-`site/assets/moisture-decision.mjs` at agi-site commit b340e4d.
-Tests compare every advertised tool name and deterministic decision response
-against the hosted endpoint, including invalid and unknown measurement states.
-The local package version is 1.1.1; `server.json` describes the existing hosted
-registry entry, version 1.3.2. Updating this mirror does not create a second entry.
+The hosted Registry entry is version 1.4.0. The local stdio package is version 1.2.0.
+The drainage rules and reviewed German-market model sources come from
+[`sites/getecoback`](https://github.com/f-tiger/agi-site/tree/main/sites/getecoback).
+The parity tests compare deterministic results with the hosted server, including
+downhill drainage, separate pump accessories and missing measurements.
