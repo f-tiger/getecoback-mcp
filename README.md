@@ -28,7 +28,7 @@ claude mcp add --transport http getecoback https://getecoback.com/mcp/v1
 { "mcpServers": { "getecoback": { "type": "http", "url": "https://getecoback.com/mcp/v1" } } }
 ```
 
-**Or run it yourself** — `src/` is the server, over stdio, with **zero dependencies**:
+**Local stdio** runs the tools on your device. Start the GitHub package with `npx`.
 
 ```
 npx github:f-tiger/getecoback-mcp
@@ -38,13 +38,21 @@ npx github:f-tiger/getecoback-mcp
 { "mcpServers": { "getecoback": { "command": "npx", "args": ["-y", "github:f-tiger/getecoback-mcp"] } } }
 ```
 
-Setup notes for other clients: <https://getecoback.com/mcp.html> ·
-discovery: [`/.well-known/mcp.json`](https://getecoback.com/.well-known/mcp.json)
+Download or clone this repository once to keep the tools available offline. With
+Node.js 22 or later, point your MCP client at `src/server.mjs` in the downloaded folder.
 
-The two versions are kept honest by a **parity test**: `npm test` calls every deterministic
-tool both locally and on the hosted endpoint and fails if a single character differs. It
-runs on every push and daily — this code is a port of logic that runs in a Cloudflare
-Worker, and ports drift silently.
+```json
+{ "mcpServers": { "getecoback": { "command": "node", "args": ["/absolute/path/to/getecoback-mcp/src/server.mjs"] } } }
+```
+
+No package installation is required for this setup. Source and guide links in tool
+answers still open their websites separately.
+
+[Setup for other clients](https://getecoback.com/mcp.html) ·
+[`/.well-known/mcp.json`](https://getecoback.com/.well-known/mcp.json)
+
+Pull requests and pushes to main verify the local CLI and its deterministic examples
+offline. Daily and manual checks also compare the exact hosted version and answers.
 
 ## Tools
 
