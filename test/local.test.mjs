@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { expandedDefinitions } from '../src/eco-suite/src/mcp-expanded.mjs';
 import { collectToolPages, MCP_PAGE_SIZE, pageTools } from '../src/eco-suite/src/mcp-pagination.mjs';
 import { callTool, TOOLS } from '../src/tools.mjs';
-import { findTools } from '../src/find-tools.mjs';
+import { findTools, runReviewedExample } from '../src/find-tools.mjs';
 
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 const server = fileURLToPath(new URL('../src/server.mjs', import.meta.url));
@@ -64,6 +64,29 @@ test('offline finder emits JSON and handles an omitted query', () => {
   const missing = spawnSync(process.execPath, [finder], {encoding:'utf8', timeout:10000});
   assert.equal(missing.status, 2);
   assert.match(missing.stderr, /Usage:/);
+});
+
+test('offline CLI examples run exact reviewed inputs and reject incomplete or live-only requests', () => {
+  const example = (...args) => spawnSync(process.execPath, [finder, '--example', ...args], {encoding:'utf8', timeout:10000});
+  const drainage = example('entfeuchter_ablaufcheck');
+  assert.equal(drainage.status, 0, drainage.stderr);
+  const drain = JSON.parse(drainage.stdout);
+  assert.equal(drain.name, 'entfeuchter_ablaufcheck');
+  assert.deepEqual(drain.example_arguments, {drain:'level_or_uphill', model:'meaco-one-20'});
+  assert.equal(drain.result.structuredContent.outcome, 'pump_check');
+  assert.match(drain.result.structuredContent.guide_url, /keller-ablauf#ablauf-vor-kauf$/);
+
+  const shower = example('dusche_zeit_bei_wasserbudget');
+  assert.equal(shower.status, 0, shower.stderr);
+  assert.deepEqual(JSON.parse(shower.stdout), runReviewedExample('dusche_zeit_bei_wasserbudget'));
+
+  for (const invalid of [[], ['hitzewelle_vorschau'], ['ratgeber_suche'], ['ratgeber_lesen'],
+    ['entfeuchter_ablaufcheck', 'unknown'], ['Kann der Schlauch nach oben?'], ['__proto__']]) {
+    const receipt = example(...invalid);
+    assert.equal(receipt.status, 2, invalid.join(' '));
+    assert.equal(receipt.stdout, '');
+    assert.match(receipt.stderr, /exact tool name.*reviewed local example/);
+  }
 });
 
 function readStdio(jobs) {
@@ -166,6 +189,7 @@ test('all deterministic expanded examples and the unknown-tool branch run withou
     for (const {name, page, example} of expandedDefinitions) {
       const result = await callTool(name, example.args);
       assert.equal(result.isError, false, name);
+      assert.deepEqual(runReviewedExample(name), {name, example_arguments:example.args, result}, name);
       assert.equal(result.structuredContent.citation_url, 'https://getecoback.com' + page, name);
       for (const [field, expected] of Object.entries(example.expect)) {
         const actual = result.structuredContent[field];
