@@ -1,6 +1,6 @@
 # EcoBack Raumklima — MCP server
 
-<!-- count -->1381<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->1484<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -1432,6 +1432,109 @@ Worker, and ports drift silently.
 | `terrasse_sitzgruppe_schatten_kleinteile_freigabe` | Verify simultaneous shade for a group and tabletop, not successive coverage. |
 | `terrasse_ausrichtung_trockener_stellflaeche_protokoll` | Preserve verified dry intervals for two staging areas. |
 | `poolreinigung_gleiches_raster_zwei_beobachtende` | Preserve observer agreement rather than pooling their counts. |
+| `gefrierschrank_24h_haushaltsspitze_und_bestandsvolumen` | Compare models by rolling 24-hour fresh load and retained volume |
+| `gefrierladung_waegeunbekannte_packung_massenintervall` | Bound fresh loading mass when packaging or already frozen contents are unresolved |
+| `gefrierschrank_schnelleinfrieren_protokoll_vorlauf` | Verify the observed lead time for the manual-documented fast-freeze mode |
+| `gefrierschrank_aufstellort_klimaband_messabdeckung` | Scope logged ambient conditions to the exact freezer climate envelope |
+| `gefrierschrank_klimaband_besuchsminimum_referenzpunkt` | Separate a cold freezer placement reading from an in-room reference |
+| `gefrierschrank_stromausfall_dauer_zwischen_ankern` | Bound the outage duration from four verified power observations |
+| `gefrierschrank_stoerakte_tuer_und_temperaturzeitpunkt` | Classify door and temperature evidence inside the confirmed outage window |
+| `gefrierfach_nach_stoerung_displayquelle_gegensichten` | Distinguish a setpoint or stored alarm reading from new temperature evidence |
+| `gefrierschrank_label_tagesanteil_gegen_eigene_messung` | Compare observed energy with the prorated annual label reference |
+| `gefrierschrank_zaehler_reset_downtime_energieluecke` | Account for a freezer energy logging gap after a meter reset |
+| `gefrierschrank_tuerraum_durchgang_bei_90_grad` | Check passage left beside a documented open freezer door |
+| `gefrierschrank_tuerwinkel_schublade_entnahme_pruefung` | Separate ordinary access and full drawer-removal door angles |
+| `gefrierschrank_versorgungsrueckkehr_anzeige_separat` | Separate power restoration from display restart evidence |
+| `gefrierschrank_stoerstunden_herstellerwert_scope` | Scope the documented holdover figure against the recorded outage duration |
+| `gefrierschrank_no_frost_fachscope_nachweis` | Separate declared auto-defrost scope from observed frost or moisture |
+| `gefrierschrank_schalllabel_kaufgrenze_gleicher_kenngruppe` | Screen both freezer labels against a sound-power preference within one class |
+| `gefrierfach_ladungsversuch_gleichzeitige_ereignisse` | Check whether a fresh-load energy observation remained isolated |
+| `gefrierschrank_beleuchtung_beleg_entnahmezugang` | Scope declared freezer lighting to the observed drawer access task |
+| `bosch_sbv4ebx00d_nische_tueroeffnung_abgleichen` | Compare the exact Bosch model’s niche and door-open envelope. |
+| `spuelernische_breitenprofil_messunsicherheit` | Bound the narrowest observed opening across three measurement stations. |
+| `spuelernische_lichte_hoehe_boden_arbeitsplatte_trennen` | Distinguish floor-level changes from worktop underside changes. |
+| `spuelernische_rueckraum_hindernis_hoehenband` | Localise where a marked rear obstruction actually reduces depth. |
+| `spueler_angebot_geraet_nische_verpackung_trennen` | Identify which dimensional evidence is missing from a seller’s listing. |
+| `spueler_tiefenbezug_wand_und_blendenflucht_umrechnen` | Translate the door-open depth to the user’s cabinet face datum. |
+| `spueler_moebelfront_altlochbild_bezug_uebereinstimmung` | Flag whether known old panel points agree with the current drawing. |
+| `spueler_frontart_geteilt_oder_einteilig_belege` | Compare documentary support for single and split fronts. |
+| `spueler_sockel_zeichnung_bezugskante_zuordnen` | Check the proof behind a toe-kick clearance comparison. |
+| `spuelertuer_nachbarschublade_gleichzeitig_grundriss` | Find interference between opposite open fixtures. |
+| `spuelertuer_eckschrank_reihenfolge_belegte_kollisionen` | Compare the two tested opening orders around a kitchen corner. |
+| `spuelerkorb_auszug_notierter_tuer_und_arbeitsweg` | Keep the user’s working space separate from physical basket travel. |
+| `spueler_lieferkarton_aufrecht_zwei_tuerprofile` | Identify straight delivery openings with insufficient width or height. |
+| `spueler_lieferweg_wendeflaeche_aufmass_schablone` | Decide whether an earlier swept-corner proof still applies. |
+| `spueler_lieferung_aufzug_nutzlast_mit_begleitung` | Include every documented load in the elevator planning check. |
+| `spueler_alt_neu_abstellflaeche_uebergabefolge` | Check whether one staging spot can serve both old and new units. |
+| `spueler_frontgewicht_inklusive_griff_messband` | Check the documented panel-weight band against the complete panel assembly mass. |
+| `spueler_hochnische_und_unterbau_zeichnungszweig` | Check that the drawing branch matches the kitchen layout. |
+| `spueler_auto_tuerstellung_raumobjekt_ausladung` | Document obstacle encroachment during an observed automatic door position. |
+| `spueler_servicetiefe_geraet_und_arbeitsbereich` | Keep temporary service extraction clearance distinct from an ordinary aisle. |
+| `spueler_technische_unterlage_e_nummer_suffix_pruefen` | Resolve whether a primary installation drawing really belongs to the installed service variant. |
+| `spueler_entladeweg_zwei_personen_umraeumprobe` | Compare recorded interruptions rather than inferring usability from aisle width. |
+| `spueler_bedienfeld_sichtprobe_front_und_offen` | Check when a status display is actually visible to the user. |
+| `spueler_moebelfront_geteilte_hoehen_sichtlinie` | Compare the location of one panel seam with neighbouring cabinet lines. |
+| `wasch_trocken_saeule_herstellerkombination_beleg` | Verify the exact published scope and exceptions of a stacking kit. |
+| `stapelsatz_typenschild_artikelnummer_beleg` | Match a visible material code or verified EAN to the exact kit. |
+| `wasch_trocken_saeule_exakte_hoehenbilanz` | Estimate nominal stacked height and remaining clearance. |
+| `wqg241001_tiefen_gemeinsame_messkante` | Compare a dryer dimension using the correct documented reference depth. |
+| `stapelsaeule_auszug_und_tuer_gemeinsamer_betriebsraum` | Distinguish aisle occupation from a possible overlap between stacked moving parts. |
+| `stapelsatz_ablagefunktion_gegen_nutzungszweck` | Distinguish a pull-out worktop from storage when choosing a kit. |
+| `stapelsaeule_oberes_bedienfeld_und_tankgriff` | Compare projected access for two different upper-unit tasks. |
+| `stapelsatz_schublade_inhalt_geschlossen_entnehmbar` | Check whether contents fit beneath the closed drawer envelope and can still lift out. |
+| `stapelsaeule_tank_vollentnahme_und_arbeitsfreiraum` | Check the full removal envelope as well as separate carrying room. |
+| `wqg241001_tank_oder_ablauf_platzentscheidung` | Distinguish user access from an independently verified drainage configuration. |
+| `stapelsaeule_einzelgeraetwechsel_alter_satz_neuer_beleg` | Recheck a retained kit when one of the two appliances changes. |
+| `miele_stapelsatz_demontage_deckelbeleg_offen` | Identify the unresolved cover evidence after a previously installed kit was removed. |
+| `stapelsaeule_auszugsnutzen_zwei_getrennte_arbeitsproben` | Check whether a pull-out worktop actually replaces a separate staging step in your routine. |
+| `stapelsaeule_paketabholung_teilstuecke_getrennt_passmass` | Verify whether each separate package clears the same narrow route. |
+| `stapelsaeule_nische_tiefe_versatz_vorderkanten` | Find differing front setbacks under a shared niche line. |
+| `wqg241001_untergeraet_gehaeuse_und_arbeitsplattentiefe` | Check comparable cabinet dimensions and the distinct worktop depth criterion. |
+| `wasch_trocken_stapel_gegen_nebeneinander_arbeitskante` | Compare two layouts against actual one-sided usable frontage. |
+| `q350_tr_250m3_schallweg_druckpunkte_v0126` | Compare two V0126 pressure points for the same documented path at 250 m³/h. |
+| `lueftungsangebote_gemeinsame_druckpunkte_finden` | Find common recorded external pressures at one matching flow. |
+| `q350_tr_etikett_oder_schallpfad_datenzeile` | Route a noise claim to the appropriate Q350 TR table. |
+| `q350_tr_dokumentauswahl_artikelnummer_revision` | Validate the documented market and exact Q350 TR article before quoting the revision. |
+| `q350_tr_waermebereitstellung_pruefregime_lesen` | Read the recovered-heat figure under the specific published test regime and variant. |
+| `lueftung_schallpfad_fassadenbeleg_oder_anlagengeraeusch` | Identify which observed paths have evidence for exterior, terminal or equipment noise. |
+| `lueftung_oktavband_daempfungsbeleg_einzelpfad` | Apply documented attenuation to one octave band on the same source path. |
+| `lueftung_schallanschluss_familienwert_lesart` | Distinguish group-level acoustic data from a separately measured port. |
+| `lueftung_lw_raumangebot_belegluecken` | Find missing evidence for applying a catalogue sound figure to an occupied room. |
+| `lueftung_betriebspunkt_datenform_zwischenwert` | Determine whether a requested pressure point has a direct documented match. |
+| `comfoair_q_handbuch_nutzerpflege_oder_fachservice` | Route a recorded care request to the user manual or professional service. |
+| `q350_tr_filterpaar_bestellcode_quellenabgleich` | Read the documented filter-pair composition for one exact part number. |
+| `lueftung_zwei_filterklappen_persoenlicher_zugang` | Assess a documented user access margin at each filter opening. |
+| `q350_tr_filterwarnung_nicht_auf_kalendertage_rechnen` | Separate a flow-dependent filter alert from a calendar service record. |
+| `q350_tr_steuerungsoption_lieferbeleg_abhaengigkeit` | Check dependencies of a documented Q350 TR control option in an offer. |
+| `lueftungsangebot_bypass_kuehlkreis_beleggrenze` | Distinguish documented supply-air bypass from active cooling in an offer. |
+| `q350_tr_aufstellraum_messbereich_quellenabgleich` | Check measured installation-room temperatures against the matched Q350 TR data limits. |
+| `lueftungsangebot_abluftschlauch_frischluftweg_beleg` | Verify an actual outdoor-air supply path independently of an exhaust hose. |
+| `q350_tr_leistungsaufnahme_gleicher_volumenstrom_pruefwert` | Read power and specific fan power at one documented 250 m³/h test point. |
+| `q350_tr_etikett_regelung_sensorpaket_bezug` | Check which evidence supports a control-specific energy-class claim. |
+| `lueftungsangebot_zuluft_abluft_doppelt_gezaehlt` | Keep simultaneous supply and extract readings separate from an advertised volume sum. |
+| `lueftung_bypass_aussen_zuluft_raum_beobachtung` | Separate measured supply-air, outdoor and room temperatures when a bypass is observed. |
+| `q350_tr_enthalpie_feuchterueckgewinnung_fehlfeld` | Keep measured moisture recovery separate from missing figures in the device’s tested configurations. |
+| `lueftung_wechselrichtung_zyklus_zuluftanteil` | Calculate a measured alternate-direction supply rate over the entire operating cycle. |
+| `oekodesign_reparatur_geraeteart_anwendungsbeleg` | Check the scope evidence for the two household appliance repair annexes. |
+| `oekodesign_teilgruppe_rollenweg_de` | Distinguish annex-listed consumer and possibly registered-professional part routes. |
+| `oekodesign_letztmodell_mindestzeit_bezugstag` | Compute an informational minimum calendar marker from the last unit placed on the EU market. |
+| `oekodesign_katalog_veroeffentlichung_erster_markttag` | Compute the publication reference from the first model unit rather than the last. |
+| `oekodesign_bestelleingang_lieferung_arbeitstage` | Count workdays from received order to documented delivery, excluding documented non-working days. |
+| `oekodesign_fachzugang_registrierung_anfrage_stufen` | Track the five-day registration and one-day information reference as distinct case stages. |
+| `ersatzteil_marktbeleg_typenschild_kaufserie` | Distinguish a documented last placing from purchase, production and discontinuation. |
+| `ersatzteil_losbereich_an_fertigungsgrenze` | Identify a documented part branch from the model lot marker without taking a full serial number. |
+| `ersatzteil_erweitertes_set_getrennte_positionen` | Audit conditional manufacturer supersession instead of assuming identical function from a part number. |
+| `ersatzteil_angebotskanal_lagerstatus_timestamp` | Check stale listing evidence without treating absent stock proof as out of stock. |
+| `ersatzteil_lieferbeleg_teilung_teilpositionen` | Reconcile two chronological delivery batches against the set required for one confirmed repair. |
+| `reparaturangebot_diagnoseabrechnung_zwei_ausgaenge` | Compare explicitly quoted costs for proceeding versus stopping after diagnosis. |
+| `reparaturangebot_annahme_material_fristkonflikt` | Detect when reservation expires before an offer can actually be accepted. |
+| `ersatzteil_folgearbeit_angebot_evidenzmoment` | Screen whether a parts quote also covers every separately required service dependency. |
+| `ersatzteil_verpackung_beleg_widerspruch_inhalt` | Hold a package identity mismatch instead of accepting an outer label as proof. |
+| `ersatzteil_angebotsalternativen_gemeinsames_lager` | Distinguish two seller listings from independently supported fulfillment. |
+| `reparaturangebot_kostenband_deckel_nachtrag` | Bound documented repair expenditure only when every included extra is capped. |
+| `ersatzteil_softwarestand_angebot_abweichende_generation` | Separate documented support for a variant from a generic software download. |
+| `ersatzteil_fachangebot_diagnose_gleichnamiger_fehler` | Check whether the quoted part follows the confirmed diagnosis for this case. |
+| `ersatzteil_kaufpause_reparatur_nutzwerthorizont` | Compare repair wait with a documented end-of-use date rather than assuming the device remains wanted. |
 <!-- tools:end -->
 
 ## Can a MeacoDry Arete One 20L drain uphill into a sink?
@@ -1445,7 +1548,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->1381<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->1484<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
@@ -1479,7 +1582,7 @@ Not engineering, legal or subsidy advice.
 
 ## Hosted and local versions
 
-The hosted Registry entry is version 1.14.0. The local stdio source is version 1.12.0. The [tool directory](https://getecoback.com/mcp.html#tools) lists the distinct household tasks and marks the compatible legacy overlap.
+The hosted Registry entry is version 1.13.0. The local stdio source is version 1.11.0. The [tool directory](https://getecoback.com/mcp.html#tools) lists the distinct household tasks and marks the compatible legacy overlap.
 The drainage rules and reviewed German-market model sources come from
 [`sites/getecoback`](https://github.com/f-tiger/agi-site/tree/main/sites/getecoback).
 Follow the returned `nextCursor` in `tools/list` to discover later pages.
