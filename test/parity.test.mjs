@@ -87,7 +87,7 @@ test("stdio server answers initialize and tools/list", {timeout: 10000}, async (
   for (const offset of pageOffsets.slice(1)) {
     const id = 3 + offset/MCP_PAGE_SIZE;
     pageIds.push(id);
-    child.stdin.write(JSON.stringify({jsonrpc:"2.0",id,method:"tools/list",params:{cursor:"1.9.0:"+offset}})+"\n");
+    child.stdin.write(JSON.stringify({jsonrpc:"2.0",id,method:"tools/list",params:{cursor:"1.10.0:"+offset}})+"\n");
   }
   child.stdin.end();
   const [status] = await exited;
@@ -101,7 +101,7 @@ test("stdio server answers initialize and tools/list", {timeout: 10000}, async (
     assert.ok(index >= 0);
     return msgs.find(item=>item.id===pageIds[index]).result;
   });
-  assert.equal(catalogue.length,759);
+  assert.equal(catalogue.length,1001);
   assert.deepEqual(catalogue.map(t=>t.name),TOOLS.map(t=>t.name));
   const call = msgs.find((m) => m.id === 3);
   assert.match(call.result.content[0].text, /BTU/);
@@ -168,9 +168,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 749 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 991 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,749);
+  assert.equal(expandedDefinitions.length,991);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);
