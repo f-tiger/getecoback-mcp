@@ -58,6 +58,33 @@ test('German questions find tools beyond the first page and keep reviewed exampl
   }
 });
 
+test('German window vacuum questions find the same five reviewed tasks in local and compact search', () => {
+  const queries = [
+    ['Kann ich mit dem Kärcher WV 2 Plus Multi Edition 30 ml aufsaugen, obwohl der Tank größer ist?', 'fenstersauger_kaercher_fluessigkeitsgrenze_und_tank'],
+    ['Was bedeutet es beim Kärcher WV 8, wenn alle LEDs zweimal kurz blinken und der Motor aus ist?', 'fenstersauger_wv3_wv8_led_muster_einordnen'],
+    ['Kann ich beim WV 3 Comfort Precision+ Black einen zweiten Akku während des Fensterputzens einsetzen?', 'fenstersauger_wv3_wv8_akkuwechsel_service_oder_reserve'],
+    ['Darf ich beim Kärcher WV 8 Schaumreiniger statt Glasreiniger nehmen?', 'fenstersauger_kaercher_glasreiniger_schaum_spiritus'],
+    ['Brauche ich eine Probe mit dem Mikrofaserbezug, bevor ich mit dem Kärcher WV 3 eine Hochglanzfläche reinige?', 'fenstersauger_wv3_wv8_hochglanz_glas_temperatur_probe'],
+  ];
+  const replies = compactReplies(queries.map(([frage]) => toolCall(compactFind, {frage})));
+  for (const [i, [query, expected]] of queries.entries()) {
+    const first = findTools(query).tools[0];
+    assert.equal(first?.name, expected, query);
+    assert.equal(first.guide_url, 'https://getecoback.com/produkte.html#fenstersauger-belege');
+    assert.deepEqual(replies[i].result.structuredContent.tools[0], first, query);
+  }
+});
+
+test('the same two-flash question distinguishes the WV 3 and WV 8 articles', async () => {
+  const [signal] = findTools('Beim Kärcher WV 3 blinken alle LEDs zweimal kurz und der Motor ist aus. Was bedeutet das?').tools;
+  assert.equal(signal?.name, 'fenstersauger_wv3_wv8_led_muster_einordnen');
+  const observed = {sicherheitsblatt_bestaetigt:true, muster:'alle_leds_zweimal_kurz_dann_lange_pause', zustand:'motor_aus'};
+  const wv3 = await callTool(signal.name, {...observed, artikel:'1.633-698.0'});
+  const wv8 = await callTool(signal.name, {...observed, artikel:'1.633-785.0'});
+  assert.equal(wv3.structuredContent.tabellenbedeutung, null);
+  assert.equal(wv8.structuredContent.tabellenbedeutung, 'akkutemperatur_zu_hoch_oder_zu_tief');
+});
+
 test('offline finder emits JSON and handles an omitted query', () => {
   const found = spawnSync(process.execPath, [finder, 'Wie lange darf ich mit 72 Litern duschen?'],
     {encoding:'utf8', timeout:10000});
