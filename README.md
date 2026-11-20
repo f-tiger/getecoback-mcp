@@ -1,6 +1,6 @@
 # EcoBack Raumklima — MCP server
 
-<!-- count -->1201<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->1381<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -59,7 +59,7 @@ Worker, and ports drift silently.
 | `klimaanlage_stromkosten` | Running cost of an air conditioner or any appliance: watts × hours × electricity price × compressor duty cycle. What does it cost to run per hour, per day, per month? |
 | `heizleistung_watt` | Required heating power in watts for a room, from floor area and insulation standard (60/80/100 W/m² for new build, existing, old building), including running cost per full-load hour. |
 | `taupunkt_lueften` | Compare outdoor dew point (Magnus approximation) with a wall estimate 2 °C below room temperature. A drying decision also needs indoor humidity and a measured coldest surface. |
-| `ratgeber_suche` | Searches this site's guides on air conditioning, window sealing, ventilation, heating, dehumidifiers and electricity costs, returning title, URL and summary for each match — citable sources for the answer. |
+| `ratgeber_suche` | citable sources for the answer. |
 | `ratgeber_lesen` | Returns the full plain text of one guide from getecoback.com so the answer can be written from the source and cited. Pass a path or URL from ratgeber_suche. |
 | `strommessung_hochrechnen` | Project meter readings across representative days. |
 | `geraetewechsel_rechnen` | Compare the cost of keeping an appliance with replacing it. |
@@ -1252,6 +1252,186 @@ Worker, and ports drift silently.
 | `heizmessung_warme_raumzone_vor_und_nach_sesselwechsel` | Test whether a colder seat zone persists after moving furniture |
 | `raumkuehlung_beobachteter_erhaltener_anteil` | Determine how much of an observed temperature gain remained at a later check |
 | `dachraum_messreihe_vorhang_zwei_ruecknahmeproben` | Check whether reversing a shading change also reversed the observed temperature movement |
+| `campereinwinterung_innenzonen_pruefstatus` | Triage accessible and hidden camper zones from the actual inspection |
+| `camper_standkontrollen_nach_hintereinander_ausfall` | Find the longest unobserved interval between completed winter visits |
+| `camper_winter_sichtkontrolle_zone_einmessfenster` | Check whether three inspection zones belong to the same camper visit |
+| `camper_granulat_waegung_boxwechsel_tara` | Separate tare changes from observed mass gain in a winter absorber |
+| `camper_granulat_zwei_besuche_saettigungsintervall` | Bound when winter reservoir limits were reached between visits |
+| `wohnmobil_lokale_taureserve_fenster_polster_paar` | Compare paired dew-point margins at a metal frame and behind upholstery |
+| `wohnmobil_polster_vorne_hinten_seitenwechsel_befund` | Track a damp observation after turning a camper cushion |
+| `wohnmobil_messpunkt_nach_polsterrueckkehr_verdeckt` | Audit whether an original measurement point remains accessible after restoring upholstery |
+| `camper_staufach_winter_nachbesuch_neu_abgedeckt` | Deduplicate two inspections of camper storage points |
+| `wohnmobil_zutritt_messreihe_vor_tueroeffnung` | Determine whether a stored measurement preceded the first door opening |
+| `camper_stellplatzwechsel_vorher_nachher_quellenscope` | Scope an observed camper change when placement and contents change together |
+| `wohnmobil_kondensatspur_foto_zonenrichtung` | Compare upper and lower visible traces without inferring an entry point |
+| `wohnmobil_rueckkehr_trockenkontrolle_materialpaar` | Match dry stored items to separately inspected camper locations |
+| `camper_absorber_rueckkehr_vor_offener_besuchspause` | Match a documented absorber check deadline against actual access |
+| `camper_heckfach_verschlusswechsel_luftsignal_kontrolle` | Compare a storage door intervention against a stable cabin airflow control |
+| `camper_tiefster_messwert_klimadaten_kaltperiode` | Interpret a winter minimum separately from the visit temperature |
+| `wohnmobil_polster_rueckkehr_fachzugang_termin` | Compare camper storage access with the later return of furnishings |
+| `camper_heckfach_stichprobe_oeffnung_veraendert` | Compare the storage reading shift with the living-area reference after opening |
+| `wohnmobil_nachwinter_befund_neu_oder_wiederholt` | Separate new sightings from repeated findings after winter |
+| `camper_standwinter_polster_massengang_referenz` | Compare mass change of stored upholstery against a dry control |
+| `wohnmobil_nachwinter_kalte_zonen_wiederholungswechsel` | Check whether the colder camper surface changed between winter visits |
+| `auto_parksonne_vorderseite_fensterseite_verschattung` | Audit front and side shade across two phases of a parked vehicle |
+| `auto_parkprobe_sonnenschutz_zeitversatz_am_selben_platz` | Separate unprotected and protected time in a parked sunshade trial |
+| `camper_granulat_stellvergleich_spitzen_und_mittelwert` | Compare peak and mean humidity under two absorber layouts |
+| `camper_standwinter_logger_zwischen_auslese_und_umzug` | Scope stored winter data across a campsite move |
+| `wohnmobil_saisonwechsel_erster_getrennter_eindruck` | Find the observable window between unpacking the camper and restoring furnishings |
+| `wohnmobil_staurouten_zwei_fachstellungen_nutzen` | Map two camper cabinet positions to storage or access needs |
+| `wohnmobil_kuehlung_luftpfad_gepackt_gegen_leer` | Compare outlet-flow coverage in the empty and packed camper |
+| `wohnmobil_standwinter_belueftung_vom_befund_trennen` | Separate a cleared visual symptom from a resolved source in the camper |
+| `wohnmobil_klima_parkmessung_vorbetrieb_kennzeichnen` | Classify cabin samples before or during a documented cooling trial |
+| `pc_chip_und_ansaugluft_abstand_zerlegen` | Decompose the observed chip change into inlet and chip-to-inlet terms. |
+| `pc_ansaugluft_zu_raum_und_auslass` | Distinguish three simultaneous PC observation points from a room-temperature claim. |
+| `pc_cpu_gpu_lastmix_zu_gepaarten_proben` | Select PC trials that repeat both recorded workload segments. |
+| `pc_temperaturmaximum_aufgaben_nachlauf` | Locate a logged PC temperature maximum relative to load and measured cooldown. |
+| `pc_leistungsabfall_und_begrenzungsmeldung` | Distinguish a recorded thermal-limit signal from slow work alone. |
+| `pc_leistungsprotokoll_ansaugfenster_wechselabstand` | Keep delayed thermal samples out of mixed workload phases. |
+| `pc_benchmark_aufzeichnung_mindestlauf_ausschluss` | Compare incomplete PC runs by workload group before using performance averages. |
+| `pc_laufpaar_startzustand_vorherige_arbeit` | Check thermal carryover from the last recorded workload rather than the current output alone. |
+| `pc_zwei_ansaugseiten_lokal_mehrlast_probe` | Test whether one inlet observation can stand for two documented intake locations. |
+| `pc_thermik_bildrate_und_aufloesung_abgleich` | Keep changed display-output settings out of matched thermal-performance observations. |
+| `arbeitsplatz_technikumschaltung_eindeutige_proben` | Recover single-change monitor or desk-light observations before comparing temperatures. |
+| `arbeitsplatz_waerme_quelle_zwei_on_off_aufzeichnungen` | Label a local desk reading by the equipment states actually documented at that instant. |
+| `arbeitsplatz_bildschirm_licht_brauchbare_feinprobe` | Compare lighting draw among two setups whose task and screen visibility were checked. |
+| `arbeitsplatz_luefter_probe_luftwert_und_empfinden` | Report whether desk fan comfort moved independently of measured air temperature. |
+| `arbeitsplatz_oberflaeche_sonnenstreifen_messpunkte` | Compare paired desk surfaces and concurrent air without assuming either surface represents the room. |
+| `arbeitsplatz_fusshoehe_sitzhoehe_wiederkehrmuster` | Classify a repeated colder foot-zone observation separately from a whole-seat drop. |
+| `arbeitsplatz_warme_optionen_unterschiedlicher_zielbereich` | Compare observed personal comfort and room warming as different completion criteria. |
+| `arbeitsplatz_technik_waerme_nach_pause_aufbauklasse` | Label local hardware warmth after an observed pause without inferring room cooldown. |
+| `pc_log_betriebsarten_gemischte_fenster_grenze` | Audit state coverage before comparing idle against active thermal readings. |
+| `pc_sensorquellen_cpu_gpu_wechsel_nicht_verketten` | Preserve independent CPU and GPU log continuity after a telemetry-view change. |
+| `pc_dauerlog_aufgabenzeit_und_wandzeit_trennen` | Map a task-runtime marker to wall time across one verified pause. |
+| `laptop_strommessung_akku_startsaldo_proben` | Flag unequal battery movement as a confound in two plugged-in laptop energy records. |
+| `monitor_sichtprobe_raumlicht_und_bildinhalt` | Audit screen appearance observations for content and room-light confounders. |
+| `arbeitsplatz_lichtmessung_bildschirm_lichtquelle_abgrenzen` | Compare controlled black-screen and reference-image readings at a fixed work surface. |
+| `pc_ansaugluft_drei_ablesungen_eigenes_stillstandsband` | Verify a recorded inlet plateau across three unchanged operating samples. |
+| `arbeitsplatz_tischluefter_messabdeckung_abseits_strahl` | Separate in-stream and off-stream data completeness in a desk fan trial. |
+| `pc_displayphase_puffer_zweiseitig` | Trim an observed desk thermal log around a known display transition. |
+| `arbeitsplatz_druckphase_waermeprotokoll` | Isolate a logged printer episode from changes to other desk loads. |
+| `arbeitsplatz_sitzdauer_waermerueckmeldung_abdeckung` | Count evidenced personal comfort across an interrupted desk session. |
+| `pc_cpu_gpu_gleiches_zeitfenster_spitzenreihenfolge` | Compare recorded CPU and GPU peak timing using the actual clock resolution. |
+| `punktwaerme_aufgabenzeit_ausfallursachen` | Account for distinct sources of missing comfort during an attended task. |
+| `punktwaerme_durchgehende_arbeitsphase_nachweis` | Distinguish a usable uninterrupted comfort run from summed fragmented minutes. |
+| `punktwaerme_eintritt_waermefenster_drei_grenzen` | Bound usable overlap for an uncertain arrival with a fixed attended task duration. |
+| `thermostat_punktwaerme_offset_moduswechsel` | Separate an active-state sensor offset from a resting-location difference. |
+| `thermostat_schaltfolge_platzband_asymmetrie` | Distinguish a documented late switch-on from late switch-off at the occupied spot. |
+| `thermostat_unauflosbare_kleine_stufen` | Test whether measured desk temperatures resolve one documented control step. |
+| `punktwaerme_routenvergleich_einzelplatz_dominiert` | Test whether point comfort persists across actual task-location changes. |
+| `punktwaerme_aufgabenmix_ungepruefte_kaltphase` | Audit coverage of real cold-start task classes. |
+| `punktwaerme_kurzpause_messwert_fluktuation` | Flag a transient comfort-temperature dip absent from the endpoint comparison. |
+| `punktwaerme_fehlerspielraum_tuerphase_kontrolliert` | Find the recovery attempts whose duration is censored by repeated door openings. |
+| `punktwaerme_zusatzkomfort_nur_neue_minuten` | Price genuinely new comfortable minutes in a matched baseline and trial timeline. |
+| `punktwaerme_abschattung_referenzgain` | Compare two measured local surface gains after subtracting their respective start readings. |
+| `punktwaerme_messraster_zonen_verteilung_spannweite` | Identify nonuniform outcomes without averaging away a required spot. |
+| `thermostat_nachlauf_oberziel_zeitordnung` | Locate observed post-switch overshoot separately from a thermostat cutoff reading. |
+| `heizluefter_arbeitsstufe_reproduzierbarer_erfolg` | Compare observed stage costs only after the same task passed in every matched trial. |
+| `punktwaerme_personenurteil_stichproben_einigung` | Check whether independent comfort judgements agree beyond their marginal response patterns. |
+| `punktwaerme_vorlaufgrenze_beobachtung_vor_erstkontakt` | Preserve left-censoring when the first comfort observation already meets the target. |
+| `thermostat_taktenergie_grundverbrauch_widerspruch` | Check an energy log against a thermostat cycle and explicit baseline range. |
+| `punktwaerme_folgesitzung_beobachtete_restnutzenquote` | Measure how much confirmed follow-on work used residual warmth. |
+| `punktwaerme_verdeckter_unterschied_koerperzonen` | Retain oppositely changing body-zone comfort instead of averaging it into one result. |
+| `punktwaerme_nach_aus_unterschreitung_beobachtungsband` | Bracket an observed decay crossing without assuming a cooling rate. |
+| `punktwaerme_raumdurchschnitt_verdeckt_festen_platz` | Check whether a rising room index masked deterioration at the occupied point. |
+| `punktwaerme_anzahl_arbeitszyklen_nutzbar` | Count full attended work units with fixed use-specific overhead. |
+| `punktwaerme_temperaturdefizit_linie_abschnitt` | Integrate only below-target deficit across one occupied segment. |
+| `heizluefter_aufgabe_sprachpause_und_waerme` | Count the heat that remains usable after overlapping conversation disruption. |
+| `punktwaerme_platzwechsel_wieder_erreichen_anteil` | Separate immediate, delayed and unresolved return comfort instead of imputing missing return observations. |
+| `punktwaerme_zwei_hoehen_reihenfolgewechsel` | Detect a measured reversal of the vertical temperature ordering. |
+| `thermostat_handkorrekturen_versuchsfolge_notiz` | Distinguish manually overridden comfort episodes from a clean baseline control. |
+| `punktwaerme_arbeitsziel_wechsel_energieabschnitt` | Compare task-specific energy per completed work item under explicit time and output limits. |
+| `thermostat_anforderungen_geraetereaktion_protokoll` | Audit matched requests, documented lockouts and unexplained starts. |
+| `luftkuehler_nass_trocken_einlassabgleich` | Compare wet and dry outlet cooling against each run’s own intake temperature. |
+| `luftkuehler_modalternativen_lufttempo_partner` | Find the closest measured dry fan setting to an established wet-mode airflow. |
+| `luftkuehler_lokale_probe_kaufbedarf` | Choose the next test or a no-buy decision from an observed local cooling need. |
+| `luftkuehler_trockenkontrolle_restfeuchte_beleg` | Check whether a fan-only control was actually documented as dry. |
+| `luftkuehler_auslassmessung_nasser_fuehler_ausschluss` | Flag an outlet measurement exposed to wetting of the temperature sensor. |
+| `luftkuehler_mattemuster_nasszonen_nachlauf` | Distinguish repeatedly dry pad areas from one-off readings after use. |
+| `luftkuehler_feuchteband_paarprobe_auslassnutzen` | Compare measured wet-mode benefit in two evidenced humidity bands. |
+| `luftkuehler_ortsprobe_kuehler_und_schwuel_empfunden` | Separate felt cooling from perceived stuffiness in a matched wet/dry trial. |
+| `luftkuehler_tankbilanz_ueber_wasserwege` | Account for reservoir drawdown, measured losses and retained water separately. |
+| `luftkuehler_tankstand_ruecklauf_nach_stopp` | Quantify the observed return to the reservoir after normal stop. |
+| `luftkuehler_betriebswahl_wasser_und_lokalziel` | Compare measured programs against a local cooling target and water budget. |
+| `luftkuehler_wasserverlust_stillstand_kontrolllauf` | Compare active-mode and stopped reservoir changes under matched conditions. |
+| `luftkuehler_fuellsicht_minimum_ohne_interpolation` | Place a measured tank level against documented fill marks without inferring volume. |
+| `luftkuehler_tank_marken_messwerte_abgrenzen` | Bound volume from two measured fill observations surrounding a new level. |
+| `luftkuehler_pflegedokument_tank_matte_unterscheiden` | Verify model-specific and separate care instructions for the reservoir and evaporative pad. |
+| `luftkuehler_kuehlakku_pegelversatz_tank` | Compare measured tank levels at a fixed water volume with and without a documented cooling pack. |
+| `luftkuehler_kuehlakku_einsatzgrenzen_belegt` | Verify whether this specific cooling pack and its intended placement are documented. |
+| `luftkuehler_kuehlakku_vor_nach_gegen_wasserprobe` | Compare a cooling pack’s early and late added effect against water-only readings. |
+| `kuehlakku_uebergangsfenster_messpunkt_zuordnen` | Locate a reading relative to an observed end of the cooling-pack stage. |
+| `luftkuehler_kuehlakku_zusatzsignal_auslass_sitz` | Check whether extra cooling at the outlet also reaches the chosen seat. |
+| `luftkuehler_wasser_kalt_luftsignal_unter_messspiel` | Distinguish a measured cooler tank from outlet cooling beyond measurement noise. |
+| `eisprobe_gemessene_schmelzmasse_waermeanteil` | Estimate latent heat from measured melting of known pure water ice. |
+| `luftkuehler_nachfuellfolge_wassertemperatur_rueckbezug` | Check when a recorded refill no longer differs from the prior tank-temperature band. |
+| `luftkuehler_alternierende_nassphasen_sitzzeit` | Separate observed wet operation from the part actually used in the airflow. |
+| `luftkuehler_feuchtemessung_nahstrahl_raumvertretung` | Classify a humidity reading by its documented exposure to the cooler’s jet. |
+| `luftkuehler_mehrfeuchte_je_lokalgrad_probe` | Relate a measured room humidity change to an observed local cooling benefit. |
+| `verdunster_raumfeuchte_versuchsabbruch_zielbelegt` | Preserve a measured local improvement and a later user-set trial stop as separate outcomes. |
+| `luftkuehler_luftgeschwindigkeit_kopf_und_tischzone` | Check a two-zone airflow arrangement against distinct personal goals. |
+| `luftkuehler_betriebswechsel_pumpe_luft_getrennte_belege` | Record independently verified airflow and wet circulation after a normal mode change. |
+| `luftkuehler_vergleich_ein_tankvolumen_getrennte_laufarten` | Verify whether a published tank runtime refers to the intended wet-use setup. |
+| `heizwaesche_rueckstandsgruppen_gewicht_unabhaengig` | Identify which weighed placement group still keeps a heated-rack load unfinished. |
+| `heizwaesche_fertige_teile_aus_massenspur_entfernen` | Correct apparent mass loss when some finished pieces were removed during heated-rack weighing. |
+| `heizwaesche_massenplateau_vor_wirklichem_ziel` | Detect a measured drying plateau while still above the target mass. |
+| `heizwaesche_reststand_neu_aufgelegt_nach_ruhezustand` | Flag observable rebound after reorganizing checked textiles. |
+| `heizwaesche_positionsreihe_abstand_einflussgrenze` | Separate a spacing comparison from trials with altered load or ventilation. |
+| `heizwaesche_endpunkt_zwischen_zwei_stichproben` | Find the bounded window in which a verified textile target was first observed. |
+| `heizwaesche_untersuchte_flaechenproben_minimum` | Check whether observed zone coverage is sufficient for a load-wide conclusion. |
+| `heizwaesche_zeitgleiche_ladetiefen_teilvergleich` | Keep regrouped pieces out of a matched heated-rack trial. |
+| `heizwaesche_relative_und_absolute_richtung` | Interpret opposing humidity changes during a drying trial. |
+| `heizwaesche_lueftungsphase_stabile_waage_gegenprobe` | Recognize air dry-down without a resolved textile mass change. |
+| `heizwaesche_luftprobe_waermequelle_zeitfenster` | Find a stand-alone observation window inside a paired-use drying log. |
+| `heizwaesche_luftvolumen_massendifferenz_ohne_zutritt` | Reconcile measured transfers without attributing an unresolved moisture remainder. |
+| `heizwaesche_spaete_kondensatbeobachtung_vorbefund` | Distinguish a pre-existing wet surface from newly observed wetness. |
+| `heizwaesche_nahmessung_gegen_lufttrend_fern` | Identify unresolved spatial moisture patterns instead of generalizing a local reading. |
+| `heizwaesche_protokoll_trockenraum_hintergrund_vergleich` | Compare rack observations with a matched empty-room baseline. |
+| `heizwaesche_hilfsentfeuchter_stop_weiteres_abtrocknen` | Determine whether measured textiles kept losing mass after an auxiliary device stopped. |
+| `heizwaesche_luftprobe_zeitpunkt_einem_abschnitt_zuordnen` | Check whether a moisture reading could straddle a phase boundary. |
+| `heizwaesche_hochpunkt_ruhe_nach_entnahme` | Retain a delayed peak after all textiles have left the room. |
+| `heizwaesche_verbrauch_am_trockenziel_eingrenzen` | Bound energy at a verified drying endpoint without interpolating it. |
+| `heizwaesche_teilprotokoll_zusatzgeraet_subtraktion` | Recover only the provably attributable share of a mixed-device drying meter log. |
+| `heizwaesche_hilfe_zeitgewinn_mehrstrom_budget` | Evaluate an observed time saving against a household marginal energy budget. |
+| `heizwaesche_messung_tara_vor_und_nach_wechsel` | Reconcile two drying-log series through a same-mass anchor at a basket change. |
+| `heizwaesche_weitergabe_trockene_teilmasse_vorrang` | Determine if a verified dry subset meets a planned first delivery. |
+| `heizwaesche_raumbelegung_freiraum_und_messziel` | Distinguish physical room clearance from a documented humidity observation. |
+| `heizwaesche_zwei_trockenziele_veraenderter_endpunkt` | Separate a documented partial drying target from the final one. |
+| `heizwaesche_teilfolge_beaufsichtigte_messpunkte` | Check whether both required observations can be actually taken. |
+| `heizwaesche_anfangsmasse_nassbezug_trockenbezug` | Detect mismatched starting moisture in equally heavy wet loads. |
+| `heizwaesche_raumziel_zwei_vergleichbare_beobachtungen` | Screen comparable drying trials against both measured room and energy criteria. |
+| `heizwaesche_langsamere_zone_rangwechsel_im_verlauf` | Detect a rank reversal between unchanged placement groups within one drying run. |
+| `heizwaesche_letzte_kontrolle_hilfsgeraet_nachlauf` | Separate measured auxiliary use after the endpoint from total trial energy. |
+| `poolroboter_bodenraster_unbesuchte_felder` | Record coverage over a simple marked pool-floor grid. |
+| `poolroboter_wandabschnitt_anhaftung_vor_nach_probe` | Compare marked wall residues before and after one observed pass. |
+| `poolroboter_treppenumkehr_sichtprotokoll` | Record observed turn-backs separately from blind spots at an approved transition. |
+| `poolroboter_korb_blaetter_feinreste_einordnung` | Compare visible matter categories without treating basket contents as water quality. |
+| `poolreinigung_neuer_schmutzeintrag_nach_lauf` | Separate visible residual debris from later arrivals within marked areas. |
+| `pool_flaechenplan_nacharbeit_gesperrte_zonen` | Keep visible work needs separate from areas with unconfirmed access. |
+| `poolroboter_umkehrabweichung_beckenvariante_beleg` | Mark exactly which prior pool observations need retesting. |
+| `poolpflege_zwischenablage_tropfprotokoll` | Schedule the use of a confirmed drip area after retrieval. |
+| `rasenroboter_zugang_zwei_routen_nachweis` | Compare route evidence where neither isolated entrance proves the whole trip. |
+| `maehroboter_gatter_durchfahrt_richtung_paare` | Check directional passage evidence for each leg of a supervised trip. |
+| `maehroboter_uebernommener_garten_aenderungsflaechen` | Scope the resurvey after fixed garden landmarks change. |
+| `rasenroboter_beobachtungsfenster_nach_kurzsperrung` | Fit a supervised retest after a shared access closure. |
+| `maehroboter_gartenbeobachtung_mittlere_unterbrechung` | Compare the time spent on access pauses and other recorded stops. |
+| `rasenroboter_maehende_teilflaechen_uebergabe` | Separate fully, partly and unobserved areas after one outing. |
+| `rasenroboter_randprobe_referenzpunkt_vor_nach` | Separate recurring edge observations from one-off marks. |
+| `maehroboter_grundstueckskizze_nachbarflaeche_abgrenzen` | Keep shared or unresolved ground outside the candidate work area. |
+| `terrasse_schattenfolge_pause_ohne_platzwechsel` | Find the longest continuous shaded interval at one fixed table. |
+| `terrasse_bodenluft_schattenprobe_getrennte_messwerte` | Separate surface temperature and air observations from a paired shade trial. |
+| `terrasse_abendsonne_blickrichtung_probe` | Compare glare by facing direction, not just the overall shadow area. |
+| `terrasse_sonnenschutz_vorab_einraeumen_termin` | Fit two planned shade-item removals into one confirmed attendance window. |
+| `terrasse_schattenzuwachs_bestehende_ueberdeckung` | Measure newly shaded time rather than counting overlap twice. |
+| `balkon_sonnenschutz_mietuebergabe_zustandsbelege` | Identify the missing before-and-after record for a reversible balcony setup. |
+| `terrasse_polster_trocknung_naechste_sitzrunde` | Plan seating from verified cushion readiness and available replacements. |
+| `balkontuer_terrassenweg_haeufige_konflikte` | Compare real doorway interruptions across two terrace setups. |
+| `terrassenbeschattung_zimmerprobe_mit_referenzraum` | Compare changes in two rooms without attributing the difference automatically. |
+| `balkon_ausweichplatz_lernpause_rueckkehrbudget` | Reserve a genuinely usable outdoor break including the return. |
+| `terrasse_beschattung_saison_probeuhrzeit_vergleich` | Compare two observed seasonal shadow shifts at the same meeting time. |
+| `terrasse_sitzgruppe_schatten_kleinteile_freigabe` | Verify simultaneous shade for a group and tabletop, not successive coverage. |
+| `terrasse_ausrichtung_trockener_stellflaeche_protokoll` | Preserve verified dry intervals for two staging areas. |
+| `poolreinigung_gleiches_raster_zwei_beobachtende` | Preserve observer agreement rather than pooling their counts. |
 <!-- tools:end -->
 
 ## Can a MeacoDry Arete One 20L drain uphill into a sink?
@@ -1265,7 +1445,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->1201<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->1381<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
@@ -1299,7 +1479,7 @@ Not engineering, legal or subsidy advice.
 
 ## Hosted and local versions
 
-The hosted Registry entry is version 1.13.0. The local stdio source is version 1.11.0. The [tool directory](https://getecoback.com/mcp.html#tools) lists the distinct household tasks and marks the compatible legacy overlap.
+The hosted Registry entry is version 1.14.0. The local stdio source is version 1.12.0. The [tool directory](https://getecoback.com/mcp.html#tools) lists the distinct household tasks and marks the compatible legacy overlap.
 The drainage rules and reviewed German-market model sources come from
 [`sites/getecoback`](https://github.com/f-tiger/agi-site/tree/main/sites/getecoback).
 Follow the returned `nextCursor` in `tools/list` to discover later pages.

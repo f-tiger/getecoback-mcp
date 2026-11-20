@@ -12,7 +12,7 @@ import { TOOLS, callTool } from "./tools.mjs";
 const PROTOCOL_VERSION = "2025-06-18";
 import {pageTools} from './eco-suite/src/mcp-pagination.mjs';
 
-const SERVER_INFO = { name: "getecoback-raumklima", version: "1.11.0" };
+const SERVER_INFO = { name: "getecoback-raumklima", version: "1.12.0" };
 
 function send(msg) {
   process.stdout.write(JSON.stringify(msg) + "\n");
