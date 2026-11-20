@@ -16,6 +16,11 @@ import {alltagZugang} from './mcp-alltag-zugang.mjs';
 import {saisonWechsel} from './mcp-saison-wechsel.mjs';
 import {kaufpraxis} from './mcp-kaufpraxis.mjs';
 import {ressourcenplan} from './mcp-ressourcenplan.mjs';
+import {raumplanung} from './mcp-raumplanung.mjs';
+import {wetterpraxis} from './mcp-wetterpraxis.mjs';
+import {kuechenpraxis} from './mcp-kuechenpraxis.mjs';
+import {servicepraxis} from './mcp-servicepraxis.mjs';
+import {belegeAbgleichen} from './mcp-belege-abgleichen.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -36,6 +41,11 @@ export const expandedDefinitions = [
   ['Saisonwechsel', saisonWechsel],
   ['Kaufpraxis', kaufpraxis],
   ['Ressourcen planen', ressourcenplan],
+  ['Raumplanung', raumplanung],
+  ['Wetterpraxis', wetterpraxis],
+  ['Küchenpraxis', kuechenpraxis],
+  ['Servicevorbereitung', servicepraxis],
+  ['Belege abgleichen', belegeAbgleichen],
 ].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));

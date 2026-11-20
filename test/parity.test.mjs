@@ -15,7 +15,7 @@ import {once} from "node:events";
 import {createInterface} from "node:readline";
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {collectToolPages} from '../src/eco-suite/src/mcp-pagination.mjs';
+import {MCP_PAGE_SIZE,collectToolPages} from '../src/eco-suite/src/mcp-pagination.mjs';
 import { TOOLS, callTool } from "../src/tools.mjs";
 
 const CI_HEADERS = { "content-type": "application/json", accept: "application/json, text/event-stream", "user-agent": "getecoback-ci/mirror-parity" };
@@ -76,9 +76,13 @@ test("stdio server answers initialize and tools/list", {timeout: 10000}, async (
   child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: {} }) + "\n");
   child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }) + "\n");
   child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "btu_empfehlung", arguments: { qm: 20 } } }) + "\n");
-  child.stdin.write(JSON.stringify({jsonrpc:"2.0",id:4,method:"tools/list",params:{cursor:"1.6.0:100"}})+"\n");
-  child.stdin.write(JSON.stringify({jsonrpc:"2.0",id:5,method:"tools/list",params:{cursor:"1.6.0:200"}})+"\n");
-  child.stdin.write(JSON.stringify({jsonrpc:"2.0",id:6,method:"tools/list",params:{cursor:"1.6.0:300"}})+"\n");
+  const pageOffsets = Array.from({length:Math.ceil(TOOLS.length/MCP_PAGE_SIZE)},(_,i)=>i*MCP_PAGE_SIZE);
+  const pageIds = [2];
+  for (const offset of pageOffsets.slice(1)) {
+    const id = 3 + offset/MCP_PAGE_SIZE;
+    pageIds.push(id);
+    child.stdin.write(JSON.stringify({jsonrpc:"2.0",id,method:"tools/list",params:{cursor:"1.7.0:"+offset}})+"\n");
+  }
   child.stdin.end();
   const [status] = await exited;
   assert.equal(status,0);
@@ -86,17 +90,13 @@ test("stdio server answers initialize and tools/list", {timeout: 10000}, async (
   const msgs = lines.map((l) => JSON.parse(l));
   const init = msgs.find((m) => m.id === 1);
   assert.equal(init.result.serverInfo.name, "getecoback-raumklima");
-  const list = msgs.find((m) => m.id === 2);
-  assert.equal(list.result.tools.length,100);
-  assert.equal(list.result.nextCursor,"1.6.0:100");
-  const remainder = msgs.find(m=>m.id===4).result;
-  assert.equal(remainder.nextCursor,"1.6.0:200");
-  const last = msgs.find(m=>m.id===5).result;
-  assert.equal(last.nextCursor,"1.6.0:300");
-  const fourth = msgs.find(m=>m.id===6).result;
-  assert.equal(fourth.nextCursor,undefined);
-  assert.equal(fourth.tools.length,89);
-  assert.deepEqual([...list.result.tools,...remainder.tools,...last.tools,...fourth.tools].map(t=>t.name),TOOLS.map(t=>t.name));
+  const catalogue = await collectToolPages(async cursor => {
+    const index = cursor === undefined ? 0 : pageOffsets.indexOf(Number(cursor.split(':').at(-1)));
+    assert.ok(index >= 0);
+    return msgs.find(item=>item.id===pageIds[index]).result;
+  });
+  assert.equal(catalogue.length,509);
+  assert.deepEqual(catalogue.map(t=>t.name),TOOLS.map(t=>t.name));
   const call = msgs.find((m) => m.id === 3);
   assert.match(call.result.content[0].text, /BTU/);
 });
@@ -162,9 +162,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 379 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 499 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,379);
+  assert.equal(expandedDefinitions.length,499);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);
