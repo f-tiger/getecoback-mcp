@@ -1,6 +1,6 @@
 # EcoBack Raumklima — MCP server
 
-<!-- count -->196<!-- /count --> tools for **indoor climate and household energy in Germany/EU**: how many BTU a
+<!-- count -->292<!-- /count --> tools for **indoor climate and household energy in Germany/EU**: how many BTU a
 room needs, how long a portable-AC window seal has to be, whether a heatwave is coming,
 what a device costs to run, whether a dehumidifier can drain uphill and which moisture checks to make. The tools also search and retrieve published guides.
 
@@ -242,6 +242,102 @@ Worker, and ports drift silently.
 | `luftbefeuchter_technik_fotobeleg` | Check whether the humidifier operating principle is actually documented. |
 | `ersatzfilter_pack_stueckpreis` | Compare bundle unit prices after accessory fit and delivery charges. |
 | `kundenrezension_modellgruppe_pruefen` | Assess whether a retailer review count applies to the exact variant. |
+| `dusche_zeit_bei_wasserbudget` | Find the shower time allowed by a personal water budget. |
+| `brause_fliessdruck_bereich` | Check a measured running pressure against the specified showerhead range. |
+| `brauseschlauch_anschluesse_abgleichen` | Check both ends of a replacement shower hose against the documented connectors. |
+| `dusche_waermeleistungsbedarf` | Estimate the continuous thermal output needed at a given shower flow. |
+| `duschfolge_warmwasservorrat_einordnen` | Estimate consecutive showers using a known usable mixed-water volume. |
+| `warmwasser_wartezeit_zapfstellen` | Compare waiting times at two taps measured from independent cold starts. |
+| `warmwasser_rechnung_fix_und_variabel` | Separate fixed charges from the volume-dependent part of a stated hot-water billing plan. |
+| `armatur_tropfverlust_schaetzen` | Project a captured drip rate over a limited observation period. |
+| `wasserzaehler_ruhezustand_einordnen` | Interpret two observed water meter readings during a no-draw interval. |
+| `duschbereich_naesse_ausserhalb` | Distinguish observations during use from water that reappears after the shower is off. |
+| `warmwasser_nutzwaerme_gegen_zaehler` | Compare useful draw heat with a thermal meter covering the agreed boundary. |
+| `spuelgang_nachwaschaufwand` | Account for actual repeat cycles when assessing dishwasher results. |
+| `spuelprogramm_fertig_bis` | Check whether a suitable programme fits a dish-ready deadline. |
+| `spuelmaschine_warmzulauf_freigabe` | Check the exact appliance manual for permission and a maximum warm inlet temperature. |
+| `kontaktgrill_platten_spuelmaschine_beleg` | Look up the exact documented contact-grill plate cleaning claim. |
+| `spuelmaschine_label_wasser_bezug` | Compare actual dishwasher litres per cycle with the applicable Eco label value. |
+| `spuelmaschine_ablaufweg_anleitung` | Check dishwasher drain route measurements against the exact provided manual limits. |
+| `trockner_programm_trockenmasse` | Check a load against the selected dryer programme’s stated capacity. |
+| `waschtrockner_waschladung_aufteilen` | Estimate dry-only batches after a separately completed wash load in a washer-dryer. |
+| `waesche_pflegeetikett_programmabgleich` | Check selected machine-wash settings against a garment’s supplied care label. |
+| `waesche_zwei_maschinen_zeitplan` | Schedule repeated laundry batches through two separate appliances. |
+| `waesche_abholzeit_trommel` | Calculate how long finished wet laundry would wait before collection. |
+| `waescheleine_trockner_ladeanteil` | Split the supplied dry load mass into dryer-permitted and separately dried laundry. |
+| `trockner_ende_feuchte_stichprobe` | Check whether the observed dryness of the slowest-drying items suits the intended next step. |
+| `fensterdichtung_falz_profilabgleich` | Match a replacement window gasket to its documented groove and gap range. |
+| `fensterrahmen_entwaesserung_dokumentieren` | Decide what to document when a window-frame opening might be drainage. |
+| `innentuer_zugluftstopper_breite` | Check draft-stopper coverage and clearance for an ordinary interior door. |
+| `thermovorhang_bahnenbedarf` | Calculate curtain panels from measured coverage and the chosen fullness. |
+| `vorhang_parkbreite_fensterweg` | Check whether a parked curtain stack intrudes into the opening or handle path. |
+| `innenrollo_lichtspalt_pruefen` | Check side light gaps using cloth width rather than mounting-bracket width. |
+| `sonnenschutz_system_gwert_vergleichen` | Compare glazing-and-shade g-tot values at equivalent rating conditions. |
+| `sonnenschutz_tageslicht_platzmessung` | Compare matched light-meter readings with a shade open and closed. |
+| `fassadenbeschattung_zeitfenster_ueberlappung` | Compare one observed direct-sun interval with the planned shade schedule. |
+| `sitzplatz_operative_temperatur_einordnen` | Estimate operative temperature under low air movement. |
+| `raumtrennung_mischszenario_temperatur` | Estimate the limiting temperature if two room-air volumes fully mix. |
+| `klimafenster_plattenzuschnitt_materialbedarf` | Estimate rectangular stock-sheet yield with edge and cutting allowances. |
+| `abluftanschluss_kupplung_abgleichen` | Compare the actual mating diameters and connector types of an exhaust cuff. |
+| `abluftgitter_freien_querschnitt_lesen` | Estimate net open area from a documented open-area ratio. |
+| `heizkoerper_reflektor_flaechenbedarf` | Size reflector material for a single unobstructed rectangular wall patch. |
+| `dachfenster_hitzeschutz_typabgleich` | Match roof-window shade documentation to the exact existing window type. |
+| `dachdurchwaermung_spitzenverzug_protokoll` | Calculate the observed time lag between matched roof and indoor peaks. |
+| `klimafenster_tag_nutzungswechsel` | Find whether a removable hose insert conflicts with scheduled daytime window use. |
+| `klima_abluftrichtung_fassadenbeobachtung` | Identify nearby openings to record when outdoor exhaust may be reaching them. |
+| `split_klima_transportweg_masscheck` | Check shipping dimensions against the narrowest straight doorway in the intended orientation. |
+| `klimafenster_stoffkit_schadensbild` | Identify which fabric window-kit component needs inspection before reuse. |
+| `raumtuer_schallmessung_a_b` | Report the measured adjacent-room level difference with one door open versus closed. |
+| `klima_schallabstand_freifeld_szenario` | Estimate distance-only sound-level change for an ideal point source outside. |
+| `monoblock_kuehlmodus_einstellung_pruefen` | Troubleshoot obvious control settings before treating a running portable AC as defective. |
+| `saugroboter_kabelroute_vorbereiten` | Route around unresolved cords and loose items before a robot run. |
+| `saugroboter_d10_wischmodul_nachlauf` | Check the documented mop removal and care sequence for the D10 Plus Gen 2. |
+| `saugroboter_absaugstation_beutelkontrolle` | Decide whether to inspect the bag or log an incomplete auto-empty. |
+| `saugroboter_zonen_faelligkeit` | Decide which zones are due under a household cleaning cadence. |
+| `saugroboter_sensorhinweis_pflege` | Pick a manual-approved sensor care or support step after an alert. |
+| `saugroboter_restaufgaben_verteilen` | Reserve separate work for stairs, edges and excluded flooring. |
+| `saugroboter_staubbeutel_nutzungsplan` | Estimate planned bag stock from observed runs per change. |
+| `saugwischer_flachbetrieb_raumprofil` | Compare head and body clearance for a wet cleaner under furniture. |
+| `saugwischer_treppentransport_touren` | Count one-way transfers between floors for a wet-cleaning plan. |
+| `saugwischer_wartezeit_nachpflege` | Check the turnaround before a wet cleaner is needed again. |
+| `saugwischer_pflegestelle_entnahmeraum` | Check measured tank and roller access at a wet-cleaner service spot. |
+| `saugwischer_reihenfolge_trockener_ausgang` | Preserve a dry exit route when scheduling floor zones. |
+| `dreame_h14_pro_tank_selbstreinigung` | Apply the documented dirty-water-tank checks around H14 Pro self-cleaning. |
+| `kuehlgeraet_platz_waermeeintrag` | Identify exposure and vent issues for an existing refrigerator placement. |
+| `gefriergeraet_abtau_ersatzlager` | Check cold-storage capacity and a documented interruption window before defrosting. |
+| `kuehlschrank_tueroeffnung_alltag` | Find which fridge-door routine accounts for more observed open time. |
+| `kuehlgeraet_einbau_lueftungsabgleich` | Compare measured clear vent area to the manufacturer minimum. |
+| `kuehlgeraet_gitter_pflegeschritt` | Choose a manual-approved or support step for dusty fridge vents. |
+| `gefriergeraet_eisschicht_verlauf` | Record repeat frost at the same location without diagnosing a defect. |
+| `kuehlschrank_einraeumfolge` | Prepare a refrigerator loading sequence from container state and available space. |
+| `schublade_faecher_reihenbreite` | Calculate usable width after divider thickness in a row of drawer bins. |
+| `schubladeneinsatz_aushebehoehe` | Check the measured vertical removal space before adding a removable drawer organizer. |
+| `maehroboter_passage_seitenspiel` | Compare usable passage width with a location-specific manual requirement for an installed mower. |
+| `schubladenfach_objekt_ausrichtung` | Find a usable 90-degree orientation for a rectangular stored object. |
+| `strommessung_abba_abwechselnd` | Compare two appliance modes while balancing a linear order trend. |
+| `feuchte_versuch_referenzraum` | Compare before-and-after humidity changes against a concurrent reference. |
+| `hygrometer_standorttausch_auswerten` | Separate position effects from sensor offsets using a crossover. |
+| `strommessung_woche_nutzungsmix` | Weight working-day and other-day measurements by their actual weekly frequency. |
+| `stromversuch_wiederholungen_planen` | Plan independent repeats from pilot variation and a chosen precision target. |
+| `gepaarte_stromversuche_richtungsspanne` | Estimate an uncertainty interval for how often a setting wins in paired repeats. |
+| `sensorprotokoll_uhrdrift_abgleichen` | Align a sensor timestamp using two reference clock checks. |
+| `messprotokolle_zeitfenster_schneiden` | Compute which part of two logs actually covers the same period. |
+| `messdauer_zeitumstellung_korrigieren` | Correct elapsed time using recorded UTC offsets from both ends of a household measurement. |
+| `raumfeuchte_abschnitte_zeitgewichtet` | Combine comparable humidity period averages without giving a short period the same weight as a long one. |
+| `strommessung_messluecke_spannweite` | Bound unobserved energy using a defensible power ceiling instead of filling a gap with an average. |
+| `trocknerversuch_abkuehlphase_check` | Identify early-cut dryer-cycle recordings before comparing full loads. |
+| `strommessung_anlaufphase_getrennt` | Separate startup energy from the measured post-start phase. |
+| `raumversuch_erholungspausen_planen` | Schedule room trials with time to restore documented starting conditions. |
+| `geraetemessung_vorzyklus_nachwirkung` | Compare the same target mode after two different predecessor modes. |
+| `messung_nullanzeige_obergrenze` | Interpret an unchanged cumulative meter reading without claiming zero consumption. |
+| `geraeteverbrauch_nutzungsveraenderung` | Decompose an observed energy change into a usage-count effect and a per-task effect. |
+| `messreihe_echte_wiederholungen_zaehlen` | Count independent household trials without treating every logger sample as a replicate. |
+| `stromlogger_kurzereignis_stichprobe` | Check whether a short load episode can fall between point samples. |
+| `ab_haushaltsversuch_stoerfaktoren` | Review workload, endpoints and changed settings before testing. |
+| `strommessung_abschnitte_verketten` | Verify that two cumulative-energy windows are adjacent and avoid double counting. |
+| `strommessung_vorhersage_praxistag` | Compare a projected daily rate to a reserved validation day. |
+| `hygrometer_grenzuebertritt_zeitfenster` | Report the observation bracket for a threshold crossing between sparse samples. |
+| `lueftungsversuch_wetterpaare_eignung` | Screen ventilation pairs against declared outdoor temperature and humidity tolerances. |
 <!-- tools:end -->
 
 ## Can a MeacoDry Arete One 20L drain uphill into a sink?
@@ -256,7 +352,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 
 - **Same arithmetic as the published calculators.** Each tool mirrors a calculator that
   runs on the website, so an assistant's answer and the page a reader lands on cannot
-  disagree. A CI job calls all <!-- count -->196<!-- /count --> tools against production daily and
+  disagree. A CI job calls all <!-- count -->292<!-- /count --> tools against production daily and
   asserts each returns the value the published calculator shows.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
@@ -290,7 +386,7 @@ Not engineering, legal or subsidy advice.
 
 ## Hosted and local versions
 
-The hosted Registry entry is version 1.6.0. The local stdio source is version 1.4.0. The [tool directory](https://getecoback.com/mcp.html#tools) groups all 196 tools by household task.
+The hosted Registry entry is version 1.7.0. The local stdio source is version 1.5.0. The [tool directory](https://getecoback.com/mcp.html#tools) groups all 292 tools by household task.
 The drainage rules and reviewed German-market model sources come from
 [`sites/getecoback`](https://github.com/f-tiger/agi-site/tree/main/sites/getecoback).
 Follow the returned `nextCursor` in `tools/list` to discover later pages.
