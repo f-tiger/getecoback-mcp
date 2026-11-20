@@ -9,9 +9,9 @@ The [searchable tool directory](https://getecoback.com/mcp.html#tools) links to
 source guides and documented examples, including a
 [meter-to-bill comparison](https://getecoback.com/mcp.html#stromrechnung-messfenster-beispiel).
 
-Listed in the official
-[MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fhvac-btu-heat-klimaanlage/versions/latest)
-as `io.github.f-tiger/hvac-btu-heat-klimaanlage`.
+Official MCP Registry entries are available for the
+[hosted endpoint](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fhvac-btu-heat-klimaanlage/versions/latest)
+and the [local MCPB bundle](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fecoback-local-tools/versions/latest).
 
 The tool table below is not hand-written: `sync.mjs` rebuilds it from the live server's
 `tools/list` every day.
@@ -28,7 +28,14 @@ claude mcp add --transport http getecoback https://getecoback.com/mcp/v1
 { "mcpServers": { "getecoback": { "type": "http", "url": "https://getecoback.com/mcp/v1" } } }
 ```
 
-**Local stdio** runs the tools on your device. Start the GitHub package with `npx`.
+**Local MCPB bundle** for clients that support MCPB installation. Download
+[EcoBack Local Household Tools 1.17.0](https://github.com/f-tiger/agi-site/releases/download/fleet-mcp-registry-2026-10-10/ecoback-local-tools-1.17.0.mcpb)
+and install it with your client's MCPB option. It requires Node.js 22 or later.
+The [local Registry entry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fecoback-local-tools/versions/latest)
+lists the current bundle URL and SHA-256 checksum. Calculations run locally.
+Weather and selected guide lookups use public endpoints when requested.
+
+**Local stdio** also runs the tools on your device. Start the GitHub package with `npx`.
 
 ```
 npx github:f-tiger/getecoback-mcp
