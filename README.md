@@ -18,22 +18,24 @@ The tool table below is not hand-written: `sync.mjs` rebuilds it from the live s
 
 ## Connect
 
-**Hosted endpoint** (no package installation or account required):
-
-```
-claude mcp add --transport http getecoback https://getecoback.com/mcp/v1
-```
-
-```json
-{ "mcpServers": { "getecoback": { "type": "http", "url": "https://getecoback.com/mcp/v1" } } }
-```
-
 **Local MCPB bundle** for clients that support MCPB installation. Download
 [EcoBack Local Household Tools 1.17.0](https://github.com/f-tiger/agi-site/releases/download/fleet-mcp-registry-2026-10-10/ecoback-local-tools-1.17.0.mcpb)
 and install it with your client's MCPB option. It requires Node.js 22 or later.
 The [local Registry entry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fecoback-local-tools/versions/latest)
 lists the current bundle URL and SHA-256 checksum. Calculations run locally.
 Weather and selected guide lookups use public endpoints when requested.
+
+<details>
+<summary>Run the downloaded bundle from a terminal</summary>
+
+Extract the MCPB archive and try the drainage check with Node.js 22 or later.
+
+```sh
+unzip -q ecoback-local-tools-1.17.0.mcpb -d ecoback-local
+printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"entfeuchter_ablaufcheck","arguments":{"drain":"level_or_uphill","model":"meaco-one-20"}}}' | node ecoback-local/src/server.mjs
+```
+
+</details>
 
 **Local stdio** also runs the tools on your device. Start the GitHub package with `npx`.
 
@@ -54,6 +56,16 @@ Node.js 22 or later, point your MCP client at `src/server.mjs` in the downloaded
 
 No package installation is required for this setup. Source and guide links in tool
 answers still open their websites separately.
+
+**Hosted endpoint** for clients that connect over HTTP.
+
+```
+claude mcp add --transport http getecoback https://getecoback.com/mcp/v1
+```
+
+```json
+{ "mcpServers": { "getecoback": { "type": "http", "url": "https://getecoback.com/mcp/v1" } } }
+```
 
 [Setup for other clients](https://getecoback.com/mcp.html) ·
 [`/.well-known/mcp.json`](https://getecoback.com/.well-known/mcp.json)
@@ -76,15 +88,17 @@ returns up to five results as JSON with the tool name, input schema and any
 recorded canonical citation, guide section and example arguments. It uses the
 reviewed German ranking rules from the EcoBack site repository. [Ranking source](https://github.com/f-tiger/agi-site/blob/d3464896ede6e50fc418af2d2f67962ba55f188e/sites/getecoback/site/assets/mcp-catalog-search.mjs)
 
-Run the drainage example directly from the same checkout to see what to check
-before routing a hose uphill.
+Try a reviewed example offline by giving its exact tool name. The reply shows
+the sample arguments, the actual tool result and any recorded source link.
 
 ```sh
-printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"entfeuchter_ablaufcheck","arguments":{"drain":"level_or_uphill","model":"meaco-one-20"}}}' | node src/server.mjs
+node src/find-tools.mjs --example entfeuchter_ablaufcheck
+node src/find-tools.mjs --example dusche_zeit_bei_wasserbudget
 ```
 
-The local reply includes the model evidence and a link to the drainage section.
-Check the pump and accessories for the exact German model before buying.
+The first example explains what to check before routing a hose uphill and links
+to the model evidence. The second calculates shower duration for the sample water
+budget. Your MCP client can supply your own inputs to either tool.
 
 ## Tools
 
