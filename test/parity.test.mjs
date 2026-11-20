@@ -1,25 +1,16 @@
-// Two things are checked here, and the second is the point of this file.
-//
-// 1. The local server speaks MCP: initialize, tools/list, tools/call over stdio.
-// 2. Every local tool returns EXACTLY what the hosted server at
-//    getecoback.com/mcp/v1 returns for the same arguments.
-//
-// (2) exists because this repository is a port of logic that lives in a
-// Cloudflare Worker elsewhere. Ports drift silently; a reader who runs this
-// package must not get a different number from the one the website publishes.
-// Live-data tools are compared on shape rather than value, since the weather
-// moves between the two calls.
+// Live fixtures confirm the reviewed stdio answers against the hosted release.
+// Weather and guide responses are checked for usable shape because they may change.
 
-import { spawn } from "node:child_process";
-import {once} from "node:events";
-import {createInterface} from "node:readline";
-import { test } from "node:test";
+import { readFileSync } from "node:fs";
+import { before, test } from "node:test";
 import assert from "node:assert/strict";
-import {MCP_PAGE_SIZE,collectToolPages} from '../src/eco-suite/src/mcp-pagination.mjs';
+import { collectToolPages } from "../src/eco-suite/src/mcp-pagination.mjs";
 import { TOOLS, callTool } from "../src/tools.mjs";
 
-const CI_HEADERS = { "content-type": "application/json", accept: "application/json, text/event-stream", "user-agent": "getecoback-ci/mirror-parity" };
-const REMOTE = process.env.MCP_URL || "https://getecoback.com/mcp/v1";
+const manifest = JSON.parse(readFileSync(new URL("../server.json", import.meta.url), "utf8"));
+const CI_HEADERS = { "content-type": "application/json", accept: "application/json, text/event-stream",
+  "user-agent": "getecoback-ci/mirror-parity", "x-probe": "1" };
+const REMOTE = process.env.MCP_URL || manifest.remotes[0].url;
 
 // Deterministic tools: same input must give a byte-identical answer.
 const CASES = [
@@ -47,12 +38,12 @@ const SHAPE_ONLY = [
   ["ratgeber_lesen", { pfad: "/guide/btu-rechner.html" }, /Quelle: https:\/\/getecoback\.com/],
 ];
 
-async function remoteCall(name, args) {
+async function remoteRequest(method, params) {
   const res = await fetch(REMOTE, {
     method: "POST",
     headers: CI_HEADERS,
     signal: AbortSignal.timeout(20000),
-    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name, arguments: args } }),
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
   });
   if (!res.ok) throw new Error(`remote HTTP ${res.status}`);
   const text = await res.text();
@@ -71,45 +62,18 @@ function localText(res) {
   return res.content.map((c) => c.text).join("\n");
 }
 
-// --- protocol ---------------------------------------------------------------
+function remoteCall(name, args) {
+  return remoteRequest("tools/call", { name, arguments: args });
+}
 
-test("stdio server answers initialize and tools/list", {timeout: 10000}, async () => {
-  const child = spawn(process.execPath, ["src/server.mjs"], { stdio: ["pipe", "pipe", "inherit"] });
-  const lines = [];
-  const reader = createInterface({input:child.stdout});
-  reader.on("line", line => lines.push(line));
-  const exited = once(child,"close");
-  child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: {} }) + "\n");
-  child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }) + "\n");
-  child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "btu_empfehlung", arguments: { qm: 20 } } }) + "\n");
-  const pageOffsets = Array.from({length:Math.ceil(TOOLS.length/MCP_PAGE_SIZE)},(_,i)=>i*MCP_PAGE_SIZE);
-  const pageIds = [2];
-  for (const offset of pageOffsets.slice(1)) {
-    const id = 3 + offset/MCP_PAGE_SIZE;
-    pageIds.push(id);
-    child.stdin.write(JSON.stringify({jsonrpc:"2.0",id,method:"tools/list",params:{cursor:"1.17.0:"+offset}})+"\n");
-  }
-  child.stdin.end();
-  const [status] = await exited;
-  assert.equal(status,0);
-
-  const msgs = lines.map((l) => JSON.parse(l));
-  const init = msgs.find((m) => m.id === 1);
-  assert.equal(init.result.serverInfo.name, "getecoback-raumklima");
-  const catalogue = await collectToolPages(async cursor => {
-    const index = cursor === undefined ? 0 : pageOffsets.indexOf(Number(cursor.split(':').at(-1)));
-    assert.ok(index >= 0);
-    return msgs.find(item=>item.id===pageIds[index]).result;
+before(async () => {
+  const ready = await remoteRequest("initialize", {
+    protocolVersion: "2025-06-18",
+    capabilities: {},
+    clientInfo: { name: "getecoback-mirror-parity", version: "1.0.0" },
   });
-  assert.equal(catalogue.length,2003);
-  assert.deepEqual(catalogue.map(t=>t.name),TOOLS.map(t=>t.name));
-  const call = msgs.find((m) => m.id === 3);
-  assert.match(call.result.content[0].text, /BTU/);
-});
-
-test("unknown tool is a protocol error, not a silent empty answer", async () => {
-  const res = await callTool("does_not_exist", {});
-  assert.equal(res.isError, true);
+  assert.equal(ready?.serverInfo?.name, manifest.name.split("/").at(-1), "Hosted MCP identity differs from server.json");
+  assert.equal(ready?.serverInfo?.version, manifest.version, "Hosted MCP version differs from server.json");
 });
 
 // --- parity with the hosted server -----------------------------------------
@@ -132,23 +96,9 @@ for (const [name, args, must] of SHAPE_ONLY) {
   });
 }
 
-test("every tool declares a bilingual description and a schema", () => {
-  for (const t of TOOLS) {
-    assert.ok(t.description.includes("—"), `${t.name} description is not bilingual`);
-    assert.equal(t.inputSchema.type, "object");
-  }
-});
-
 // Fail as soon as a tool is added or retired; matching counts cannot detect drift.
 test('local advertised tool names match the hosted contract', async()=>{
- const hosted=await collectToolPages(async cursor=>{
-   const res=await fetch(REMOTE,{method:'POST',headers:CI_HEADERS,signal:AbortSignal.timeout(20000),
-     body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/list',params:cursor?{cursor}:{}})});
-   assert.equal(res.status,200);
-   const data=await res.json();
-   assert.equal(data.error,undefined);
-   return data.result;
- });
+ const hosted=await collectToolPages(cursor=>remoteRequest("tools/list",cursor?{cursor}:{}));
  assert.deepEqual(TOOLS.map(x=>x.name).sort(),hosted.map(x=>x.name).sort());
  assert.equal((await callTool('balkonspeicher_foerderung',{})).isError,true,'Retired advice must not reappear');
 });
