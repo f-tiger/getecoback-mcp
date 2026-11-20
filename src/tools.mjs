@@ -1,4 +1,4 @@
-// EcoBack MCP tools. The 90-task suite shares source with the hosted service.
+// EcoBack MCP tools. The deterministic suites share source with the hosted service.
 //
 // This is a port of the logic that runs in the hosted server at
 // https://getecoback.com/mcp/v1 — same formulas, same rounding, same wording.
@@ -14,16 +14,19 @@ export const DISCLOSURE =
 
 const SITE = "https://getecoback.com";
 
-function ok(text) {
-  return { content: [{ type: "text", text }], isError: false };
+function ok(text, structuredContent) {
+  return {
+    content: [{type: "text", text}],
+    ...(structuredContent === undefined ? {} : {structuredContent}),
+    isError: false,
+  };
 }
 function err(text) {
   return { content: [{ type: "text", text }], isError: true };
 }
-function de(n, digits) {
-  return digits === undefined
-    ? n.toLocaleString("de-DE")
-    : n.toFixed(digits).replace(".", ",");
+
+function mcpNumberInRange(value, min, max = Infinity) {
+  return Number.isFinite(value) && value >= min && value <= max;
 }
 
 export const TOOLS = [
@@ -46,7 +49,7 @@ export const TOOLS = [
   {
     name: "btu_empfehlung",
     description:
-      "Empfohlene Kühlleistung (BTU) für einen Raum, mit passender Geräteklasse. — Recommended cooling capacity in BTU for a room, with the matching device class: how many BTU do I need for X m²? Same formula as the calculator on getecoback.com (340 BTU/m² × sun factor), for Germany and Europe.",
+      "Überschlägige Kühlleistung (BTU/h) aus Raumfläche und Sonne. — Estimate cooling capacity in BTU/h from room area and sun exposure, using the website's baseline of 340 BTU/h per m². Consider a detailed load calculation for large rooms.",
     inputSchema: {
       type: "object",
       properties: {
@@ -59,7 +62,7 @@ export const TOOLS = [
   {
     name: "fensterabdichtung_laenge",
     description:
-      "Benötigte Länge einer Fensterabdichtung für mobile Klimaanlagen aus den Flügelmaßen. — Required window-seal length for a portable air conditioner from the sash measurements (perimeter = 2×(width+height)), plus the off-the-shelf size that fits. Covers tilt-and-turn and roof windows.",
+      "Benötigte Länge einer Fensterabdichtung aus den Flügelmaßen. — Estimate the seal length for a portable air conditioner from sash measurements (perimeter = 2 × (width + height)) and identify a stock size to verify. Covers tilt-and-turn and roof windows.",
     inputSchema: {
       type: "object",
       properties: {
@@ -109,7 +112,7 @@ export const TOOLS = [
   {
     name: "taupunkt_lueften",
     description:
-      "Taupunkt der Außenluft und die Antwort auf 'darf ich jetzt lüften?'. — Dew point of the outside air and whether opening the window right now would make a basement or damp room wetter (Magnus formula, walls counted 2 °C below room temperature).",
+      "Außentaupunkt mit geschätzter Wandtemperatur vergleichen. — Compare outdoor dew point (Magnus approximation) with a wall estimate 2 °C below room temperature. A drying decision also needs indoor humidity and a measured coldest surface.",
     inputSchema: {
       type: "object",
       properties: {
@@ -152,41 +155,55 @@ export const TOOLS = [
 const HEAT_CITIES = [
   ["Berlin", 52.52, 13.41], ["Frankfurt", 50.11, 8.68], ["München", 48.14, 11.58],
 ];
+const HEAT_NOTHING = { level: 0, region: "", temp: null, day: "" };
+const HEAT_FORECAST_DAYS = 3;
+const HEAT_SOURCE = "https://open-meteo.com/en/docs";
+const HEAT_GUIDE = "https://getecoback.com/guide/hitze-check.html";
 
 async function cityMax(name, lat, lon) {
   try {
     const r = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-      `&daily=temperature_2m_max&forecast_days=3&timezone=Europe%2FBerlin`,
+      `&daily=temperature_2m_max&forecast_days=${HEAT_FORECAST_DAYS}&timezone=Europe%2FBerlin`,
       { signal: AbortSignal.timeout(6000) });
     if (!r.ok) return null;
     const d = await r.json();
-    const temps = (d && d.daily && d.daily.temperature_2m_max) || [];
-    const days = (d && d.daily && d.daily.time) || [];
+    const temps = d?.daily?.temperature_2m_max;
+    const days = d?.daily?.time;
+    if (!Array.isArray(temps) || !Array.isArray(days)) return null;
+    const coveredDays = new Set();
     let top = null;
-    temps.forEach((t, i) => {
-      if (typeof t === "number" && (top === null || t > top.temp)) {
-        top = { region: name, temp: t, day: days[i] || "" };
-      }
-    });
-    return top;
-  } catch (e) {
+    for (let i = 0; i < HEAT_FORECAST_DAYS; i++) {
+      const temp = temps[i];
+      const day = days[i];
+      if (!Number.isFinite(temp) || typeof day !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(day)) continue;
+      coveredDays.add(day);
+      if (top === null || temp > top.temp) top = {region: name, temp, day};
+    }
+    return top && {...top, availableDays: coveredDays.size};
+  } catch {
     return null;
   }
 }
 
+// The bare reading, shared by the JSON endpoint and the MCP tool.
 async function heatReading() {
-  let best = { level: 0, region: "", temp: null, day: "" };
-  try {
-    const results = await Promise.all(HEAT_CITIES.map(([n, la, lo]) => cityMax(n, la, lo)));
-    for (const c of results) {
-      if (c && (best.temp === null || c.temp > best.temp)) best = { level: 0, ...c };
+  const readings = await Promise.all(HEAT_CITIES.map(([name, lat, lon]) => cityMax(name, lat, lon)));
+  const coverage = HEAT_CITIES.map(([city], index) => ({
+    city,
+    available_days: readings[index]?.availableDays ?? 0,
+  }));
+  let best = {...HEAT_NOTHING};
+  for (const reading of readings) {
+    if (reading && (best.temp === null || reading.temp > best.temp)) {
+      const {region, temp, day} = reading;
+      best = {level: temp >= 32 ? 2 : temp >= 28 ? 1 : 0, region, temp, day};
     }
-    if (best.temp !== null) best.level = best.temp >= 32 ? 2 : best.temp >= 28 ? 1 : 0;
-  } catch (e) {
-    best = { level: 0, region: "", temp: null, day: "" };
   }
-  return best;
+  const forecast_status = best.temp === null ? "unavailable"
+    : coverage.every(({available_days}) => available_days === HEAT_FORECAST_DAYS) ? "available"
+    : "partial";
+  return {...best, forecast_status, coverage};
 }
 
 const SEARCH_STOP = new Set([
@@ -255,6 +272,9 @@ export async function callTool(name, args) {
   if (name === drainTool.name) return drainDecision(args);
   const a = args || {};
   if (name === "geraet_wahl") {
+    if (!["zu_heiss", "feucht_schimmel", "zu_kalt", "stickige_luft"].includes(a.problem)) {
+      return err("Ungültiges Problem. Wähle zu_heiss, feucht_schimmel, zu_kalt oder stickige_luft.");
+    }
     const qm = Math.max(4, Math.min(120, Number(a.qm) || 20));
     const qp = qm <= 12 ? 10 : qm <= 17 ? 15 : qm <= 22 ? 20 : qm <= 27 ? 25 : qm <= 35 ? 30 : 40;
     // Heating/cooling retain their sizing rules; moisture uses the shared
@@ -293,96 +313,121 @@ export async function callTool(name, args) {
   }
 
   if (name === "btu_empfehlung") {
-    const qm = Math.max(4, Math.min(120, Number(a.qm) || 20));
-    const sun = a.sonne === "wenig" ? 0.9 : (a.sonne === "viel" ? 1.2 : 1);
+    const {qm, sonne = "normal"} = a;
+    if (!mcpNumberInRange(qm, 4, 120) || !["wenig", "normal", "viel"].includes(sonne)) {
+      return err("Gib eine Raumfläche von 4 bis 120 m² und die Sonne als wenig, normal oder viel an.");
+    }
+    const sun = sonne === "wenig" ? 0.9 : (sonne === "viel" ? 1.2 : 1);
+    // Use the baseline from the browser calculator. It has additional inputs.
     const btu = Math.round((qm * 340 * sun) / 500) * 500;
-    let klasse;
-    if (btu <= 9000) klasse = "bis ca. 9.000 BTU (z. B. Comfee MPPH-09CRN7)";
-    else if (btu <= 11000) klasse = "ca. 10.000–11.000 BTU (z. B. De'Longhi Pinguino PAC EX105)";
-    else klasse = "ab 12.000 BTU (z. B. Klarstein Kraftwerk Smart 12K)";
-    const qp = qm <= 12 ? 10 : qm <= 17 ? 15 : qm <= 22 ? 20 : qm <= 27 ? 25 : qm <= 35 ? 30 : 40;
+    const largeLoad = qm > 50 || btu > 14000;
+    const klasse = btu <= 9000 ? "bis ca. 9.000 BTU/h"
+      : btu <= 11000 ? "ca. 10.000–11.000 BTU/h"
+      : "ca. 12.000–14.000 BTU/h";
+    const qp = qm <= 12 ? 10 : qm <= 17 ? 15 : qm <= 22 ? 20 : qm <= 27 ? 25 : qm <= 35 ? 30 : qm <= 45 ? 40 : 50;
+    const sizing = largeLoad
+      ? "Hohe überschlägige Kühllast. Prüfe Zonen, Wärmequellen und Geräteleistung anhand einer Kühllastberechnung."
+      : `Geräteklasse als Orientierung: ${klasse}. Vergleiche die Nennkühlleistung mit der geschätzten Last.\nOrientierung nach Raumgröße: https://getecoback.com/guide/klimaanlage-${qp}-qm.html`;
     return ok(
-      `Empfohlene Kühlleistung für ${qm} m² (Sonne: ${a.sonne || "normal"}): ca. ${de(btu)} BTU.\n` +
-      `Passende Geräteklasse: ${klasse}.\n` +
-      `Wichtig: Ohne dichte Fensterabdichtung verliert jeder Monoblock den Großteil seiner Wirkung.\n` +
-      `Geräte-Empfehlungen für diese Raumgröße: ${SITE}/guide/klimaanlage-${qp}-qm.html\n` +
-      `Vollständiger Rechner (Decke, Personen, offene Küche): ${SITE}/guide/btu-rechner.html\n${DISCLOSURE}`);
+      `Geschätzte Kühlleistung für ${qm} m² (Sonne: ${sonne}): ca. ${btu.toLocaleString("de-DE")} BTU/h.\n` +
+      `${sizing}\nBei einem Monoblock auch Abluftweg und Fensterabdichtung prüfen.\n` +
+      `Vollständiger Rechner (Decke, Personen, offene Küche): https://getecoback.com/guide/btu-rechner.html\n${DISCLOSURE}`);
   }
-
   if (name === "fensterabdichtung_laenge") {
     const W = Math.max(20, Math.min(300, Number(a.breite_cm) || 60));
     const H = Math.max(20, Math.min(300, Number(a.hoehe_cm) || 140));
+    // Identical to the EB_SEALFIT calculator: perimeter of the sash.
     const need = (2 * (W + H)) / 100;
-    const sizes = [2.0, 2.8, 3.0, 4.0, 5.0];
+    const sizes = [2.0, 2.8, 3.0, 4.0, 5.0, 5.6];
     const fit = sizes.find((s) => s >= need);
-    const size = fit ? `Passende Konfektionsgröße: ${Math.round(fit * 100)} cm.`
-      : "Größer als übliche Konfektionsgrößen — hier hilft nur Maßanfertigung.";
+    const size = fit ? `Konfektionsgröße zum Prüfen: ${Math.round(fit * 100)} cm.`
+      : "Die Beispielgrößen reichen hier nicht. Prüfe größere Kits oder eine Maßanfertigung.";
+    // Window sealing is the topic AI assistants already cite this site for, so
+    // the answer carries the guide for the window type that was actually asked
+    // about rather than one generic link.
     const typGuide = a.fenstertyp === "dachfenster"
-      ? `Dachfenster/Velux: ${SITE}/guide/klimaanlage-dachfenster.html`
-      : `Kipp- & Dreh-Kipp-Fenster: ${SITE}/guide/klimaanlage-kippfenster.html`;
+      ? "Dachfenster/Velux: https://getecoback.com/guide/klimaanlage-dachfenster.html"
+      : "Kipp- & Dreh-Kipp-Fenster: https://getecoback.com/guide/klimaanlage-kippfenster.html";
     return ok(
-      `Benötigte Abdichtungslänge für einen Flügel ${W}×${H} cm: mindestens ${de(need, 2)} m (Umfang 2×(B+H)). ${size}\n` +
-      `Gemessen wird der bewegliche Flügel, nicht der Rahmen. Üblicher Schwachpunkt ist das Klebeband — wo möglich klemmen statt kleben.\n` +
+      `Benötigte Abdichtungslänge für einen Flügel ${W}×${H} cm: mindestens ${need.toFixed(2).replace(".", ",")} m (Umfang 2×(B+H)). ${size}\n` +
+      `Gemessen wird der bewegliche Flügel, nicht der Rahmen. Prüfe Fenstertyp und Messvorgaben des konkreten Sets.\n` +
       `${typGuide}\n` +
-      `Kaufberatung nach Bauart: ${SITE}/guide/fensterabdichtung-klimaanlage.html\n${DISCLOSURE}`);
+      `Kaufberatung nach Bauart: https://getecoback.com/guide/fensterabdichtung-klimaanlage.html\n${DISCLOSURE}`);
   }
-
   if (name === "hitzewelle_vorschau") {
     const d = await heatReading();
     let head;
-    if (!d || !d.level) head = "Keine Hitze in Sicht: In Berlin/Frankfurt/München bleibt es die nächsten 3 Tage unter 28 °C.";
-    else if (d.level >= 2) head = `Hitzewelle im Anmarsch: bis ${Math.round(d.temp)} °C in ${d.region} (${d.day}). Erfahrungsgemäß sind mobile Klimageräte dann innerhalb weniger Tage vergriffen — vor der Welle entscheiden.`;
-    else head = `Es wird warm: bis ${Math.round(d.temp)} °C in ${d.region} (${d.day}).`;
-    return ok(`${head}\nDatenquelle: open-meteo (3 Städte, 3 Tage). Ratgeber: ${SITE}/\n${DISCLOSURE}`);
-  }
-
-  if (name === "klimaanlage_stromkosten") {
-    const watt = Math.max(1, Number(a.watt) || 1000);
-    const h = Math.max(0, Math.min(24, Number(a.stunden_pro_tag) || 8));
-    const price = Math.max(0, Number(a.strompreis_euro_kwh) || 0.3);
-    const days = Math.max(1, Math.min(365, Number(a.tage) || 30));
-    const duty = Math.max(0, Math.min(1, a.auslastung === undefined ? 0.65 : Number(a.auslastung)));
-    const perH = (watt / 1000) * price * duty;
-    const total = perH * h * days;
-    return ok(
-      `Stromkosten für ${watt} W, ${h} h/Tag, ${de(price, 2)} €/kWh, Auslastung ${(duty * 100).toFixed(0)} %:\n` +
-      `≈ ${de(perH, 2)} €/Betriebsstunde · ≈ ${de(total, 2)} € über ${days} Tage.\n` +
-      `Vollständiger Rechner: ${SITE}/guide/stromkosten-rechner.html\n${DISCLOSURE}`);
-  }
-
-  if (name === "heizleistung_watt") {
-    const qm = Math.max(1, Math.min(100, Number(a.qm) || 20));
-    const wPerQm = a.daemmung === "gut" ? 60 : (a.daemmung === "schlecht" ? 100 : 80);
-    const price = Math.max(0, Number(a.strompreis_euro_kwh) || 0.3);
-    const watt = Math.round((qm * wPerQm) / 10) * 10;
-    const split = watt > 2000
-      ? `\nÜber 2.000 W besser auf zwei Panels verteilen, z. B. 2 × ${de(Math.round(watt / 2 / 50) * 50)} W an verschiedenen Wänden.`
-      : "";
-    return ok(
-      `Heizleistung für ${qm} m² (Dämmung: ${a.daemmung || "mittel"}, ${wPerQm} W/m²): ca. ${de(watt)} Watt.${split}\n` +
-      `Betriebskosten bei ${de(price, 2)} €/kWh: ca. ${de((watt / 1000) * price, 2)} € pro Stunde Volllast — Infrarot heizt Flächen, läuft aber selten durchgehend.\n` +
-      `Vollständiger Rechner: ${SITE}/guide/infrarotheizung-watt-rechner.html\n${DISCLOSURE}`);
-  }
-
-  if (name === "taupunkt_lueften") {
-    const t = Number(a.aussen_temp_c);
-    const rh = Math.max(5, Math.min(100, Number(a.aussen_luftfeuchte_prozent)));
-    const ti = Number(a.innen_temp_c);
-    if (!isFinite(t) || !isFinite(rh) || !isFinite(ti)) {
-      return err("Bitte Außentemperatur, Außenluftfeuchte und Innentemperatur als Zahlen angeben.");
+    if (d.forecast_status === "unavailable") {
+      head = "Aktuell keine verwertbare Vorhersage. Ob 28 °C erreicht werden, ist unbekannt.";
+    } else if (d.forecast_status === "partial") {
+      head = `Unvollständige Vorhersage: höchster verfügbarer Wert ${d.temp} °C in ${d.region} (${d.day}). Für die fehlenden Tage oder Städte ist die Temperaturlage unbekannt.`;
+    } else {
+      const signal = d.level === 2 ? "Hitzehinweis ab 32 °C"
+        : d.level === 1 ? "Wärmehinweis ab 28 °C"
+        : "Alle vorliegenden Tagesmaxima unter 28 °C";
+      head = `${signal}. Höchster vorhergesagter Wert: ${d.temp} °C in ${d.region} (${d.day}).`;
     }
+    const coverage = d.coverage.map(({city, available_days}) => `${city}: ${available_days}/${HEAT_FORECAST_DAYS} Tage`).join(", ");
+    return ok(
+      `${head}\nDatenabdeckung (Europe/Berlin): ${coverage}.\nDatenquelle: Open-Meteo — ${HEAT_SOURCE}\nRatgeber: ${HEAT_GUIDE}\n${DISCLOSURE}`,
+      {forecast_status:d.forecast_status, coverage:d.coverage, peak_c:d.temp, peak_city:d.region || null,
+        peak_date:d.day || null, forecast_source_url:HEAT_SOURCE, citation_url:HEAT_GUIDE});
+  }
+  if (name === "klimaanlage_stromkosten") {
+    const {watt, stunden_pro_tag:h, strompreis_euro_kwh:price, tage:days = 30, auslastung:duty = 0.65} = a;
+    if (!mcpNumberInRange(watt, 0) || !mcpNumberInRange(h, 0, 24) || !mcpNumberInRange(price, 0) ||
+        !mcpNumberInRange(days, 0, 365) || !mcpNumberInRange(duty, 0, 1)) {
+      return err("Gib Watt und Arbeitspreis als nichtnegative Zahlen ein sowie 0–24 Stunden pro Tag, optional 0–365 Tage und eine Auslastung von 0 bis 1.");
+    }
+    // Identical to /guide/stromkosten-rechner.html: perHour = kW × price × duty.
+    const perH = (watt / 1000) * duty * price;
+    const total = perH * (h * days);
+    if (!Number.isFinite(total)) return err("Die angegebenen Werte ergeben keine endlichen Stromkosten.");
+    const citationUrl = "https://getecoback.com/guide/stromkosten-rechner.html";
+    return ok(
+      `Stromkosten für ${watt} W, ${h} h/Tag, ${price.toFixed(2).replace(".", ",")} €/kWh, Auslastung ${(duty * 100).toFixed(0)} %:\n` +
+      `≈ ${perH.toFixed(2).replace(".", ",")} €/Betriebsstunde · ≈ ${total.toFixed(2).replace(".", ",")} € über ${days} Tage.\n` +
+      `Vollständiger Rechner: ${citationUrl}\n${DISCLOSURE}`,
+      {eur_per_operating_hour:Number(perH.toFixed(6)), eur_for_period:Number(total.toFixed(2)), citation_url:citationUrl});
+  }
+  if (name === "heizleistung_watt") {
+    const {qm, daemmung = "mittel", strompreis_euro_kwh:price = 0.3} = a;
+    if (!mcpNumberInRange(qm, 1, 100) || !mcpNumberInRange(price, 0) || !["gut", "mittel", "schlecht"].includes(daemmung)) {
+      return err("Gib eine Fläche von 1 bis 100 m² und optional einen nichtnegativen Arbeitspreis und gut, mittel oder schlecht für die Dämmung an.");
+    }
+    const wPerQm = daemmung === "gut" ? 60 : (daemmung === "schlecht" ? 100 : 80);
+    // Identical to /guide/infrarotheizung-watt-rechner.html.
+    const watt = Math.round((qm * wPerQm) / 10) * 10;
+    const perH = (watt / 1000) * price;
+    if (!Number.isFinite(perH)) return err("Die angegebenen Werte ergeben keine endlichen Stromkosten.");
+    const split = watt > 2000
+      ? `\nÜber 2.000 W besser auf zwei Panels verteilen, z. B. 2 × ${(Math.round(watt / 2 / 50) * 50).toLocaleString("de-DE")} W an verschiedenen Wänden.`
+      : "";
+    const citationUrl = "https://getecoback.com/guide/infrarotheizung-watt-rechner.html";
+    return ok(
+      `Heizleistung für ${qm} m² (Dämmung: ${daemmung}, ${wPerQm} W/m²): ca. ${watt.toLocaleString("de-DE")} Watt.${split}\n` +
+      `Betriebskosten bei ${price.toFixed(2).replace(".", ",")} €/kWh: ca. ${perH.toFixed(2).replace(".", ",")} € pro Stunde Volllast — Infrarot heizt Flächen, läuft aber selten durchgehend.\n` +
+      `Vollständiger Rechner: ${citationUrl}\n${DISCLOSURE}`,
+      {estimated_watts:watt, eur_per_full_load_hour:Number(perH.toFixed(6)), citation_url:citationUrl});
+  }
+  if (name === "taupunkt_lueften") {
+    const {aussen_temp_c:t, aussen_luftfeuchte_prozent:rh, innen_temp_c:ti} = a;
+    if (!Number.isFinite(t) || !mcpNumberInRange(rh, 5, 100) || !Number.isFinite(ti)) {
+      return err("Gib Außen- und Innentemperatur in °C und die Außenluftfeuchte als Zahl von 5 bis 100 % an.");
+    }
+    // The legacy input estimates the wall temperature and does not measure indoor humidity.
     const g = Math.log(rh / 100) + (17.62 * t) / (243.12 + t);
     const td = (243.12 * g) / (17.62 - g);
-    const good = td < ti - 2;
+    if (!Number.isFinite(td)) return err("Für diese Werte lässt sich mit der Näherung kein Taupunkt berechnen.");
+    const wall = ti - 2;
+    const comparison = td < wall ? "liegt unter der geschätzten Wandtemperatur"
+      : "erreicht oder überschreitet die geschätzte Wandtemperatur";
     return ok(
-      `Taupunkt der Außenluft: ${de(td, 1)} °C (bei ${t} °C und ${rh} % rel. Feuchte).\n` +
-      (good
-        ? `Lüften ist jetzt sinnvoll: Der Taupunkt liegt unter der gerechneten Wandtemperatur (${de(ti - 2, 1)} °C), es schlägt sich nichts nieder.`
-        : `Jetzt nicht lüften: Der Taupunkt liegt über der gerechneten Wandtemperatur (${de(ti - 2, 1)} °C) — die warme Außenluft würde an den kühlen Wänden kondensieren und die Feuchte erhöhen.`) +
-      `\nGerechnet wird mit Wänden 2 °C unter Raumtemperatur. Im Sommer sind das oft die frühen Morgenstunden.\n` +
-      `Hintergrund & Check im Browser: ${SITE}/guide/keller-lueften-sommer.html\n${DISCLOSURE}`);
+      `Taupunkt der Außenluft: ${td.toFixed(1).replace(".", ",")} °C (bei ${t} °C und ${rh} % rel. Feuchte).\n` +
+      `Der Außentaupunkt ${comparison} von ${wall.toFixed(1).replace(".", ",")} °C (Raumtemperatur minus 2 °C).\n` +
+      `Für eine Lüftungsentscheidung die kälteste Oberfläche messen und den Innentaupunkt aus Temperatur und Luftfeuchte mit dem Außentaupunkt vergleichen. Die Eingaben erlauben noch keine Aussage, ob Lüften trocknet.\n` +
+      `Hintergrund & Check im Browser: https://getecoback.com/guide/keller-lueften-sommer.html\n${DISCLOSURE}`);
   }
-
   if (name === "ratgeber_suche") {
     const tokens = searchTokens(a.frage);
     if (!tokens.length) return err("Bitte einen Suchbegriff mit mindestens drei Buchstaben angeben.");

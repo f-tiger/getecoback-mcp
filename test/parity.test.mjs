@@ -25,12 +25,18 @@ const REMOTE = process.env.MCP_URL || "https://getecoback.com/mcp/v1";
 const CASES = [
   ["btu_empfehlung", { qm: 20, sonne: "normal" }],
   ["btu_empfehlung", { qm: 45, sonne: "viel" }],
+  ["btu_empfehlung", { qm: 120 }],
   ["fensterabdichtung_laenge", { breite_cm: 60, hoehe_cm: 140, fenstertyp: "kipp" }],
   ["fensterabdichtung_laenge", { breite_cm: 200, hoehe_cm: 200, fenstertyp: "dachfenster" }],
+  ["fensterabdichtung_laenge", { breite_cm: 130, hoehe_cm: 140, fenstertyp: "kipp" }],
   ["klimaanlage_stromkosten", { watt: 1000, stunden_pro_tag: 8, strompreis_euro_kwh: 0.3, tage: 30, auslastung: 0.65 }],
+  ["klimaanlage_stromkosten", { watt: 1000, stunden_pro_tag: 0, strompreis_euro_kwh: 0 }],
+  ["klimaanlage_stromkosten", { watt: 1000, stunden_pro_tag: 8, strompreis_euro_kwh: 0.3, auslastung: 2 }],
   ["heizleistung_watt", { qm: 30, daemmung: "schlecht", strompreis_euro_kwh: 0.35 }],
+  ["heizleistung_watt", { qm: 20, strompreis_euro_kwh: 0 }],
   ["taupunkt_lueften", { aussen_temp_c: 18, aussen_luftfeuchte_prozent: 60, innen_temp_c: 16 }],
   ...['zu_heiss','zu_kalt','stickige_luft'].map(problem=>['geraet_wahl',{problem,qm:20}]),
+  ["geraet_wahl", { problem: "unknown" }],
   ...[{}, {purpose:'damage'}, {humidity:'normal'}, {humidity:'high',temperature:'cold'}, {purpose:'laundry',humidity:'high',temperature:'warm'}, {humidity:'high',temperature:'warm'}, {purpose:'invalid'}].map(args=>['geraet_wahl',{problem:'feucht_schimmel',...args}]),
 ];
 
@@ -81,7 +87,7 @@ test("stdio server answers initialize and tools/list", {timeout: 10000}, async (
   for (const offset of pageOffsets.slice(1)) {
     const id = 3 + offset/MCP_PAGE_SIZE;
     pageIds.push(id);
-    child.stdin.write(JSON.stringify({jsonrpc:"2.0",id,method:"tools/list",params:{cursor:"1.8.0:"+offset}})+"\n");
+    child.stdin.write(JSON.stringify({jsonrpc:"2.0",id,method:"tools/list",params:{cursor:"1.9.0:"+offset}})+"\n");
   }
   child.stdin.end();
   const [status] = await exited;
@@ -95,7 +101,7 @@ test("stdio server answers initialize and tools/list", {timeout: 10000}, async (
     assert.ok(index >= 0);
     return msgs.find(item=>item.id===pageIds[index]).result;
   });
-  assert.equal(catalogue.length,634);
+  assert.equal(catalogue.length,759);
   assert.deepEqual(catalogue.map(t=>t.name),TOOLS.map(t=>t.name));
   const call = msgs.find((m) => m.id === 3);
   assert.match(call.result.content[0].text, /BTU/);
@@ -111,10 +117,10 @@ test("unknown tool is a protocol error, not a silent empty answer", async () => 
 for (const [name, args] of CASES) {
   test(`parity: ${name} ${JSON.stringify(args)}`, async () => {
     const [mine, theirs] = await Promise.all([
-      callTool(name, args).then(localText),
-      remoteCall(name, args).then(localText),
+      callTool(name, args),
+      remoteCall(name, args),
     ]);
-    assert.equal(mine, theirs, `local and hosted answers differ for ${name}`);
+    assert.deepEqual(mine, theirs, `local and hosted answers differ for ${name}`);
   });
 }
 
@@ -162,9 +168,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 624 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 749 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,624);
+  assert.equal(expandedDefinitions.length,749);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);

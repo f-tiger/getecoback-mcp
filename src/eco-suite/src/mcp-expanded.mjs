@@ -26,6 +26,11 @@ import {luftpfade} from './mcp-luftpfade.mjs';
 import {modellunterlagen} from './mcp-modellunterlagen.mjs';
 import {haushaltsbuch} from './mcp-haushaltsbuch.mjs';
 import {praxistest} from './mcp-praxistest.mjs';
+import {messunsicherheit} from './mcp-messunsicherheit.mjs';
+import {geraeteablauf} from './mcp-geraeteablauf.mjs';
+import {weiterverwendung} from './mcp-weiterverwendung.mjs';
+import {raumuebergabe} from './mcp-raumuebergabe.mjs';
+import {wohnszenarien} from './mcp-wohnszenarien.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -56,6 +61,11 @@ export const expandedDefinitions = [
   ['Modellunterlagen', modellunterlagen],
   ['Haushaltsbuch', haushaltsbuch],
   ['Praxistests', praxistest],
+  ['Messunsicherheit', messunsicherheit],
+  ['Geräteablauf', geraeteablauf],
+  ['Weiterverwendung', weiterverwendung],
+  ['Raumübergabe', raumuebergabe],
+  ['Wohnszenarien', wohnszenarien],
 ].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));
