@@ -9,9 +9,56 @@ import { fileURLToPath } from 'node:url';
 import { expandedDefinitions } from '../src/eco-suite/src/mcp-expanded.mjs';
 import { collectToolPages, MCP_PAGE_SIZE, pageTools } from '../src/eco-suite/src/mcp-pagination.mjs';
 import { callTool, TOOLS } from '../src/tools.mjs';
+import { findTools } from '../src/find-tools.mjs';
 
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 const server = fileURLToPath(new URL('../src/server.mjs', import.meta.url));
+const finder = fileURLToPath(new URL('../src/find-tools.mjs', import.meta.url));
+
+test('offline lookup preserves every exact name and input schema', () => {
+  for (const {name, inputSchema} of TOOLS) {
+    const result = findTools(name);
+    assert.equal(result.totalMatches, 1, name);
+    assert.equal(result.tools[0].name, name);
+    assert.deepEqual(result.tools[0].inputSchema, inputSchema, name);
+  }
+});
+
+test('German questions find tools beyond the first page and keep reviewed examples', () => {
+  const drainage = findTools('Kann ich den Abflussschlauch nach oben führen?');
+  assert.equal(drainage.tools[0].name, 'entfeuchter_ablaufcheck');
+
+  const shower = findTools('Wie lange darf ich mit 72 Litern duschen?').tools[0];
+  assert.equal(shower.name, 'dusche_zeit_bei_wasserbudget');
+  assert.match(shower.citation_url, /^https:\/\/getecoback\.com\//);
+  assert(shower.example_arguments);
+
+  const filter = findTools('Auf dem Tisch liegt der iRobot-Filterpack 4785887. Mein Roomba j7+ hat keinen Combo-Zusatz. Nennt die deutsche Packliste mein Modell?');
+  assert.equal(filter.tools[0].name, 'roboter_ersatzfilter_exakte_de_zuordnung');
+  assert(TOOLS.findIndex(tool => tool.name === filter.tools[0].name) >= MCP_PAGE_SIZE);
+
+  const toaster = 'Bosch TAT8613 Krümelschublade';
+  assert.deepEqual(findTools(toaster.normalize('NFD')), findTools(toaster));
+  assert.deepEqual(findTools('Bosch TAT8613 Kruemelschublade'), findTools(toaster));
+  assert(findTools(toaster).tools.some(tool => tool.name === 'bosch_tat8613_kruemelschublade_vor_betrieb_vorhanden'));
+
+  const broad = findTools('Fenster');
+  assert(broad.totalMatches > 5);
+  assert.equal(broad.tools.length, 5);
+  for (const query of ['  ', 'wie kann ich', 'qzxunknownzqp']) {
+    assert.deepEqual(findTools(query), {totalMatches: 0, tools: []});
+  }
+});
+
+test('offline finder emits JSON and handles an omitted query', () => {
+  const found = spawnSync(process.execPath, [finder, 'Wie lange darf ich mit 72 Litern duschen?'],
+    {encoding:'utf8', timeout:10000});
+  assert.equal(found.status, 0, found.stderr);
+  assert.equal(JSON.parse(found.stdout).tools[0].name, 'dusche_zeit_bei_wasserbudget');
+  const missing = spawnSync(process.execPath, [finder], {encoding:'utf8', timeout:10000});
+  assert.equal(missing.status, 2);
+  assert.match(missing.stderr, /Usage:/);
+});
 
 function readStdio(jobs) {
   // Regular descriptors exercise the real process without relying on libuv child sockets.
