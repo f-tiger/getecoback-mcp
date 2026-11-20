@@ -1,6 +1,6 @@
 # EcoBack Raumklima — MCP server
 
-<!-- count -->1484<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->1580<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -1535,6 +1535,102 @@ Worker, and ports drift silently.
 | `ersatzteil_softwarestand_angebot_abweichende_generation` | Separate documented support for a variant from a generic software download. |
 | `ersatzteil_fachangebot_diagnose_gleichnamiger_fehler` | Check whether the quoted part follows the confirmed diagnosis for this case. |
 | `ersatzteil_kaufpause_reparatur_nutzwerthorizont` | Compare repair wait with a documented end-of-use date rather than assuming the device remains wanted. |
+| `dunstabzug_de_modell_set_filter_belegkette` | Distinguish a documented recirculation kit from an installed-kit replacement |
+| `dunstabzug_starterset_17004061_paketrolleninventur` | Audit the documented contents of Bosch starter kit 17004061 |
+| `dunstabzug_dwb66bc50_normale_maxstufe_kenndaten` | Retrieve model-specific airflow and sound power for a documented operating mode |
+| `dunstabzug_gehaeusehoehe_je_betriebsbauform` | Compare the hood outline height for the documented configuration |
+| `dunstabzug_metall_kohle_pflegeauftrag_abgrenzen` | Keep grease-filter dishwasher evidence separate from carbon-filter care |
+| `dunstabzug_aktivkohle_tausch_zeitband_hersteller` | Classify a recorded exchange against the exact filter’s published guidance |
+| `dunstabzug_dkf12r_regeneration_und_gesamtalter` | Keep regeneration timing separate from total service age for DKF 12-R |
+| `dunstabzug_dkf16p_zweierpack_einsatznachweis` | Verify the documented two-piece DKF 16-P pack before counting a complete replacement |
+| `dunstabzug_abgelesene_kennziffern_set_oder_filter` | Detect a Bosch listing that swaps the starter and replacement article identities |
+| `dunstabzug_b_label_zwei_unterschiedliche_bezuege` | Disambiguate the hood energy, fan, lighting and grease classes |
+| `dunstabzug_umluft_und_fensterprogramm_zuordnung` | Keep cooker-hood recirculation apart from independently documented outdoor airflow |
+| `dunstabzug_geruchsprobe_kueche_nachbarraum_gemeinsame_basis` | Compare kitchen and adjacent-room odor observations under matched cooking conditions |
+| `dunstabzug_licht_probe_kochfeld_ecken_unterschied` | Compare measured illumination at two hood work positions |
+| `dunstabzug_filterzugriff_ansicht_nach_position` | Separate visible grease-filter access from confirmed odor-filter access |
+| `dunstabzug_kohlefilter_beleg_alter_zwischen_belegen` | Bound active filter age when the original fitting date is uncertain |
+| `dunstabzug_geruchsprobe_spitze_dauer_entscheidung` | Distinguish odor intensity from persistence in a matched kitchen trial |
+| `dunstabzug_pflegeangebot_filterpaket_und_arbeitsumfang` | Identify scope gaps in a hood maintenance quote |
+| `backofenauszug_modellbereich_und_betriebsart` | Check exact rail families and explicit use exclusions. |
+| `backofenzubehoer_reinigungsart_exakter_beleg` | Evaluate the requested cleaning method from its actual scope. |
+| `h2861bp_auszug_gitter_blech_packeinheit` | Audit the exact H 2861 BP receipt without counting one rail as one pair. |
+| `miele_flexiclip_simultane_ebenen_paarbedarf` | Count how many complete single-pair boxes remain needed. |
+| `bosch_hez638370_feste_ebenen_arbeitsfolge` | Locate requested positions outside HEZ638370’s fixed coverage. |
+| `backofenauszug_paarbeleg_hinweis_auf_andere_ebene` | Verify that two observed rails actually document the same requested pair and position. |
+| `backofenzubehoer_nachkauf_bestand_eigenes_exemplar` | Check whether claimed seller stock is tied to a complete identified unit. |
+| `backofenauszug_tatsaechlich_sichtbare_blechtiefe` | Check real access beyond the label full extension. |
+| `h2861bp_plus_hfc_tabellenspalte_und_ebenenbezug` | Check +HFC versus −HFC and keep rail and food positions distinct. |
+| `backofenauszug_obere_untere_kalte_greifspur` | Compare the measured vertical access gap against a personal handling envelope. |
+| `backofenzubehoer_entnahmebereich_vollstaendige_uebung` | Distinguish reaching a tray from completing the intended check. |
+| `backofenauszug_zwei_kalte_blickhoehen_ohne_umbau` | Check alternative heights by uniquely visible required marks. |
+| `miele_flexiclip_materialnummer_und_ean_widerspruch` | Detect conflicting material number and barcode evidence on the same accessory. |
+| `backofenzubehoer_nur_ersetzen_wenn_funktion_fehlt` | Separate a genuine access gap from a feature already provided by existing equipment. |
+| `backofenauszug_einzelansicht_belegt_ebene_oder_satz` | Separate verified rail positions from coverage implied by a photo caption. |
+| `backofenauszug_kalte_paarstellung_bis_zum_anschlag` | Flag an observed left-right extension difference under equivalent measurement. |
+| `flexiclip_ein_paar_zwei_kalte_zeitfenster` | Determine whether the logged tasks actually need simultaneous coverage. |
+| `backofenauszug_auflageart_baugruppe_und_abmessungsbeleg` | Separate documented tray categories from fit of one particular item. |
+| `tisken_50400307_zwei_wandfelder_oberflaeche` | Screen two locations against IKEA’s documented surface conditions. |
+| `pulsify_artikel_strahlart_techniktabelle_drei_bar` | Read the exact DE technical row rather than a series headline. |
+| `duschhalter_fugenfeld_kontaktschablone_messband` | Bound a contact patch against one measured tile joint. |
+| `duschhalter_wandbelag_deckschicht_kontaktbeleg` | Track whether the visible face belongs to the documented substrate. |
+| `duschhalter_feldwechsel_bestandsbeobachtung_abgrenzen` | Mark which parts of a prior contact observation do not carry over. |
+| `handbrause_halter_sitz_kopf_und_griff_beobachten` | Keep nozzle seating evidence separate from an accessible grip. |
+| `duschgriff_zwei_nutzende_gemeinsame_ablage` | Find a shared reachable position from two independent observations. |
+| `duschhalter_greifen_zuruecklegen_bewegung_getrennt` | Keep retrieval and replacement observations distinct. |
+| `duschbrause_schlauch_ruhezone_und_entnahmepfad` | Separate route obstructions in two observed use states. |
+| `duschhalter_winkel_nutzerwunsch_vorhandene_stellungen` | Compare observed aiming positions without inferring a universal range. |
+| `brause_werbeaussage_serienwert_technikwert_zuordnen` | Resolve showroom headline versus an exact technical row. |
+| `brause_angebotszitat_strahlart_einzelwert_maximum` | Check mode-specific and product-maximum figures for a common basis. |
+| `handbrause_angebot_verwechslung_kopfbrause_bauart` | Keep an overhead-shower listing out of a hand-shower shortlist. |
+| `duschhalter_bohrfrei_befestigungsart_beleg` | Distinguish suction, adhesive and clamp claims before buying. |
+| `duschset_halter_schon_vorhanden_angebotsumfang` | Spot a duplicate holder or a missing item in a confirmed shower bundle. |
+| `duschhalter_kontaktumfang_skizze_und_produktmass` | Verify which outline the manufacturer’s drawing actually describes. |
+| `duschhalter_ablage_position_lieblingshand_wechsel` | Compare left/right hand changes in observed retrieval routines. |
+| `duschhalter_gebraucht_auflage_und_etikett_beleg` | Distinguish missing model evidence from a visibly different attachment. |
+| `duschgriff_blickverdeckung_und_tatsaechliche_erreichbarkeit` | Keep view obstruction separate from an observed reach limitation. |
+| `duschkabinentuer_brausenablage_einstieg_ausstieg` | Distinguish arrival and exit observations around the same shower screen. |
+| `brause_drei_bar_beleg_druckzahl_und_bezug` | Separate the numeric pressure interval from the relevant documented pressure type. |
+| `brause_strahlarten_anzeigename_zuordnungsbeleg` | Check which exact spray name belongs to the observed selector. |
+| `duschhalter_wiederholte_handhabung_ausgelassene_faelle` | Quantify handling evidence without mistaking skipped attempts for successful use. |
+| `daikin_mc80zvm_rollensatz_teilcode_abgrenzen` | Distinguish the exact Daikin caster kit code from the filter code. |
+| `daikin_rollenangebot_satz_und_einzelangabe_abgleichen` | Reconcile box and individual quantities only when the offer proves distinct units. |
+| `venta_6060_kompatibilitaetslisten_modellkonflikt` | Compare the conflicting official trolley lists for an exact Venta model. |
+| `venta_rollwagen_6060_url_und_6060500_artikel` | Distinguish the visible trolley SKU from the family URL component. |
+| `daikin_mc80zvm_griffrolle_zweck_und_fundstelle` | Route carrying and optional rolling to their own manufacturer documentation. |
+| `daikin_laufrollensatz_anleitung_zur_wegfrage` | Locate a route-specific requirement in the actual caster instructions. |
+| `venta_rollwagen_belagrichtung_marketing_und_eigenbefund` | Separate rubberized caster information and actual floor observations. |
+| `rollwagen_fuellzustand_und_tatsache_fahrtbeleg` | Check the water-fill state in the actual observation and applicable documentation. |
+| `geraeterollen_enveloppe_aus_gemeinsamen_seitenkanten` | Reconstruct the observed assembly width from body and base edges at one reference. |
+| `daikin_mc80zvm_massangabe_geraet_oder_aufbau` | Keep published body dimensions separate from measured assembled dimensions. |
+| `geraeterollen_schwenkbewegung_mitte_ausserhalb_endlagen` | Compare observed midpoint sweep with both recorded endpoints. |
+| `rollwagen_belagwechsel_richtungsspezifischer_stopp` | Identify direction-specific pauses at the same already observed flooring transition. |
+| `rollwagen_bodenabdruecke_vorbestand_lokalzuordnung` | Distinguish a pre-existing floor mark from a new observation at the parking location. |
+| `laufrolle_abrollstrecke_pro_umlaeufe_sichtkontrolle` | Compare observed travel to the no-slip reference for counted wheel turns. |
+| `rollwagen_feststellrolle_exakten_nachweis_kaufen` | Check whether a requested wheel-lock feature is documented for the exact variant. |
+| `rollwagen_parkprobe_geraet_gegen_grundrahmen` | Compare apparent relative motion between a parked appliance and the base. |
+| `rollwagen_bodenpflege_zusammenhang_abstellen_und_rueckkehr` | Check whether the original footprint remained available until recorded cleaning completion. |
+| `geraetetransport_wegabschnitt_rollen_oder_griff_nachweis` | Match documented rolling and carrying evidence to separate route sections. |
+| `elektrog_altgeraete_flaechenbasis_haendler` | Match a verified area to the proper shop or distance-selling threshold. |
+| `elektrog_kleingeraete_dreifach_mass_anzahl` | Check the inclusive size threshold and the per-type small-device count together. |
+| `elektrog_eins_zu_eins_geraeteart_kernfunktionen` | Check like-for-like scope without inferring functional equivalence from a common marketing category. |
+| `elektrog_fernabsatz_kategorie_annahmeweg` | Distinguish home pickup from an appropriate reachable return route in distance selling. |
+| `elektrog_geraetekategorie_bezeichner_anlage` | Identify listed household examples with the necessary category-specific size evidence. |
+| `altgeraete_abholhinweis_vertragsmoment_beleg` | Audit which checkout disclosures were actually observed without turning them into a booking. |
+| `altgeraete_marktplatz_verkaeufer_logistikkette` | Trace a pickup commitment to the seller or its verified carrier. |
+| `altgeraete_termin_neulieferung_verschoben_mitnahme` | Preserve a pickup status when the new-device delivery date changes. |
+| `altgeraete_kosten_beleg_getrennte_leistungen` | Separate the take-back line from paid delivery and optional ancillary work. |
+| `altgeraete_abholvorgang_tatsaechliche_uebergabe` | Reconcile actual handover separately from delivery of the replacement. |
+| `altgeraete_mitnahmewunsch_zur_zustelltour` | Track an old-appliance request through checkout confirmation to the carrier work order. |
+| `altgeraete_neuannahme_abbruch_mitnahmebindung` | Check the pickup dependency when the replacement is not handed over. |
+| `altgeraete_annahmeort_umzug_zwei_belegorte` | Compare documented pickup and replacement delivery places without collecting addresses. |
+| `altgeraete_wechsel_nutzungsluecke_tatsaechlich` | Compute an observed service gap using the first usable replacement date rather than a delivery promise. |
+| `altgeraete_annahmestelle_betreiber_nachweis` | Identify the documented return-point operator before treating locations as interchangeable. |
+| `altgeraete_trotz_gleicher_tour_zuordnung_zwei_auftraege` | Ensure a shared delivery route does not merge unrelated pickup orders. |
+| `altgeraete_zusteller_vertretung_fuer_alt_und_neu` | Keep replacement acceptance separate from the confirmed delegation of the old appliance. |
+| `altgeraete_symbol_anlage_drei_weglese` | Tell a separate-collection mark from the marked route to a collection point. |
+| `altgeraete_annahme_und_weiterverwendung_beleg` | Avoid inferring reuse or recycling from a handover receipt alone. |
+| `altgeraete_abholversuch_grund_und_erneute_zusage` | Triage an unsuccessful pickup using the documented obstacle and latest reassignment. |
 <!-- tools:end -->
 
 ## Can a MeacoDry Arete One 20L drain uphill into a sink?
@@ -1548,7 +1644,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->1484<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->1580<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
