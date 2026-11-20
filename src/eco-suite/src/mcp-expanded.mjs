@@ -8,6 +8,10 @@ import {energyNext} from './mcp-energy-next.mjs';
 import {climateNext} from './mcp-climate-next.mjs';
 import {careNext} from './mcp-care-next.mjs';
 import {evidenceNext} from './mcp-evidence-next.mjs';
+import {waterHousehold} from './mcp-water-household.mjs';
+import {envelopeSuite} from './mcp-envelope.mjs';
+import {useWorkflows} from './mcp-use-workflows.mjs';
+import {measurementLab} from './mcp-measurement-lab.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -20,6 +24,10 @@ export const expandedDefinitions = [
   ['Raumkomfort prüfen', climateNext],
   ['Geräte pflegen', careNext],
   ['Quellen & Kaufprüfung', evidenceNext],
+  ['Wasser & Wäsche', waterHousehold],
+  ['Gebäude & Fenster', envelopeSuite],
+  ['Geräte im Alltag', useWorkflows],
+  ['Messpraxis', measurementLab],
 ].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));
