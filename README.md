@@ -4,7 +4,7 @@
 gemessene Temperatur und Luftfeuchte in deinem Keller ein oder vergleiche die
 Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
-[Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline)
+[Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
 <!-- count -->2003<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
@@ -85,6 +85,39 @@ enthalten die verfügbaren Quellen für die weitere Prüfung.
 
 Ohne `--compact` bleibt der vollständige Werkzeugkatalog verfügbar. Aktuelles
 Wetter und Ratgeber-Volltext sind im vollständigen Modus abrufbar.
+
+### Lokales EcoBack in VS Code
+
+Entpacke das MCPB in einen eigenen Ordner. Öffne `MCP: Add Server` in
+einer lokalen Copilot-Sitzung in VS Code. Wähle `Command (stdio)`. Nutze
+`node "/absoluter/pfad/zum/entpackten/src/server.mjs" --compact` als
+Startbefehl und `ecoback` als Server-ID. Wähle `Global` → `Copilot Global`.
+Der Eintrag gehört unter `mcpServers` in
+die persönliche Copilot-Konfiguration (Standardpfad `~/.copilot/mcp-config.json`).
+Setze den absoluten Pfad zu `src/server.mjs` aus dem entpackten MCPB ein.
+Falls `node` im Client nicht gefunden wird, setze unter `command` den
+absoluten Pfad zu Node.js 22 oder neuer.
+
+```json
+{
+  "mcpServers": {
+    "ecoback": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/absolute/path/to/ecoback-local/src/server.mjs", "--compact"],
+      "tools": ["ecoback_werkzeug_finden", "ecoback_werkzeug_ausfuehren"]
+    }
+  }
+}
+```
+
+Probiere im Copilot-Chat „Nutze EcoBack. Der Wäschetrockner braucht 1,8 kWh
+pro Ladung, der Luftentfeuchter 1,2 kWh. Was kostet jede Variante bei
+0,30 €/kWh? Die Endtrockenheit habe ich noch nicht verglichen.“ Öffne den
+Werkzeugaufruf im Chat. Die Rechnung mit diesen Beispielwerten ergibt
+0,54 € und 0,36 € je Ladung. Solange Wäschemenge und Endtrockenheit nicht
+vergleichbar sind, bleibt offen, welche Variante günstiger ist.
+[MCP-Konfiguration für Copilot in VS Code](https://code.visualstudio.com/docs/agents/reference/mcp-configuration#_portable-configuration).
 
 ### Quellen für einen kalten Keller offline lesen
 
