@@ -184,6 +184,14 @@ function matchWeight(term, root, entry) {
   return Math.max(body, Math.min(reference, 2));
 }
 
+function asksForLaundryCostComparison(terms) {
+  return terms.some(term => /^(?:waesche)?trockner(?:s|n)?$/.test(term)) &&
+    terms.some(term => /^(?:luft)?entfeuchter(?:s|n)?$/.test(term)) &&
+    terms.some(term => /^(?:(?:waesche|wasch)?ladung(?:en)?|trocknungsgang|trocknungsgaenge)$/.test(term)) &&
+    terms.some(term => /^(?:kosten|kostet|stromkosten|stromgeld|euro|billiger|guenstiger)$/.test(term)) &&
+    !terms.some(term => /^(?:kaufpreis|anschaffung|amortis|rentier|rechnet)/.test(term));
+}
+
 export function findCatalogueTools(index, {query='', category='', name=null}={}) {
   const eligible = entry => (!category || category === entry.tool.category) && (name === null || name === entry.tool.name);
   const bounded = query.slice(0, 512);
@@ -233,5 +241,11 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
       sum + weight * (weight >= 5 && terms[i].strongFrequency <= rareLimit ? 2 : 1), 0);
     ranked.push({tool, score});
   }
-  return ranked.sort((a, b) => b.score - a.score).map(result => result.tool);
+  const results = ranked.sort((a, b) => b.score - a.score).map(result => result.tool);
+  if (!asksForLaundryCostComparison(tokens)) return results;
+
+  // Keep the measured cost comparison available even when long buyer questions
+  // match too few of its published terms to pass the ordinary ranking threshold.
+  const comparison = index.find(entry => entry.tool.name === 'waesche_trocknungskosten' && eligible(entry));
+  return comparison ? [comparison.tool, ...results.filter(tool => tool.name !== comparison.tool.name)] : results;
 }

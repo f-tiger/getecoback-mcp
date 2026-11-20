@@ -10,6 +10,7 @@ import { expandedDefinitions } from '../src/eco-suite/src/mcp-expanded.mjs';
 import { collectToolPages, MCP_PAGE_SIZE, pageTools } from '../src/eco-suite/src/mcp-pagination.mjs';
 import { callTool, TOOLS } from '../src/tools.mjs';
 import { findTools, runReviewedExample } from '../src/find-tools.mjs';
+import { findCatalogueTools, indexCatalogue } from '../src/eco-suite/site/assets/mcp-catalog-search.mjs';
 
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 const server = fileURLToPath(new URL('../src/server.mjs', import.meta.url));
@@ -65,6 +66,51 @@ test('offline finder emits JSON and handles an omitted query', () => {
   const missing = spawnSync(process.execPath, [finder], {encoding:'utf8', timeout:10000});
   assert.equal(missing.status, 2);
   assert.match(missing.stderr, /Usage:/);
+});
+
+test('German per-load cost comparisons find the existing measured laundry tool', () => {
+  const queries = [
+    'Wäschetrockner oder Luftentfeuchter – was kostet das Trocknen pro Ladung?',
+    'Was kostet mich das Trocknen pro Waschladung mit dem Trockner oder Entfeuchter?',
+    'Trockner oder Luftentfeuchter: Wie viel Stromgeld kostet mich eine gleich trockene Ladung Wäsche?',
+    'Waeschetrockner gegen Luftentfeuchter: Welcher Trocknungsweg kostet bei gleicher Ladung weniger Euro?',
+    'Ich habe die kWh für den Trockner und den Entfeuchter gemessen. Was kostet eine Ladung Wäsche jeweils?',
+  ];
+  const name = 'waesche_trocknungskosten';
+  const measurements = {dryer:2,dehum:1,price:0.3,comparable:false};
+  for (const query of queries) assert.equal(findTools(query).tools[0]?.name, name, query);
+
+  const [lookup, example, comparable] = compactReplies([
+    toolCall(compactFind, {frage:queries[0]}),
+    toolCall(compactRun, {name, eingaben:measurements}),
+    toolCall(compactRun, {name, eingaben:{...measurements, comparable:true}}),
+  ]);
+  const first = lookup.result.structuredContent.tools[0];
+  assert.equal(first.name, name);
+  assert.deepEqual(first.example_arguments, measurements);
+  assert.deepEqual(example.result, runReviewedExample(name).result);
+  assert.equal(first.citation_url, 'https://getecoback.com/waeschetrockner-oder-luftentfeuchter.html');
+  assert.equal(example.result.structuredContent.dryer_eur_per_load, 0.6);
+  assert.equal(example.result.structuredContent.dehumidifier_eur_per_load, 0.3);
+  assert.equal(example.result.structuredContent.lower_cost, 'unconfirmed');
+  assert.equal(comparable.result.structuredContent.lower_cost, 'dehum');
+
+  const index = indexCatalogue([{name, category:'Strom & Haushalt', description:'Messwerte für zwei Trocknungswege vergleichen'}]);
+  assert.equal(findCatalogueTools(index, {query:queries[0], category:'Strom & Haushalt', name})[0]?.name, name);
+  assert.deepEqual(findCatalogueTools(index, {query:queries[0], category:'Feuchte'}), []);
+  assert.deepEqual(findCatalogueTools(index, {query:queries[0], name:'geraetewechsel_rechnen'}), []);
+
+  for (const [query, previousFirst] of [
+    ['Was kostet eine Ladung nur im Wäschetrockner bei meinem Stromtarif?',undefined],
+    ['Wäschetrockner oder Luftentfeuchter: Nach wie vielen Wintern rechnet sich der Kaufpreis?',undefined],
+    ['Trockner oder Luftentfeuchter: Welche Methode trocknet meine Wäsche schneller?','waesche_wochenbedarf_leine_und_trockner'],
+    ['Wie haenge ich die Waesche auf dem Waeschestaender auf, damit sie ohne Trockner schneller trocknet?','waesche_wochenbedarf_leine_und_trockner'],
+    ['Luftentfeuchter','entfeuchter_ablaufcheck'],
+    ['Wäschetrockner','pflegeetikett_naturweg_bei_trocknerverbot'],
+    ['Trocknen','saugwischer_dock_laden_trocknen_ablauf'],
+    ['Ladung','spuelmaschine_ladung_entnahme_stationen'],
+    ['Waschladung','waschtrockner_waschladung_aufteilen'],
+  ]) assert.equal(findTools(query).tools[0]?.name, previousFirst, query);
 });
 
 test('offline CLI examples run exact reviewed inputs and reject incomplete or live-only requests', () => {
