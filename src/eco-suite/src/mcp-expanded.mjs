@@ -21,6 +21,11 @@ import {wetterpraxis} from './mcp-wetterpraxis.mjs';
 import {kuechenpraxis} from './mcp-kuechenpraxis.mjs';
 import {servicepraxis} from './mcp-servicepraxis.mjs';
 import {belegeAbgleichen} from './mcp-belege-abgleichen.mjs';
+import {textilpraxis} from './mcp-textilpraxis.mjs';
+import {luftpfade} from './mcp-luftpfade.mjs';
+import {modellunterlagen} from './mcp-modellunterlagen.mjs';
+import {haushaltsbuch} from './mcp-haushaltsbuch.mjs';
+import {praxistest} from './mcp-praxistest.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -46,6 +51,11 @@ export const expandedDefinitions = [
   ['Küchenpraxis', kuechenpraxis],
   ['Servicevorbereitung', servicepraxis],
   ['Belege abgleichen', belegeAbgleichen],
+  ['Textilpraxis', textilpraxis],
+  ['Luftpfade', luftpfade],
+  ['Modellunterlagen', modellunterlagen],
+  ['Haushaltsbuch', haushaltsbuch],
+  ['Praxistests', praxistest],
 ].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));
