@@ -18,6 +18,42 @@ const rounded = value => Math.round(value*100)/100;
 
 export const kaufpraxis = [
   {
+    name:'waesche_trocknungswechsel_kaufschwelle',
+    description:'Lohnt sich ein Luftentfeuchter zum Wäschetrocknen, wenn ein Teil der Waschladungen im Winter weiter in den Trockner geht? Vergleiche gemessene Stromkosten, Anschaffung und Amortisation je Saison — Check the payback when replacing only some dryer loads.',
+    page:'/waeschetrockner-oder-luftentfeuchter.html',
+    guide_url:'https://getecoback.com/waeschetrockner-oder-luftentfeuchter.html#laundry-check',
+    properties:{
+      ladungen_saison:number('Anzahl aller vergleichbaren Ladungen je Trocknungssaison, als Ganzzahl.',1,2000),
+      ladungen_ersetzbar:number('Davon realistisch mit dem Entfeuchter getrocknete Ladungen, als Ganzzahl.',0,2000),
+      trockner_kwh:number('Gemessene kWh je vollständiger Ladung im bisherigen Trockner.',0,100),
+      entfeuchter_kwh:number('Gemessene kWh je vollständiger Ladung mit Entfeuchter, einschließlich elektrischer Zusatzgeräte.',0,100),
+      tarif_eur_kwh:number('Eigener Arbeitspreis je kWh in Euro.',0,5),
+      anschaffung_eur:money('Zusätzliche Anschaffung einschließlich nötigen Zubehörs. Null, wenn alles schon vorhanden ist.'),
+      ladungen_vergleichbar:bool('Gleiche Wäschemenge, Schleuderdrehzahl und Endtrockenheit beim Messen?'),
+      zusatzstrom_erfasst:bool('Ist der gesamte Strom für diesen Trocknungsweg erfasst, etwa auch für einen Ventilator oder eine elektrische Zusatzheizung?'),
+    },
+    calculate({ladungen_saison,ladungen_ersetzbar,trockner_kwh,entfeuchter_kwh,tarif_eur_kwh,anschaffung_eur,ladungen_vergleichbar,zusatzstrom_erfasst}) {
+      if (![ladungen_saison,ladungen_ersetzbar].every(Number.isInteger) || ladungen_ersetzbar>ladungen_saison) {
+        throw new RangeError('Vergleichbare und ersetzbare Ladungen je Saison');
+      }
+      const grenze='Vergleich eigener Messungen. Prüfe Raumfeuchte, Lüftung, Platz und verfügbare Zeit vor dem Kauf. Nicht erfasste Heizwärme, Wartung, Lebensdauer und Tarifänderungen fehlen in der Rechnung.';
+      const continued = ladungen_saison-ladungen_ersetzbar;
+      if (!ladungen_vergleichbar || !zusatzstrom_erfasst) {
+        return {status:'erst_vergleichbar_messen',trocknerladungen_weiter:continued,bisher_saison_eur:null,
+          gemischt_saison_eur:null,stromersparnis_saison_eur:null,kostendeckung_saisons:null,grenze};
+      }
+      const oldCost = ladungen_saison*trockner_kwh*tarif_eur_kwh;
+      const mixedCost = (continued*trockner_kwh+ladungen_ersetzbar*entfeuchter_kwh)*tarif_eur_kwh;
+      const savedCents = Math.round((trockner_kwh-entfeuchter_kwh)*ladungen_ersetzbar*tarif_eur_kwh*100);
+      const outlayCents = Math.round(anschaffung_eur*100);
+      const status = savedCents<=0 ? 'kein_stromkostenvorteil' : outlayCents===0 ? 'vorhandene_option_stromguenstiger' : 'rechnerische_kostendeckung';
+      return {status,trocknerladungen_weiter:continued,bisher_saison_eur:rounded(oldCost),gemischt_saison_eur:rounded(mixedCost),
+        stromersparnis_saison_eur:(savedCents || 0)/100,kostendeckung_saisons:savedCents>0?Math.ceil(outlayCents/savedCents):null,grenze};
+    },
+    example:{args:{ladungen_saison:100,ladungen_ersetzbar:60,trockner_kwh:1.4,entfeuchter_kwh:0.6,tarif_eur_kwh:0.35,anschaffung_eur:100,ladungen_vergleichbar:true,zusatzstrom_erfasst:true},
+      expect:{status:'rechnerische_kostendeckung',trocknerladungen_weiter:40,bisher_saison_eur:49,gemischt_saison_eur:32.2,stromersparnis_saison_eur:16.8,kostendeckung_saisons:6}},
+  },
+  {
     name:'geraetekauf_raten_gegen_barpreis',
     description:'Ausgewiesene Raten, Schlusszahlung und Gebühren zum Barpreisvergleich addieren — Compare the stated installment total with the full cash price.',
     page:costPage,

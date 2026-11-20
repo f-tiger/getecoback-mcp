@@ -20,6 +20,8 @@ const bracketTool = 'midea_portasplit_fensterhalterung_pruefen';
 const bracketCitation = 'https://getecoback.com/guide/midea-portasplit-ausverkauft-alternativen.html';
 const bracketGuide = bracketCitation + '#kaufpruefung';
 const bracketEntry = bracketCitation + '?mcp_entry=portasplit-fensterhalterung#kaufpruefung';
+const laundryTool = 'waesche_trocknungswechsel_kaufschwelle';
+const laundryCitation = 'https://getecoback.com/waeschetrockner-oder-luftentfeuchter.html';
 const roofWithoutBracket = {
   angebot_ean:4048164116478,
   fenster:'dachfenster',
@@ -484,6 +486,44 @@ test('PortaSplit keeps one fixed first-party entry through each decision state',
   const entryOverride = await callTool(bracketTool, {...roofWithoutBracket, entry_url:bracketCitation});
   assert.equal(entryOverride.isError, true);
   assert.equal(entryOverride.structuredContent, undefined);
+});
+
+test('the German mixed laundry decision is discoverable and runnable offline', async () => {
+  await withFetchFixtures(new Map(), async () => {
+    const question = 'Lohnt sich ein Luftentfeuchter zum Wäschetrocknen wenn ein Teil der Waschladungen im Winter weiter in den Trockner geht';
+    const found = findTools(question).tools[0];
+    assert.equal(found.name, laundryTool);
+    assert.equal(found.citation_url, laundryCitation);
+    assert.equal(found.guide_url, laundryCitation + '#laundry-check');
+    assert.deepEqual(found.inputSchema.required, Object.keys(found.example_arguments));
+
+    const example = runLocalCommand(finder, ['--example', laundryTool]);
+    assert.equal(example.status, 0, example.stderr);
+    const output = JSON.parse(example.stdout);
+    assert.deepEqual(output, runReviewedExample(laundryTool));
+    const {structuredContent: decision} = output.result;
+    assert.equal(decision.citation_url, found.citation_url);
+    assert.equal(decision.guide_url, found.guide_url);
+    assert.equal(decision.status, 'rechnerische_kostendeckung');
+    assert.equal(decision.trocknerladungen_weiter, 40);
+    assert.equal(decision.stromersparnis_saison_eur, 16.8);
+    assert.equal(decision.kostendeckung_saisons, 6);
+
+    const calculate = changes => callTool(laundryTool, {...found.example_arguments, ...changes});
+    const unknown = (await calculate({zusatzstrom_erfasst:false})).structuredContent;
+    assert.equal(unknown.status, 'erst_vergleichbar_messen');
+    assert.equal(unknown.stromersparnis_saison_eur, null);
+    assert.equal(unknown.kostendeckung_saisons, null);
+    const worse = (await calculate({entfeuchter_kwh:2})).structuredContent;
+    assert.equal(worse.status, 'kein_stromkostenvorteil');
+    assert.equal(worse.stromersparnis_saison_eur, -12.6);
+    assert.equal(worse.kostendeckung_saisons, null);
+    const available = (await calculate({anschaffung_eur:0})).structuredContent;
+    assert.equal(available.status, 'vorhandene_option_stromguenstiger');
+    assert.equal(available.kostendeckung_saisons, 0);
+    assert.equal((await calculate({ladungen_ersetzbar:100.5})).isError, true);
+    assert.equal((await calculate({ladungen_ersetzbar:101})).isError, true);
+  });
 });
 
 test('advertised tools have bilingual descriptions and valid required input names', () => {

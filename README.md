@@ -6,7 +6,7 @@ Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
 [Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
-<!-- count -->2016<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2017<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -530,6 +530,7 @@ separately measured loads reach different levels of dryness.
 | `heizdecke_saison_vorlauf_abschaltcheck` | Verify whether a documented blanket preheat timer ends before the chosen use time. |
 | `ventilator_nacht_geraeuschprofil_kompromiss` | Find which measured fan settings meet independently chosen air speed and sound criteria. |
 | `raumklimageraet_modus_nach_strompause` | Check which previously scheduled room-climate settings actually returned after an observed outage. |
+| `waesche_trocknungswechsel_kaufschwelle` | Check the payback when replacing only some dryer loads. |
 | `geraetekauf_raten_gegen_barpreis` | Compare the stated installment total with the full cash price. |
 | `geraeteaufpreis_strompreisband` | Test the purchase premium across a range of energy prices. |
 | `geraete_gebraucht_restnutzungs_schwelle` | Find the used appliance usage threshold relative to a new one. |
@@ -2218,7 +2219,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->2016<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2017<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
