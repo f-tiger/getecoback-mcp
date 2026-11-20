@@ -1,6 +1,6 @@
 # EcoBack Raumklima — MCP server
 
-<!-- count -->1001<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->1201<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -1052,6 +1052,206 @@ Worker, and ports drift silently.
 | `warmwasser_einmaliger_wasserweg_folge_nutzung` | Avoid charging measured shared run-up twice across two immediate tasks. |
 | `fenstersauger_messaufgabe_mulde_einzweck` | Keep rinse water out of the suction performance measurement. |
 | `waesche_umsetzen_wasserflecken_wegbefund` | Separate marks that appeared on a carry leg from marks present beforehand. |
+| `schallangabe_split_bauteil_zuordnung` | Assign published split-unit noise figures to the documented component. |
+| `geraeteton_schmalband_spitze_gegen_nachbarbaender` | Compare an observed spectral peak against equally wide adjacent frequency bins. |
+| `schallreport_gesamtwert_teilstichproben_widerspruch` | Check a reported equivalent sound level against the range of complete subinterval means. |
+| `schallmessung_a_c_gewichtung_gleichzeitige_spreizung` | Calculate the simultaneous LCeq minus LAeq difference. |
+| `geraeuschaufnahme_pegel_von_wiedergabe_trennen` | Check whether recorded gain and reference settings support a level comparison. |
+| `geraeuschlog_messbereich_gueltige_stichproben` | Count usable readings after excluding clipped, under-range and missing samples. |
+| `geraet_geraeuschlog_zwei_uhranker_abgleichen` | Align a recorded sound marker to an appliance log using two shared time anchors. |
+| `schallmessung_referenzprobe_vor_nach_drift` | Check observed meter drift using the same reference before and after a series. |
+| `geraeuschmessung_mikrofon_abschattung_paar` | Check how the observer position changes a fixed-point level reading. |
+| `geraeuschdaten_leisewert_modusabdeckung` | Check whether a published minimum noise figure represents the intended mode. |
+| `geraeuschspitzen_getrennte_ereignisfenster` | Decide whether two recorded sound events are distinguishable in time. |
+| `geraeuschereignisse_rate_je_beobachtungsstunde` | Normalize recorded sound-event counts to an observation hour. |
+| `ventilator_mittelstufe_aus_gegenrichtungen_beobachten` | Compare sound on one fan setting reached from two directions. |
+| `schalllog_spitze_zu_abschnittsgrenze` | Assign an observed peak to a logged phase while preserving boundary ambiguity. |
+| `geraeuschwiederholung_abstandsregelmaessigkeit` | Check variation between four observed sound onsets. |
+| `geraeuschereignis_zwei_hoerplaetze_synchron` | Quantify overlap between event observations at two listening positions. |
+| `schallspitze_fast_slow_zeitgewichtung` | Compare LAFmax and LASmax from the same measurement interval. |
+| `ventilator_schwenkung_spitzenabschnitte_am_platz` | Summarize observed noise peaks during and outside a fan pass. |
+| `geraeuschzeit_luecken_bei_zwei_markierten_spitzen` | Find the longest observed gap outside two recorded sound events. |
+| `geraeuschprobe_grundpegel_rueckkehr_nach_ereignis` | Assess whether the measured post-event background returned to its initial band. |
+| `schallpegel_drei_einzelquellen_modellsumme` | Estimate three independent simultaneous source contributions at one location. |
+| `schallmodell_gemeinsam_messen_rechenrest` | Compare a calculated total level with a matching combined measurement. |
+| `raumgeraeusch_eigenes_pegelziel_zusatzbeitrag` | Estimate an independent added source budget under a chosen total level. |
+| `schallquelle_hintergrundspanne_schaetzintervall` | Bound an independent source contribution using a measured background range. |
+| `geraeuschquellen_gleichzeitigkeit_erwartungsreferenz` | Compare observed source overlap with an independent occupancy reference. |
+| `kurzgeraeusch_abtastluecke_im_pegelprotokoll` | Check whether a recorded brief sound could fall wholly between instantaneous samples. |
+| `schallmessung_zwei_aufstellungen_eigener_hintergrund` | Compare two placements using their own measured background levels. |
+| `geraeuschphase_eigenes_mittel_verfuegbare_zeit` | Solve for the time allowance of a louder phase under a chosen equivalent level. |
+| `geraeuschereignis_sel_und_zeitfenster_abgleichen` | Convert one isolated event exposure to equivalent levels for two comparison windows. |
+| `geraeuschprobe_ueberlagerte_spitzen_aussortieren` | Check how unrelated event timing affects two recorded maxima. |
+| `geraeuschabstand_gemessen_gegen_freifeld` | Compare measured level attenuation with an ideal free-field reference. |
+| `geraet_schallrichtung_gleicher_radius_seitenvergleich` | Compare measured side levels relative to the front at a matching distance. |
+| `monoblock_kontaktvibration_zu_schallereignissen` | Separate logged acoustic events with and without observed contact vibration. |
+| `raumreflexion_zweitimpuls_wegdifferenz_modell` | Estimate excess acoustic path length from an existing delayed sound marker. |
+| `geraeusch_aufstellung_rueckkehrtest_a_b_a` | Compare placement B against before-and-after readings at placement A. |
+| `hoerplatz_messhoehen_eigenziel_beide_positionen` | Test a chosen comparison level at seated and standing ear heights. |
+| `ventilator_messmikrofon_direktwind_kontrollprobe` | Compare a meter reading with and without a documented microphone wind condition. |
+| `mobilgeraet_schallplatz_sichtlinie_messbeleg` | Compare two existing acoustic positions classified by observed line of sight. |
+| `saugroboter_fahrgeraeusch_bodenuebergang_wiederkehr` | Compare repeated noise marks at ordinary floor transitions and on uninterrupted runs. |
+| `hoerprobe_zwei_betriebsarten_subjektive_urteile` | Summarize paired listening preferences while keeping undecided trials visible. |
+| `stromgruppe_vier_betriebszustaende_wechselwirkung` | Reconcile all four observed activation states under comparable conditions. |
+| `stromgruppe_geraeteband_aus_gesamtmessung` | Bound one device from aggregate energy and independently justified remaining-load ranges. |
+| `geraeteaktivitaet_ueberlappung_zeitnachweis` | Recover joint device time from a separately logged union. |
+| `stromspitze_zwei_lasten_einzelursache_pruefen` | Rule out a lone active load only when all relevant peak ceilings are documented. |
+| `stromgruppe_anlaufstaffel_kosten_und_messspitze` | Check whether a staggered start lowered the observed peak while using more energy. |
+| `stromgruppe_arbeitspreis_stufe_zusatzauftrag` | Attribute marginal task costs across a documented progressive usage threshold. |
+| `haushaltsgruppe_ersatzablauf_ohne_neuanteil` | Compute observed energy change only for demonstrably displaced work. |
+| `geraetegruppe_aufgabenpaket_vollstaendigkeit` | Infer full paired service from output counts only when pairing is verified. |
+| `gruppenmessung_zwei_geraeteraten_identifizierbar` | Solve a two-window mixing model only when the operating profiles differ enough. |
+| `stromgruppe_unbeobachtete_gemeinsamlast_erkennung` | Detect unexplained energy in recorded both-idle periods. |
+| `wassergruppen_ueberlappung_mindestdurchfluss` | Compare individual solo and overlapping water flows against distinct task requirements. |
+| `haushaltsaufgaben_verteilter_vorrat_teilbar` | Reserve enough shared refill water after respecting non-transferable supplies. |
+| `raumgeraete_heizen_kuehlen_gegenarbeit_messung` | Quantify balanced opposing thermal output during one verified overlap window. |
+| `raumgeraetekombination_zwei_zielquoten` | Compare energy only across modes meeting both measured room outcomes. |
+| `entfeuchtung_sammelsystem_beide_wege_abgleich` | Reconcile asynchronous collection paths without silently ignoring a differing observation window. |
+| `geraetegruppe_energievorteil_verbrauchsmaterial_ausgleich` | Determine when material overhead offsets a measured energy advantage. |
+| `geraetefolge_teilpuffer_nach_lieferung` | Test a staged production buffer while keeping both timed resource commitments visible. |
+| `stromgruppe_steuergeraet_weckvorgaenge_abgleich` | Audit which shared controller wakeups replaced repeated wake events. |
+| `raumgeraete_komfortquote_schnittmenge_band` | Bound simultaneous target time when paired measurements were not retained. |
+| `haushaltskreislauf_zwei_endpunkte_eine_messung` | Compare intermediate and complete workflow rankings with measured follow-on consumption. |
+| `stromgruppe_drei_paare_messziel` | List the pairs within a budgeting target for interval-average power. |
+| `gruppenmessung_stichprobe_anteil_betriebsprofile` | Weight device shares by aggregate energy in the matching profiles. |
+| `geraetepool_ausfall_uebernahme_exklusiv` | Recover only interchangeable work from a measured failed-device backlog. |
+| `geraetegruppe_zubehoer_symptom_wandert` | Classify a recorded cross-swap without assuming it proves a component defect. |
+| `heizgruppe_gemeinsame_waerme_laufmittel` | Combine unequal input energies and outputs without averaging two individual ratios. |
+| `haushaltsgeraete_zeitversatz_teilzustellung` | Schedule a second-stage batch with a separate confirmed partial release. |
+| `stromgruppe_zeitreihe_hoechstwert_nicht_addieren` | Verify coincidence before interpreting summed individual peaks. |
+| `gruppenbetrieb_doppelbelegung_stueckverdraengung` | Measure output lost to overlapping equipment occupancy while respecting confirmed work positions. |
+| `klimageraete_waermeeintrag_im_kuehlraum_einordnen` | Compare a justified indoor waste-heat contribution with measured sensible cooling. |
+| `stromgruppe_restaufgaben_preiskappung_minimalkosten` | Optimize two all-or-nothing reservations when cheap capacity is scarce. |
+| `stromgruppe_gegenlaeufige_lastwechsel_netto` | Identify real load cancellation hidden in the observed aggregate change. |
+| `geraetegruppen_uebergabe_verbrauchsstelle_wechselbilanz` | Check the preserved total across a verified device reassignment between meters. |
+| `geraetegruppe_gemeinsamer_vorlauf_auftragswechsel` | Compare a batched workflow with duplicated preparation overhead. |
+| `haushaltsablaeufe_ressourcen_dominanz_beobachtet` | Detect resource dominance without imposing a preference or price on remaining trade-offs. |
+| `geraetepaar_wiederverwendung_gemeinsames_medium` | Trace a recovered medium through two device tasks without double-counting procurement. |
+| `geraetegruppe_getrennte_geraetezahl_schattenkosten` | Compare metered energy with measured occupied device-minutes. |
+| `geraeteprogramm_je_freigabefenster_anzahlband` | Bound two-resource service capacity from documented availability intervals. |
+| `haushaltsgruppe_realbetrieb_einzelauftrag_ersatzplan` | Reconcile a completed-work cost where some device tasks need redo. |
+| `stromgruppe_vollstaendigkeitsrabatt_gesamtverlust` | Audit a documented threshold rebate separately from variable energy cost. |
+| `gruppenbetrieb_verbrauchskosten_gleiche_teilauftraege` | Detect duplicate workflow quoting when a base package already contains a documented extra. |
+| `gebrauchtgeraet_zustandswort_mit_einzelbefund_abgleichen` | Translate broad seller condition language into observed and open checks. |
+| `gebrauchtgeraet_fotos_nach_letzter_aenderung` | Separate usable current pictures from pre-change images. |
+| `gebrauchtgeraet_sammlung_einzelfoto_oder_muster` | Check the evidence scope of a multi-unit listing. |
+| `gebrauchtgeraet_unbenutzt_behauptung_nach_zaehlerwechsel` | Limit a zero counter reading to the documented counter history. |
+| `gebrauchtgeraet_nutzungsprotokolle_ueberschneidung` | Sum confirmed lifetime-use subsets without counting overlap twice. |
+| `gebrauchtgeraet_lang_gelagert_lagerzeit_nachweisgrenze` | Bound the documented storage coverage before evaluating a used appliance. |
+| `gebrauchtgeraet_angebot_sichtprobe_fotoausschnitt` | Prioritize a follow-up view of a claimed clear but obscured section. |
+| `gebrauchtgeraet_seit_wartung_tatsaechliche_einsaetze` | Establish which actual-use records follow maintenance. |
+| `gebrauchtgeraet_nutzungsprofil_alter_vs_umfang` | Separate calendar age from observed use intensity. |
+| `gebrauchtgeraet_dokumentierter_zubehoerwechsel_vor_test` | Match a demonstration run to the accessories that would actually transfer. |
+| `gebrauchtgeraet_oberflaechenspur_in_funktionszone` | Distinguish wear on a working interface from nearby cosmetic marks. |
+| `gebraucht_behaelter_sitz_linke_rechte_auflage` | Compare visible seated-container alignment against your measurement tolerance. |
+| `gebrauchtgeraet_spur_nach_dem_transport_neu_einordnen` | Identify confirmed newly visible marks without guessing who caused them. |
+| `gebraucht_kondensatspur_vor_nach_stillstand` | Separate previously visible marks from an observed recurrence while idle. |
+| `gebraucht_rolle_arbeitsbreite_ausgebrochene_abschnitte` | Record distinct visibly affected spans along a roller without projecting cleaning performance. |
+| `gebraucht_auflagepads_unterschied_kompressionsprobe` | Compare a pad pair’s observed compression without making a material-lifetime claim. |
+| `gebraucht_klimageraet_abluftstrecke_uebergabezustand` | Separate accessory condition at each end from the state of the flexible span. |
+| `gebrauchtgeraet_bedienmarken_lesbarkeit_bedarfsweg` | Check whether a worn control label affects the intended local workflow. |
+| `gebraucht_dichtung_zugangsabschnitte_sichtbefund` | Keep obscured portions out of a visual gasket inspection. |
+| `gebrauchtgeraet_schatten_kamerawinkel_gegenprobe` | Separate a reproducible mark from a view-dependent appearance. |
+| `gebrauchtangebot_teilabholung_aufteilung_nach_beleg` | Decide whether the first partial pickup covers a self-contained intended task. |
+| `gebrauchtgeraet_originalkarton_aufgedruckt_enthalten` | Avoid counting printed pack contents as received components. |
+| `gebrauchtgeraet_reset_und_eigene_einrichtung_trennen` | Verify device handover state without collecting account information. |
+| `gebrauchtgeraet_rueckgabe_vorentscheidung_claim_klaeren` | Compare seller headline and actual written return terms. |
+| `gebrauchtangebot_erstbesichtigung_eigner_terminbeleg` | Distinguish monitorable acceptance checks from checks disallowed at pickup. |
+| `gebraucht_angebote_pflichtteil_kategorien_luecken` | Find offer-specific missing requirements instead of comparing total included pieces. |
+| `gebrauchtgeraet_mehrfachbeigabe_ohne_gebrauchsnachweis` | Audit unverified extras without treating them as usable spares. |
+| `gebrauchtgeraet_demo_medien_verkaufsangebot_abgleich` | Check whether the offered configuration agrees with the documented live demo. |
+| `gebrauchtgeraet_fehler_haeufigkeit_angabe_widerspruch` | Detect an explicit intermittent-fault frequency mismatch from comparable records. |
+| `gebrauchtgeraet_ausstattung_geaendertes_angebot_version` | Detect material reductions in the latest recorded used-device offer. |
+| `gebrauchtgeraet_video_ausschnitt_vollstaendiger_start` | Detect gaps in recorded proof of a used-appliance start. |
+| `gebrauchtgeraet_vorfuehrung_kaltstart_nur_belegt` | Distinguish a demonstrated cold start from an already-running unit. |
+| `gebrauchtgeraet_vorfuehrung_stoppursache_qualifiziert` | Distinguish a completed demonstration from a seller-stopped or unobserved run. |
+| `gebrauchtgeraet_testlauf_vorherige_befuellung_effekt` | Correct a used-unit demonstration for pre-existing tank contents. |
+| `gebrauchtgeraet_vorfuehrung_eigene_last_untergrenze` | Check whether a demonstration actually covers the buyer’s minimum workload. |
+| `gebrauchtgeraet_test_reihenfolge_nutzermodus_wiederfinden` | Check whether observed success depended on an unrecorded operator action. |
+| `gebrauchtgeraet_laufzeiten_verschiedene_zeitgrenzen` | Normalize seller-reported duration for omitted startup and finish segments. |
+| `gebrauchtgeraet_testprotokoll_normalfall_nachtrag` | Detect a changed result mix when documented omitted runs are restored. |
+| `gebrauchtgeraet_testlast_eigener_ablauf_nur_kombination` | Verify whether a buyer-required joint use was actually demonstrated. |
+| `gebrauchtgeraet_wartungsbeleg_zielbauteil_gegen_kit` | Check which sold assemblies are actually covered by a maintenance receipt. |
+| `backofen_vorheizanteil_getrennte_laeufe` | Compare measured preheat shares for one combined session and two separate sessions. |
+| `backofen_blech_sichtprobe_mitte_und_rand` | Compare center and edge outcome counts for a fixed tray placement. |
+| `backofen_blechwechsel_gleichwertige_messpaare` | Identify admissible measurements when tray shape or loading changed. |
+| `heissluft_gemeinsam_getrennt_messwert_je_ausgabe` | Compare per-serving draw from simultaneous and separate dual-basket use. |
+| `heissluft_teilauslastung_messwert_mehrportion` | Attribute incremental measured electricity to extra servings at a documented load. |
+| `kontaktgrill_kontaktflaeche_formprobe_stuecke` | Count observed fit categories on a cold, stationary grill surface. |
+| `wasserkocher_giessprobe_rest_und_verlust` | Reconcile cold pour-test water across cups and jug remainder. |
+| `wasserkocher_warmhalte_innenmessung_grenzpunkt` | Estimate measured marginal kettle holding electricity without extrapolating beyond the observation. |
+| `messbecher_zwei_marken_nutzteilung_abweichung` | Check a measuring jug increment independently of absolute mark offsets. |
+| `kuechenwaage_tara_behaelterwechsel_charge` | Track material transfer using separate container tare weights. |
+| `kochtopf_deckelprobe_verdunstung_energie` | Separate evaporation and power differences in matched lidded pot trials. |
+| `kochwasser_herd_oder_kanne_transferbilanz` | Include observed transfer loss and follow-on heating when comparing kettle versus stovetop. |
+| `handspuelen_becken_und_hahn_mengenbilanz` | Combine recorded basin fill and separate tap use without overlap. |
+| `spuelmaschine_nachlauf_messfenster_energiesignal` | Keep measured dishwasher follow-on energy outside a runtime reading. |
+| `spuelmaschine_abtropfplan_restwassergrenze` | Choose among measured draining results after unloading. |
+| `spuelmaschine_ladung_kompensierte_teilwiederholung` | Compare unique usable items and machine cycles after partial repeat loads. |
+| `kuehlschrank_tuerroutine_ereignisse_sammelphase` | Decide which logged door periods can serve as isolated observations. |
+| `kuehlgeraet_stromsignal_raumwaerme_vergleichbar` | Gate a refrigerator energy comparison by observed room-temperature comparability. |
+| `gefrierfach_nach_abtaukontrolle_energieabschnitte` | Separate a noted freezer restart block from routine energy observation. |
+| `kuehlfach_flaechenprobe_mischbehaelter_zwischenraum` | Compare usable shelf footprint after a separately reserved gap. |
+| `kuechenarbeitsplatte_zwei_freizonen_einmal_abziehen` | Reconcile overlapping retained clear areas on a countertop. |
+| `kuechenablage_blech_quer_oder_laengs_probe` | Compare both rectangular orientations for a cold baking tray. |
+| `kuechenvorbereitung_schneidbrett_ablagen_verlust` | Identify capacity lost to incompatible prep bowls. |
+| `kochutensilien_set_ersatz_nur_nach_pruefung` | Count complete tool capacity after verified substitutes. |
+| `heissluft_schublade_einsaetze_auflageflaechen` | Compare the observed usable tray surface of two compatible inserts. |
+| `kueche_tropfablage_abgetrennte_auflagenprobe` | Identify which observed surface contributed water outside the drip tray. |
+| `kochtopf_gemessene_waermekapazitaet_wasser_export` | Bound the sensible heat stored in the measured water and compare it with metered input. |
+| `kuechen_spuelmittel_gesamtverbrauch_nachfuellen` | Account for additions when measuring detergent stock use. |
+| `kuechen_dosierloeffel_stueckbedarf_stufenplan` | Match one quantity using measured whole dry scoops of two sizes. |
+| `spuelgut_nutzbar_ersatz_vorrat_ausgabefolge` | Allocate clean pieces across two rounds using only observed eligible returns. |
+| `spuelmaschine_temperatur_einlauf_abschnitte` | Estimate measured incoming water heat across two dishwasher fill segments. |
+| `kontaktgrill_programmstrom_leerlauf_ohne_ausgabe` | Report measured grill waiting energy without assuming it is avoidable. |
+| `kuechenprogramm_gleiches_ende_schwankung_messen` | Compare observed energy ranges from repeated runs with the same outcome. |
+| `kueche_teigformen_passprobe_getrennte_innenmasse` | Check a cold insert against usable internal form dimensions. |
+| `spuelbecken_kaltfuellung_stufenwechsel_zeitpunkt` | Locate a basin fill mark within a measured two-rate cold-water sequence. |
+| `kochplatten_leerplatz_geschirrwechsel_uebersicht` | Track cold-vessel availability through a staged cleanup. |
+| `kuehlfach_behaeltertausch_gebrauchte_deckelpaare` | Count usable container pairs by observed compatibility families. |
+| `wasserkocher_portionsprobe_mindestmengenrest` | Separate mandatory fill surplus from additional measured excess. |
+| `kueche_portionsverpackung_restmasse_ausgabe` | Reconcile completed servings and partially prepared amounts by weight. |
+| `kueche_messprotokoll_gemeinsamer_zaehler_zwei_pausen` | Derive nonoverlapping kitchen-use segments from an intact meter reading sequence. |
+| `sommerlueftung_abkuehlrate_nach_fensterschluss` | Compare cooling rates before and after closing a window |
+| `dachraum_hitzetrend_erstes_ziel_nach_trendknick` | Identify in which observed trend segment the temperature target first appeared |
+| `raumtemperatur_dreipunkt_abflachung_folgemessung` | Check whether the latest cooling segment flattened beyond a chosen tolerance |
+| `zimmerkuehlung_zwei_messpunkte_bestaetigt_unter_ziel` | Distinguish a one-off reading from two spaced readings below the target |
+| `raumluft_messpause_schwellendauer_grenzen` | Bound warm time without filling an interruption in the log |
+| `sonnenschutz_scheibe_und_platz_reagieren_getrennt` | Separate glass and occupied-zone response after shading |
+| `feuchtequelle_abfolge_vor_lueftungsprobe` | Check whether a ventilation observation excludes the preceding moisture event |
+| `haushaltsklima_wechselereignisse_eindeutiger_vorlauf` | Scope an observed response to one preceding intervention when another cannot overlap |
+| `heizpause_oberflaeche_luft_trend_gegenlaeufig` | Detect diverging wall and air trends after heating changes |
+| `heizkoerper_waerme_zeitfolge_raumreaktion` | Check whether sampling resolves heater response before the room response |
+| `sonnenschutz_lueftung_vier_aufbauten_wechselwirkung` | Compare the observed ventilation contrast with and without shade |
+| `raumthermometer_mitfuehren_abweichungsrichtung_wechsel` | Check whether a carried thermometer’s offset changed sign after placement |
+| `lueftungsverlauf_co2_minimum_gegen_temperaturgrenze` | Match the lowest recorded CO₂ reading with simultaneous temperature |
+| `schrank_raumluft_feuchteunterschied_nach_umschichten` | Check whether a cupboard-to-room humidity gap narrowed after rearrangement |
+| `keller_taupunkt_reihenfolge_gepaart_vor_nach` | Check for diverging cellar temperature and dew point after ventilation |
+| `zimmerklima_letztes_gleiches_fenster_vor_stoerung` | Identify completed measurement lengths before a confounding event |
+| `raumlogger_sprung_simultane_referenzbewertung` | Identify a brief anomaly present only in one room logger |
+| `raumfeuchte_intervall_hoch_bleibt_nach_quellenende` | Separate high humidity during an event from its documented persistence afterwards |
+| `klimaprobe_waermedifferenz_fensterseite_von_durchgang` | Resolve the order of a thermal observation at an opened doorway |
+| `klimageraet_verlauf_ausfallphasen_ungeklaert` | Separate active cooling, planned pauses and unresolved downtime |
+| `verschattung_erholung_innerhalb_eigener_streubreite` | Assess recovery toward the recorded baseline range after shading |
+| `schlafraum_waermesprung_tuerbelegung_quellenbilanz` | Count nights with two candidate confounders around a warmth event |
+| `raumklima_tagesmaximum_abschnitt_bestimmen` | Scope a stored maximum to a shading phase only when the reset interval allows it |
+| `ventilator_sitzprobe_luftwechsel_tempstabil` | Separate seat-level airflow from measured room temperature changes |
+| `lueftung_vorhang_geschlossen_zwei_ortsreaktionen` | Detect a new window-to-room temperature split after ventilation |
+| `bad_erholung_duschfolge_wann_nachprobe_startet` | Identify which shower sequence allows an uncontaminated recovery observation |
+| `nachtluft_kuehlerer_aussenwert_vor_erstem_abfall` | Verify timing for an outdoor-to-indoor temperature crossover before a later reading |
+| `fenster_taureserve_wechsel_frueher_als_beschlag` | Compare dew-point margin before the first observed condensation |
+| `hitzetag_warmzeit_auf_eigene_anwesenheit_beziehen` | Match a sustained warm interval to actual room occupancy |
+| `heizaufzeichnung_ueberschwingen_nach_absenkung` | Detect measured overshoot after a recorded setback |
+| `kellerfeuchte_endlueftung_taupunkt_ursprung_wechseln` | Compare cellar recovery relative to the measured outdoor dew point |
+| `nachtlueftung_querweg_wiederholte_richtungswechsel` | Count directional reversals in repeated doorway airflow checks |
+| `kuehlprobe_innen_und_aussen_zeitgewichtete_luecke` | Report observed paired temperature gaps and their uncovered time |
+| `vorhang_sonnenlauf_waerme_licht_gemeinsame_probe` | Check simultaneous heat and daylight goals in a measured shading trial |
+| `luftfeuchte_trocknungsprobe_waesche_ortssprung_markieren` | Separate drying observations on either side of a room move |
+| `keller_kompressor_lueftung_getrennte_tankabnahme` | Mark reservoir intervals affected by a separate ventilation event |
+| `klimageraet_raumfaelle_warme_spitze_vor_oder_nach_pause` | Resolve the order of the measured peak and cooling interruption |
+| `heizmessung_warme_raumzone_vor_und_nach_sesselwechsel` | Test whether a colder seat zone persists after moving furniture |
+| `raumkuehlung_beobachteter_erhaltener_anteil` | Determine how much of an observed temperature gain remained at a later check |
+| `dachraum_messreihe_vorhang_zwei_ruecknahmeproben` | Check whether reversing a shading change also reversed the observed temperature movement |
 <!-- tools:end -->
 
 ## Can a MeacoDry Arete One 20L drain uphill into a sink?
@@ -1065,7 +1265,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->1001<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->1201<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
@@ -1099,7 +1299,7 @@ Not engineering, legal or subsidy advice.
 
 ## Hosted and local versions
 
-The hosted Registry entry is version 1.12.0. The local stdio source is version 1.10.0. The [tool directory](https://getecoback.com/mcp.html#tools) lists the distinct household tasks and marks the compatible legacy overlap.
+The hosted Registry entry is version 1.13.0. The local stdio source is version 1.11.0. The [tool directory](https://getecoback.com/mcp.html#tools) lists the distinct household tasks and marks the compatible legacy overlap.
 The drainage rules and reviewed German-market model sources come from
 [`sites/getecoback`](https://github.com/f-tiger/agi-site/tree/main/sites/getecoback).
 Follow the returned `nextCursor` in `tools/list` to discover later pages.
