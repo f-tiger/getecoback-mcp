@@ -53,6 +53,11 @@ import {spuelerEinbau} from './mcp-spueler-einbau.mjs';
 import {waschTrockenSaeule} from './mcp-wasch-trocken-saeule.mjs';
 import {lueftungsKaufpraxis} from './mcp-lueftungs-kaufpraxis.mjs';
 import {ersatzteilnachweis} from './mcp-ersatzteilnachweis.mjs';
+import {dunstabzugBelege} from './mcp-dunstabzug-belege.mjs';
+import {backofenzubehoer} from './mcp-backofenzubehoer.mjs';
+import {brausenZubehoer} from './mcp-brausen-zubehoer.mjs';
+import {geraeterollenBelege} from './mcp-geraeterollen-belege.mjs';
+import {altgeraeteRueckgabe} from './mcp-altgeraete-rueckgabe.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -110,6 +115,11 @@ export const expandedDefinitions = [
   ['Wäschesäule', waschTrockenSaeule],
   ['Lüftungskauf', lueftungsKaufpraxis],
   ['Ersatzteilnachweis', ersatzteilnachweis],
+  ['Dunstabzug', dunstabzugBelege],
+  ['Backofenzubehör', backofenzubehoer],
+  ['Brausenzubehör', brausenZubehoer],
+  ['Rollenzubehör', geraeterollenBelege],
+  ['Altgeräte-Rücknahme', altgeraeteRueckgabe],
 ].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));
