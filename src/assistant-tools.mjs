@@ -2,6 +2,7 @@ import { drainTool } from './drain.mjs';
 import { isExpandedTool } from './eco-suite/src/mcp-expanded.mjs';
 import { findTools } from './find-tools.mjs';
 import { callTool } from './tools.mjs';
+import { CELLAR_RESOURCE, CELLAR_RESOURCE_TEXT, matchesColdCellarQuestion } from './cellar-resource.mjs';
 
 const finder = 'ecoback_werkzeug_finden';
 const runner = 'ecoback_werkzeug_ausfuehren';
@@ -51,7 +52,14 @@ export function callAssistantTool(method, args) {
       return error('Gib eine Frage mit 1 bis 500 Zeichen an.');
     }
     const result = findTools(frage, isOffline);
-    return {isError:false, structuredContent:result, content:[{type:'text', text:JSON.stringify(result)}]};
+    const evidence = matchesColdCellarQuestion(frage);
+    const structuredContent = evidence ? {...result, resources:[CELLAR_RESOURCE]} : result;
+    const content = [{type:'text', text:JSON.stringify(structuredContent)}];
+    if (evidence) {
+      const {uri, mimeType} = CELLAR_RESOURCE;
+      content.push({type:'resource', resource:{uri, mimeType, text:CELLAR_RESOURCE_TEXT}});
+    }
+    return {isError:false, structuredContent, content};
   }
   if (method !== runner || Object.keys(args).length !== 2 || typeof args.name !== 'string' || !object(args.eingaben)) {
     return error('Gib den exakten Werkzeugnamen und die Eingaben als Objekt an.');
