@@ -1,6 +1,6 @@
 # EcoBack Raumklima — MCP server
 
-<!-- count -->292<!-- /count --> tools for **indoor climate and household energy in Germany/EU**: how many BTU a
+<!-- count -->389<!-- /count --> tools for **indoor climate and household energy in Germany/EU**: how many BTU a
 room needs, how long a portable-AC window seal has to be, whether a heatwave is coming,
 what a device costs to run, whether a dehumidifier can drain uphill and which moisture checks to make. The tools also search and retrieve published guides.
 
@@ -338,6 +338,103 @@ Worker, and ports drift silently.
 | `strommessung_vorhersage_praxistag` | Compare a projected daily rate to a reserved validation day. |
 | `hygrometer_grenzuebertritt_zeitfenster` | Report the observation bracket for a threshold crossing between sparse samples. |
 | `lueftungsversuch_wetterpaare_eignung` | Screen ventilation pairs against declared outdoor temperature and humidity tolerances. |
+| `hygrometer_anzeige_vom_sitzplatz` | Compare two hygrometer display positions from the usual reading seat. |
+| `hygrometer_minmax_ablesen_uebergabe` | Identify whether a minimum or maximum can be assigned to the intended observation window. |
+| `saugwischer_bedienphasen_pausenfenster` | Find which active stages exceed a household’s chosen uninterrupted-work window. |
+| `saugwischer_griffwechsel_routine` | Compare observed grip changes during two wet-cleaner control layouts. |
+| `saugwischer_tanklast_vor_nach_entleeren` | Compare the measured empty and loaded mass of a removable wet-cleaner tank. |
+| `saugroboter_laufstatus_haushalt_uebergabe` | Decide what to hand off after an interrupted or unverified robot run. |
+| `saugroboter_start_ohne_telefon_ersatzplan` | Identify documented on-device alternatives when the phone is unavailable. |
+| `entfeuchter_tank_zwischenablage_abgleichen` | Check usable shelf dimensions for a removed dehumidifier tank. |
+| `entfeuchter_tankmeldung_uebergabe` | Assign a checked human handoff when the dehumidifier tank indication is hard to notice. |
+| `entfeuchter_bedienmatrix_ohne_app` | Map which household dehumidifier operations have a verified local control. |
+| `luftbefeuchter_nachfuellen_kleine_portionen` | Calculate hand-carried refill portions when the device instructions permit in-place filling. |
+| `luftbefeuchter_lokale_regelung_ersatzroutine` | Distinguish a local target selector from a simple humidifier output setting. |
+| `ventilator_fernbedienung_nutzplaetze` | Compare observed remote-control reception at two usual fan-use positions. |
+| `ventilator_stufenwahl_tastendruecke` | Count presses needed on a documented cyclic fan control. |
+| `ventilator_schwenkbereich_sitzplaetze` | Check whether an observed fan sweep geometrically reaches both chosen seats. |
+| `thermostat_manuelle_aenderung_ueberlappt_termin` | Check whether a documented manual hold covers the intended occupancy window. |
+| `thermostat_wechselakku_ladefenster` | Plan charging batches for a verified removable thermostat battery pack. |
+| `thermostat_kopfzuordnung_raumplan` | Count thermostat labels missing from a room with multiple radiator heads. |
+| `schublade_zugriff_hintere_tiefe` | Find how much of a drawer stays behind the cabinet front. |
+| `schubladen_markierungen_zuordnen` | Plan how many distinct drawer labels are still needed and check the space for a tested label. |
+| `kuehlschrank_griffseite_routinenvergleich` | Compare how often a measured refrigerator door routine requires walking around the door. |
+| `luftreiniger_filterwechsel_anzeige_uebergabe` | Distinguish a completed physical replacement from a display reset during care handoff. |
+| `waeschestaender_leinen_reichweite` | Count drying lines inside a self-measured preferred height range. |
+| `steckdosenleiste_schalter_zugriffsweg` | Check obstruction-free physical access to an existing switched power strip. |
+| `klimageraet_fruehjahrsstart_ruhezeit` | Schedule a portable AC restart after the documented settling period. |
+| `klima_herbst_trocknungsfenster_planen` | Fit a documented end-of-season drying run before pick-up. |
+| `klima_abschalttimer_mitternacht` | Set a delay-based overnight switch-off timer at the nearest earlier supported step. |
+| `mobilklima_zweiraum_folgeplan` | Check when one portable unit can serve two rooms in a fixed sequence. |
+| `schlafzimmer_kuehlpause_reserve` | Estimate the remaining off-period before a chosen indoor temperature is reached. |
+| `klima_nachtregime_ziel_und_verbrauch` | Choose the least energy-intensive observed night regime that met your coverage requirement. |
+| `ventilator_wochenbudget_nachtmix` | Allocate stronger fan nights while reserving the measured baseline for every night. |
+| `wechselzeit_heiz_kuehl_schaltung` | Classify a mild-season morning, noon and evening against your chosen mode boundaries. |
+| `thermostat_ferienprogramm_rueckkehr` | Identify a recovery shortfall around holiday mode and the first scheduled heating period. |
+| `thermostat_fensterpause_verzoegerung` | Compare a measured ventilation stop with a documented fixed thermostat pause. |
+| `heizkoerper_saison_warmefreigabe_pruefen` | Trace the first heating demand through known room and central controls. |
+| `kwl_winter_rueckwaerme_messquote` | Estimate an apparent single-point supply-air heat-recovery ratio. |
+| `kwl_sommerbypass_kuehlgewinn_probe` | Compare matched summer bypass supply temperatures against a personal target. |
+| `keller_sommer_lueften_messfenster` | Select observed summer basement airing windows from absolute humidity and sensor uncertainty. |
+| `entfeuchter_mindestpause_zeitplan` | Schedule the next dehumidification interval using the exact documented restart delay. |
+| `entfeuchtung_rueckkehr_nach_pause` | Report moisture rebound after a documented drying interval. |
+| `keller_entfeuchter_saisonstunden_abdeckung` | Estimate how much of a sampled cold-season dehumidification window falls within the documented temperature range. |
+| `luftreiniger_zweistufen_aussenluftvergleich` | Estimate the clean-air contribution of a high and a quiet filter phase without counting fresh air. |
+| `klima_lueftung_aufgaben_uebergabe` | Identify missing outdoor-air provision after switching to recirculating cooling. |
+| `thermostat_uebergang_zeitplan_umgehung` | Distinguish manual overrides and automation rules from a normal scheduled setpoint. |
+| `raeumzeit_profil_thermostat_kalenderwechsel` | Compare changed workday occupancy with an existing scheduled heating interval. |
+| `heizdecke_saison_vorlauf_abschaltcheck` | Verify whether a documented blanket preheat timer ends before the chosen use time. |
+| `ventilator_nacht_geraeuschprofil_kompromiss` | Find which measured fan settings meet independently chosen air speed and sound criteria. |
+| `raumklimageraet_modus_nach_strompause` | Check which previously scheduled room-climate settings actually returned after an observed outage. |
+| `geraetekauf_raten_gegen_barpreis` | Compare the stated installment total with the full cash price. |
+| `geraeteaufpreis_strompreisband` | Test the purchase premium across a range of energy prices. |
+| `geraete_gebraucht_restnutzungs_schwelle` | Find the used appliance usage threshold relative to a new one. |
+| `geraet_reparatur_ausfallkosten` | Add necessary downtime costs to a household repair quote. |
+| `geraet_bundle_aufpreis_gebrauchswert` | Value only wanted and confirmed extras when comparing a bundle premium. |
+| `reiniger_zeitgewinn_gegen_aufpreis` | Quantify the break-even personal value per hour of active cleaning time saved. |
+| `thermostat_erprobung_wiederverwendungskosten` | Compare pilot and direct expansion costs after crediting confirmed reusable components. |
+| `kuehlloesung_uebergangsbudget_gegen_aufpreis` | Compare bridging costs with the premium for a verified immediate alternative. |
+| `oskar_filtermatten_gemeinsamer_vorrat` | Plan a shared stock of verified O-030 mat packs across the two compatible humidifiers. |
+| `verbrauchsmaterial_parallel_beschaffen` | Identify the critical delivery time when all mandatory consumables are needed. |
+| `beurer_lb200_filter_frist_auslastung` | Compare the documented runtime alert and maximum calendar replacement interval for a Beurer LB 200 filter. |
+| `saugwischer_gebraucht_startmaterial_budget` | Add verified consumable needs to the used wet cleaner start-up budget. |
+| `saugwischer_handbuch_ace_xt_abgleichen` | Distinguish the exact F25 XT variant from the related ACE manual and other trims. |
+| `klima_zubehoerbudget_verteilreserve` | Partition an accessory budget into verified quotes and remaining allowance. |
+| `angebote_gueltigkeitsfenster_ueberschneidung` | Find the overlap between two confirmed quote-validity windows. |
+| `geraete_label_rundung_abstand` | Check whether report rounding alone could explain a small difference between two comparable labels. |
+| `luftreiniger_cadr_wert_pruefvergleich` | Check comparability of advertised CADR for the required particle category and operating setting. |
+| `geraet_verpackungsmass_datenblatt_abgrenzen` | Separate unpacked operating dimensions from carton measurements before a buying shortlist. |
+| `angebot_rabatt_ungeplante_fuellerkosten` | Test a coupon against items you would not otherwise buy. |
+| `kaufangebot_rueckgabe_szenario_budget` | Estimate a return-and-rebuy budget from confirmed fees and refund assumptions. |
+| `oskar_luftbefeuchter_zielstufe_dokumentiert` | Check whether Oskar or Oskar little documents the requested target-humidity control setting. |
+| `kuehltechnik_varianten_beleg_inverter` | Qualify evidence for inverter modulation without inferring it from split versus monoblock. |
+| `klima_alternativen_gemeinsames_ausschlusskriterium` | Compare two alternatives against one actual non-negotiable setup requirement. |
+| `geblaese_leistungsangabe_betriebsart` | Identify whether an input-power figure refers to fan-only or compressor cooling. |
+| `ersatzteil_erneuerung_passung_und_einsatzzeit` | Compare repair-part lead time and setup time with a confirmed replacement path. |
+| `stromfenster_mehrphasen_start` | Find the cheapest contiguous start for a two-phase load. |
+| `unterbrechbare_last_preisfenster_verteilen` | Allocate interruptible energy across known time slots with capacity limits. |
+| `strompreis_zwei_geraete_ruhefenster` | Pick distinct low-cost slots for two planned chores that must not overlap. |
+| `strombudget_optionale_zyklen_priorisieren` | Allocate full optional runs in priority order after essential use and reserve. |
+| `strombudget_restwochenpfad` | Find the remaining workday allowance after actual usage and planned weekend loads. |
+| `strombudget_hitzetage_reserve` | Find the headroom for hot days above the measured normal-day baseline. |
+| `strombudget_maximaler_arbeitspreis` | Compute the maximum all-in variable rate a fixed consumption budget can absorb. |
+| `strommessung_unterzaehler_netzbaum` | Reconcile a nested submeter plus independent loads without counting its measured child twice. |
+| `haushaltsstrom_geteilte_nutzung_szenario` | Build a private two-party household cost-sharing scenario from direct and shared usage. |
+| `strombedarf_zwei_zeitfenster_aufschubkosten` | Check whether standby energy during a delayed cycle offsets tariff savings. |
+| `stromsparplan_massnahmen_ueberlappung` | Avoid double-counting overlapping measured electricity savings. |
+| `stromrechnung_ruecklage_geplant` | Estimate a monthly reserve from a supplied final-bill range. |
+| `duschwasserbudget_zwei_personen` | Allocate a shared water allowance when two showers have different measured flow rates. |
+| `spuelprogramme_wasser_strom_zielkonflikt` | Check measured dishwashing cycles against independent water and electricity limits. |
+| `brause_duschdauer_wasser_und_waerme_limit` | Find a comparable shower duration that keeps both water and heat within the old use. |
+| `waesche_wochenbedarf_leine_und_trockner` | Check weekly dryer energy needed when outdoor or rack slots are limited. |
+| `strombudget_verbrauch_messspanne` | Decide whether a budget is certainly met, exceeded, or unresolved under two measurement bounds. |
+| `heizpause_durchlaufen_wiederaufheizen` | Compare matched heating sessions with and without an intervening pause. |
+| `stromkosten_preis_und_menge_abgleichen` | Reconcile a higher bill into fixed, usage, and rate effects by a fixed calculation order. |
+| `stromrechnung_zeilenrundung_abgleichen` | Reconcile per-line cents against rounding the combined electricity amount. |
+| `beleuchtung_schaltgruppen_belegung` | Estimate the benefit of separately switching two light groups during partly shared use. |
+| `geraetelauf_aufsichtswechsel_zeitplan` | Find a feasible finish when different people handle launch and unload at known times. |
+| `haushalt_strommessgeraete_wochenrotation` | Plan how many non-overlapping batches of simultaneous household measurements are needed. |
+| `haushaltsgeraete_tagesfenster_energierahmen` | Allocate a household energy envelope to a timed block and show the remainder. |
 <!-- tools:end -->
 
 ## Can a MeacoDry Arete One 20L drain uphill into a sink?
@@ -352,7 +449,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 
 - **Same arithmetic as the published calculators.** Each tool mirrors a calculator that
   runs on the website, so an assistant's answer and the page a reader lands on cannot
-  disagree. A CI job calls all <!-- count -->292<!-- /count --> tools against production daily and
+  disagree. A CI job calls all <!-- count -->389<!-- /count --> tools against production daily and
   asserts each returns the value the published calculator shows.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
@@ -386,7 +483,7 @@ Not engineering, legal or subsidy advice.
 
 ## Hosted and local versions
 
-The hosted Registry entry is version 1.7.0. The local stdio source is version 1.5.0. The [tool directory](https://getecoback.com/mcp.html#tools) groups all 292 tools by household task.
+The hosted Registry entry is version 1.8.0. The local stdio source is version 1.6.0. The [tool directory](https://getecoback.com/mcp.html#tools) lists the distinct household tasks and marks the compatible legacy overlap.
 The drainage rules and reviewed German-market model sources come from
 [`sites/getecoback`](https://github.com/f-tiger/agi-site/tree/main/sites/getecoback).
 Follow the returned `nextCursor` in `tools/list` to discover later pages.

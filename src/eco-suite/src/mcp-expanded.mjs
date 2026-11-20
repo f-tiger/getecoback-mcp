@@ -12,6 +12,10 @@ import {waterHousehold} from './mcp-water-household.mjs';
 import {envelopeSuite} from './mcp-envelope.mjs';
 import {useWorkflows} from './mcp-use-workflows.mjs';
 import {measurementLab} from './mcp-measurement-lab.mjs';
+import {alltagZugang} from './mcp-alltag-zugang.mjs';
+import {saisonWechsel} from './mcp-saison-wechsel.mjs';
+import {kaufpraxis} from './mcp-kaufpraxis.mjs';
+import {ressourcenplan} from './mcp-ressourcenplan.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -28,10 +32,25 @@ export const expandedDefinitions = [
   ['Gebäude & Fenster', envelopeSuite],
   ['Geräte im Alltag', useWorkflows],
   ['Messpraxis', measurementLab],
+  ['Zugang & Alltag', alltagZugang],
+  ['Saisonwechsel', saisonWechsel],
+  ['Kaufpraxis', kaufpraxis],
+  ['Ressourcen planen', ressourcenplan],
 ].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));
 export const isExpandedTool = name => handlers.has(name);
+
+export function catalogueExample(name) {
+  const tool = handlers.get(name);
+  if (!tool) return {example:null};
+  const citation_url = 'https://getecoback.com' + tool.page;
+  return {
+    example:{arguments:tool.example.args, expected_fields:tool.example.expect},
+    citation_url,
+    citation_markdown_url:citation_url.replace(/\.html$/,'.md'),
+  };
+}
 
 export const expandedTools = expandedDefinitions.map(({name, description, properties}) => ({
   name, description,
