@@ -118,9 +118,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 2004 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 2005 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,2004);
+  assert.equal(expandedDefinitions.length,2005);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);
@@ -128,4 +128,18 @@ test("all 2004 deterministic suite tools have hosted and stdio parity on the doc
       assert.deepEqual(local.structuredContent,remote.structuredContent,name);
     }));
   }
+});
+
+test("the German window-width comparison keeps its optional first-party entry identical", async () => {
+  const name = "fenstersauger_sprossenfenster_duesenbreite";
+  const argumentsForPurchase = {lichte_breite_mm:170,spiel_pro_seite_mm:5,vorhandene_duese_mm:0,kauf_geplant:true};
+  const [local, hosted] = await Promise.all([
+    callTool(name, argumentsForPurchase),
+    remoteCall(name, argumentsForPurchase),
+  ]);
+  assert.deepEqual(local.structuredContent, hosted.structuredContent);
+  assert.equal(local.structuredContent.nutzbreite_mm,160);
+  assert.equal(local.structuredContent.nominell_passende_originalpakete[0].artikel,"06008B7000");
+  assert.equal(local.structuredContent.entry_url,
+    "https://getecoback.com/produkte.html?mcp_entry=fenstersauger-breitencheck#fenstersauger-duesenbreite");
 });
