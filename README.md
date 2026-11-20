@@ -1,6 +1,6 @@
 # EcoBack Raumklima — MCP server
 
-<!-- count -->634<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->759<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -53,12 +53,12 @@ Worker, and ports drift silently.
 <!-- tools:start -->
 | `entfeuchter_ablaufcheck` | Check a German basement dehumidifier’s hose route, pump or tank options and cite evidence for the exact model. |
 | `geraet_wahl` | Choose a next step for heat, damp/mould, cold or stale air. For damp rooms, measure first, investigate damage and compare cold-room or laundry conditions before buying; floor area alone cannot size a dehumidifier. Same decision rules as the website. |
-| `btu_empfehlung` | Recommended cooling capacity in BTU for a room, with the matching device class: how many BTU do I need for X m²? Same formula as the calculator on getecoback.com (340 BTU/m² × sun factor), for Germany and Europe. |
-| `fensterabdichtung_laenge` | Required window-seal length for a portable air conditioner from the sash measurements (perimeter = 2×(width+height)), plus the off-the-shelf size that fits. Covers tilt-and-turn and roof windows. |
+| `btu_empfehlung` | Estimate cooling capacity in BTU/h from room area and sun exposure, using the website's baseline of 340 BTU/h per m². Consider a detailed load calculation for large rooms. |
+| `fensterabdichtung_laenge` | Estimate the seal length for a portable air conditioner from sash measurements (perimeter = 2 × (width + height)) and identify a stock size to verify. Covers tilt-and-turn and roof windows. |
 | `hitzewelle_vorschau` | Live heatwave outlook for Germany: highest temperature over the next three days across Berlin, Frankfurt and Munich (open-meteo), flagged from 28 °C and 32 °C. |
 | `klimaanlage_stromkosten` | Running cost of an air conditioner or any appliance: watts × hours × electricity price × compressor duty cycle. What does it cost to run per hour, per day, per month? |
 | `heizleistung_watt` | Required heating power in watts for a room, from floor area and insulation standard (60/80/100 W/m² for new build, existing, old building), including running cost per full-load hour. |
-| `taupunkt_lueften` | Dew point of the outside air and whether opening the window right now would make a basement or damp room wetter (Magnus formula, walls counted 2 °C below room temperature). |
+| `taupunkt_lueften` | Compare outdoor dew point (Magnus approximation) with a wall estimate 2 °C below room temperature. A drying decision also needs indoor humidity and a measured coldest surface. |
 | `ratgeber_suche` | Searches this site's guides on air conditioning, window sealing, ventilation, heating, dehumidifiers and electricity costs, returning title, URL and summary for each match — citable sources for the answer. |
 | `ratgeber_lesen` | Returns the full plain text of one guide from getecoback.com so the answer can be written from the source and cited. Pass a path or URL from ratgeber_suche. |
 | `strommessung_hochrechnen` | Project meter readings across representative days. |
@@ -685,6 +685,131 @@ Worker, and ports drift silently.
 | `werkstatt_mehrfachgriff_platzwechselprobe` | Measure repeat reaches before and after moving a tool. |
 | `werkstatt_probedruck_nacharbeit_serienentscheid` | Decide whether a small run of drawer dividers fits your measured rework budget. |
 | `werkstatt_trenner_wechsel_ohne_umraeumen` | Measure how often a divider can be repositioned without emptying the drawer. |
+| `messlogger_raster_dubletten_auswertbar` | Audit usable timestamp slots without mistaking duplicates for coverage. |
+| `raumlogger_ereignis_raster_grenzfall` | Assign an uncertain event time to a single fixed-width log bin when possible. |
+| `messluecken_ereignisgruppen_verdecken` | Distinguish total missing time from the longest blind spot. |
+| `stromlog_integrationsmethode_abstand` | Test sensitivity to step-hold versus linear interpretation of three unevenly spaced power samples. |
+| `messreihe_konstante_anzeige_kontrollwechsel` | Screen a flat trace against a documented above-resolution reference change. |
+| `messprotokoll_zeitpaarung_viele_zeilen` | Quantify many-to-many row inflation before joining timestamped logs. |
+| `haushaltswaage_nullpunkt_driftspanne` | Bound tare drift using verified zero readings at both ends. |
+| `hygrometer_zweipunkt_referenz_abgleich` | Estimate a bounded two-point humidity comparison without extrapolating. |
+| `strommessung_gemeinsamer_offset_differenz` | Bound a power difference with or without verified common-mode cancellation. |
+| `stromversuch_streuung_gruppen_zusammen` | Pool individual energy-run variation while preserving between-group differences. |
+| `raumfeuchte_mittelwert_schwellenanteil` | Bound time at or above a humidity threshold when only aggregate data survive. |
+| `stromexport_gerundete_bloecke_summieren` | Audit the accumulated rounding range in a block energy export. |
+| `duschdurchfluss_start_stopp_zeitfehler` | Bound water flow with independently bounded endpoint timing error. |
+| `stromzaehler_sprung_leistungsplausibilitaet` | Flag a cumulative-meter jump beyond the supported energy bound. |
+| `stromvergleich_ausfall_nach_modus` | Assess selective missingness by operating mode rather than global uptime. |
+| `stromprotokoll_lueckensumme_anker` | Recover only the aggregate energy of missing bins from a matched reference total. |
+| `stromexport_einheit_metadaten_abgleichen` | Normalize documented energy units while leaving unknown labels unresolved. |
+| `stromlogger_spitzenmittel_ausreisserabstand` | Test consistency of peak duration and aggregate energy. |
+| `duschdurchfluss_vergleich_menge_zeitband` | Compare flow ranges from independently bounded volumes and durations. |
+| `messreihe_grenzwert_rundung_faelle` | Bound the count above a threshold from three categories of rounded observations. |
+| `klimalog_zeitpaar_naechster_eindeutiger_wert` | Pair an anchor sample to its unique nearest timestamp within a chosen tolerance. |
+| `stromlogger_sequenz_counter_luecke` | Audit packet counters separately from metered values. |
+| `messlogger_raster_phasen_gleichzeit` | Check whether fixed periodic logs have any exact timestamp coincidences. |
+| `klimageraet_schallzeit_mittel_zwei_phasen` | Combine two separately measured equivalent A-weighted levels on an energy basis. |
+| `stromimpuls_export_ereignisabgleich` | Cross-check recorded pulse counts against a documented energy-per-pulse scale. |
+| `saugroboter_zwei_raumtermine_reihenfolge` | Choose the feasible order for two robot-cleaning deadlines. |
+| `saugroboter_dockbesuch_ruhefenster` | Find the parts of a documented dock visit that extend into quiet hours. |
+| `saugroboter_wischen_nach_trockenauftrag` | Budget the verified dry-to-wet changeover separately from idle time. |
+| `saugwischer_dock_laden_trocknen_ablauf` | Compare dock occupancy with verified simultaneous versus sequential charging and drying. |
+| `saugwischer_fuellstelle_vor_abschnitt` | Check whether the next approved refill point arrives before either cleaning segment runs short. |
+| `spuelmaschine_deckel_belegen_tellerplaetze` | Account for plate positions displaced by compatible lids. |
+| `spuelmaschine_zubehoer_korb_umbauwechsel` | Compare feasible baskets layouts when one run must hold both tall glasses and tall pieces. |
+| `spuelmaschine_zwischenlauf_abstellfolge` | Confirm separate unloading and loading availability between two dishwasher runs. |
+| `heissluft_unterbrechungsfreies_programmfenster` | Fit a documented uninterrupted cycle between two fixed kitchen uses. |
+| `heissluft_folgelauf_vorheizen_konfiguration` | Evaluate the extra heat-up occupation observed in a compatible follow-on cycle. |
+| `kontaktgrill_platten_spuelgang_ladeschluss` | Determine whether eligible grill plates reach the current dishwasher loading cutoff. |
+| `heissluft_rost_entnahme_ablage_nachlauf` | Check whether a compatible heat-resistant rack rest is occupied when the next task needs it. |
+| `wasch_trockner_zweiladung_uebergabestau` | Quantify when a second washed load waits for the dryer in a two-load sequence. |
+| `trockner_zeitfenster_nachlauf_und_raum` | Keep a shared room reservation separate from a dryer’s automatic and manual occupation. |
+| `entfeuchter_tankleerung_zwei_zeitpunkte` | Check one manual tank emptying between two supervised dehumidifier sessions. |
+| `luftbefeuchter_zweistufen_tank_restmenge` | Budget measured water for two humidifier modes without projecting a room effect. |
+| `luftbefeuchter_betrieb_nach_routinewechsel` | Compare a normally cleaned tank with an existing, approved ready tank at the next session. |
+| `klimageraet_ein_aus_timer_kombinationsbeleg` | Verify that both ends of an AC window can be automated together. |
+| `klimageraet_timer_moduswechsel_uebergang` | Reserve a manual-verified changeover and any documented restart delay. |
+| `ventilator_timer_wiederholtage_abdecken` | Compare supported repeat days with the planned weekly fan routine. |
+| `lichterkette_timer_einschaltfenster_vergleichen` | Intersect a documented daily light timer with the intended clock window. |
+| `heizthermostat_ausnahme_normalplan_rueckkehr` | Identify whether a documented temporary override shortens or masks the next ordinary thermostat period. |
+| `gefrierfach_hohe_boxen_flexplatzbedarf` | Allocate high and short freezer containers across restricted and flexible positions. |
+| `heizdecke_abschaltautomatik_einzelnutzung` | Account for documented auto-off within one already permitted, attended use. |
+| `waschtrockner_kombilauf_entnahmefaelle` | Detect which pieces prevent a documented no-handoff wash-to-dry batch. |
+| `filter_vorfilter_komplette_saetze_binden` | Count complete verified filter sets without crossing declared kit groups. |
+| `filter_lagerprotokoll_fach_status_klaeren` | Triage spare filters after uncertain storage without guessing usability. |
+| `filter_waschrotation_nach_gepruefter_trocknung` | Plan two compatible washable parts around verified availability and drying downtime. |
+| `ersatzteile_unterstuetzte_alternativen_zuordnen` | Preserve scarce interchangeable equipment parts for tasks with no supported alternative. |
+| `verbrauchsmittel_zwei_originalbehaelter_einzelbedarf` | Allocate whole uses from two original containers without combining remnants. |
+| `verbrauchsmittel_charge_bis_klaerung_sperren` | Exclude held and untraceable consumables when checking immediate coverage. |
+| `geraet_nach_reparatur_eigenes_ersatzgeraet_abbauen` | Review a documented trial before releasing a temporary backup. |
+| `geraet_zubehoer_beim_wechsel_getrennt_verplanen` | Keep a working fallback equipped while transferring verified spares. |
+| `haushaltsgeraet_weitergabe_optionale_ausstattung` | Preserve useful optional equipment without weakening a handover kit. |
+| `vorhandenes_geraet_routine_und_sonderbedarf` | Check whether a verified complement covers only the uncovered household tasks. |
+| `ersatzbestellung_nach_fund_aenderungsbedarf` | Separate avoidable order quantities from already committed units. |
+| `geraet_ersatz_ausloeser_fehlende_zusatzfunktion` | Revisit a replacement trigger only for the verified missing function. |
+| `filter_pflegejournal_verspaetete_eintraege` | Reconcile a later data entry with the underlying wash or replacement event. |
+| `haushaltsgeraet_teilen_freie_rueckgabefenster` | Find a feasible undivided borrowing slot including handback time. |
+| `verbrauchsmittel_zweite_packung_erst_bei_luecke` | Delay opening a sealed pack until a dated need exceeds usable stock. |
+| `filterwechsel_teilwechsel_ohne_satzreset` | Keep the earlier due component visible after a partial maintenance event. |
+| `geraeteablage_saisonstart_teilzuordnung` | Audit which stored set pieces still need checking before seasonal use. |
+| `granulatbox_einsatzbereich_nach_umzug_pruefen` | Reassess a retained passive absorber for a changed use case. |
+| `geraet_geteilt_verbrauch_bis_rueckgabe` | Track what a borrower should return with a shared household device. |
+| `geraetezubehoer_ruecklauf_vollstaendigkeitsfolge` | Identify the earliest dated accessory arrival that completes a specific plan. |
+| `ersatzmaterial_regalflaeche_ohne_umfuellen` | Test whether original consumable packs fit in a documented storage zone. |
+| `ersatzmaterial_doppelt_reservierte_stuecke` | Detect inventory reservations that refer to the same identified pieces. |
+| `haushaltsgeraet_ersatz_unabhaengige_engpaesse` | Check whether rescheduling covers only transferable workload. |
+| `saugroboter_buerstenpflege_erneut_gleiche_zone` | Compare repeat observations before replacing a cleaned brush. |
+| `ersatzteil_mengenabgleich_einzelpackung_rueckbehalt` | Select as few whole sealed packs as needed for a verified reserve. |
+| `hygrometer_umzug_erstes_stabiles_ablesefenster` | Find the first usable reading after relocating a hygrometer |
+| `hygrometer_nachfolger_anzeigegrenzen_ueberlappung` | Check whether a replacement hygrometer preserves a warning threshold |
+| `entfeuchter_raumwechsel_tankrest_zuteilen` | Bound the second room’s collected water when a tank was carried over |
+| `entfeuchter_raumprotokoll_ablaufzweige` | Track counted and unmetered dehumidifier drainage after a transfer |
+| `lueftungsprotokoll_tuerphase_auswertung_trennen` | Decide whether a reading can extend an interrupted ventilation trial |
+| `luftreiniger_leihe_filterstunden_mindeststand` | Carry verified purifier filter hours through a loan |
+| `strommessung_raumzuordnung_ungeklaerter_anteil` | Separate allocated and unassigned energy from a shared power meter |
+| `waesche_trocknung_teilserie_raumwechsel` | Determine whether moved laundry still belongs to its original weigh-in series |
+| `saugroboter_raumkarte_teilflaeche_oder_doppelung` | Combine robot cleaning map coverage without counting the same area twice |
+| `saugwischer_geteilte_pflege_letzte_tankphase` | Check if floor washer tank care followed the latest use |
+| `raumkuehlung_uebergabe_thermometer_belastungspaar` | Compare logged cooling changes only within a matched starting temperature context |
+| `waermelogger_heizphase_setzwert_anteile` | Split a heating observation at a documented setpoint change |
+| `thermostat_raumwechsel_aktiver_zeitplan` | Identify the active setpoint source after moving a smart thermostat |
+| `klimafenster_zubehoer_zielraum_luecke` | Identify which room still lacks a documented compatible window accessory |
+| `nachtkuehlung_handoff_raumwerte_zeitbezug` | Select night readings using the actual occupancy handoff |
+| `saugroboter_neue_karte_wischsperren_abgleich` | Audit retained no-mop zones after migrating to a new map |
+| `saugwischer_uebergabe_bodenabschnitt_freigaben` | Determine which floor area is still covered by the retained washing approval |
+| `sonnenschutz_raumuebernahme_doppelte_aufzeichnung` | Reconcile overlapping shade observations for one window |
+| `luftbefeuchter_raumwechsel_wasseralter_nachweis` | Track the oldest documented tank water through a humidifier handoff |
+| `dusche_durchflusswert_uebergabe_kopf_freigabe` | Separate measured flows for two settings of a transferred showerhead |
+| `ventilator_uebergabe_markierte_stufenpaare` | Compare marked fan settings by actual control mode after handoff |
+| `heizwaerme_uebergabe_temperaturpuffer_ortspaare` | Identify which room has the smaller measured margin above its own heating target |
+| `keller_lueftungsnotiz_aussenwert_ersatzquelle` | Audit the timing and placement of a substitute outdoor reading |
+| `saugroboter_station_raumwechsel_servicezugang_plan` | Compare two docking locations for retained service access |
+| `feuchteprotokoll_raumwechsel_logbuch_abdeckung` | Quantify location-resolved evidence after switching room loggers |
+| `heizzone_gemeinsames_komfortband_belegung` | Check overlapping user-selected comfort bands while both rooms are occupied. |
+| `heizzonen_messpaar_reaktion_zielraeume` | Separate two room temperature responses to the same heating request. |
+| `heizpause_raumfolge_wiederanlauf_engpass` | Check a shared restart against distinct readiness deadlines. |
+| `heizzone_moebel_nutzungsstellung_abstand` | Compare everyday and guest furniture positions against your documented clearance. |
+| `heizzone_zeitplan_lueftung_raumwechsel` | Check scheduled heating overlap with two separate airing windows. |
+| `fensterbehang_winter_lichtgewinn_zwei_bloecke` | Check actual daylight access in two separately planned use blocks. |
+| `thermovorhang_paarprobe_scheibe_feuchte` | Compare observed window moisture with the curtain open and closed. |
+| `fensterbehang_sichtschutz_termin_zwischen_pflege` | Check if a laundry window leaves a scheduled privacy gap. |
+| `verschattung_blendpause_zwei_fenster_arbeit` | Compare observed glare and planned shade in a fixed work window. |
+| `arbeitsplatz_ersatzraum_ruhe_waerme_vergleich` | Choose between two trial work spots for a specific call. |
+| `schlafraum_arbeitswechsel_abkuehlung_zeitgruende` | Schedule a measured cooldown before switching a home office to a bedroom. |
+| `schlafplaetze_zuordnung_persoenliche_nachtziele` | Allocate two sleeping rooms to people with different measured needs. |
+| `gaesteraum_morgenlicht_fruehe_nutzung` | Coordinate a guest’s dark window with the room’s next morning use. |
+| `arbeitsplatz_raumwechsel_persoenliche_hitzepause` | Check productive time left after a temporary heat-driven desk move. |
+| `wohnmessung_feste_referenz_zwei_rotationsorte` | Check simultaneous coverage for a fixed logger and two rotating rooms. |
+| `wohnmessung_logger_uhrdrift_gemeinsamer_stichtag` | Check whether timestamp drift permits matching two room recordings. |
+| `wohnfeuchte_zwei_raeume_gemeinsame_ereignisse` | Separate simultaneous humidity exceedances from room-only events. |
+| `wohnmessung_sonnenfleck_zeitmaske_ortsvergleich` | Mask both sensors’ direct-sun windows before comparing rooms. |
+| `wohnmessung_nachprobe_raeume_ereignisfenster` | Select a feasible order for two timed room follow-ups with one meter. |
+| `entfeuchter_zwei_raeume_tank_zwischenstopp` | Check reservoir headroom across two measured room sessions. |
+| `ventilator_leihe_raeume_ruheziel_vorrang` | Resolve competing room slots for one trialled fan. |
+| `wohnklima_geraetewechsel_rueckgabefrist_testfenster` | Fit two tests and pack-up before a known hand-back time. |
+| `infrarotheizung_leihe_vor_ankauf_nachprobe` | Flag when seat trials cannot transfer to other use cases. |
+| `klimaanlage_wechselort_fensterkit_rueckbau` | Find missing reusable fittings before moving an existing portable AC. |
+| `fensterschutz_saisonwechsel_freigabe_zwei_raeume` | Prepare a reversible shade change only where storage and operation are ready. |
 <!-- tools:end -->
 
 ## Can a MeacoDry Arete One 20L drain uphill into a sink?
@@ -697,15 +822,14 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 
 ## What makes the answers safe to quote
 
-- **Same arithmetic as the published calculators.** Each tool mirrors a calculator that
-  runs on the website, so an assistant's answer and the page a reader lands on cannot
-  disagree. A CI job calls all <!-- count -->634<!-- /count --> tools against production daily and
-  asserts each returns the value the published calculator shows.
+- **Checked examples and source links.** The hosted directory supplies exact input
+  schemas, examples and source URLs. Tests cover all <!-- count -->759<!-- /count -->
+  callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
 - **Honest about what it is not.** Product recommendations summarise public tests; nothing
   is lab-tested here. Each source identifies the model and purchase conditions it covers.
-- **Hosted privacy.** The drainage and moisture decisions store a fixed result code rather than household inputs. Other tools retain bounded parameters and limited client metadata. See the [privacy notice](https://getecoback.com/datenschutz.html). The stdio drainage calculation runs locally.
+- **Hosted privacy.** New usage records contain the tool name, a fixed outcome and limited client metadata for every tool. Submitted arguments are processed to answer requests and are absent from usage records. See the [privacy notice](https://getecoback.com/datenschutz.html). The stdio drainage calculation runs locally.
 
 ## Also machine-readable
 
@@ -733,7 +857,7 @@ Not engineering, legal or subsidy advice.
 
 ## Hosted and local versions
 
-The hosted Registry entry is version 1.10.0. The local stdio source is version 1.8.0. The [tool directory](https://getecoback.com/mcp.html#tools) lists the distinct household tasks and marks the compatible legacy overlap.
+The hosted Registry entry is version 1.11.0. The local stdio source is version 1.9.0. The [tool directory](https://getecoback.com/mcp.html#tools) lists the distinct household tasks and marks the compatible legacy overlap.
 The drainage rules and reviewed German-market model sources come from
 [`sites/getecoback`](https://github.com/f-tiger/agi-site/tree/main/sites/getecoback).
 Follow the returned `nextCursor` in `tools/list` to discover later pages.
