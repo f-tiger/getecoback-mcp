@@ -14,6 +14,7 @@ import { findTools, runReviewedExample } from '../src/find-tools.mjs';
 const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 const server = fileURLToPath(new URL('../src/server.mjs', import.meta.url));
 const finder = fileURLToPath(new URL('../src/find-tools.mjs', import.meta.url));
+const cellarUri = 'ecoback://evidence/de/kellerentfeuchter';
 
 test('offline lookup preserves every exact name and input schema', () => {
   for (const {name, inputSchema} of TOOLS) {
@@ -161,6 +162,73 @@ test('stdio handles initialize, the complete paginated catalogue, BTU and unknow
   assert.equal(replies.get(unknown).error.code, -32602);
 });
 
+test('default and compact stdio expose the same offline German cellar evidence resource', () => {
+  const uri = cellarUri;
+  const mimeType = 'text/markdown';
+  const meacoSource = 'https://eu.meaco.com/products/meacodry-arete-one-20l-luftentfeuchter-luftreiniger';
+  const comfeeSource = 'https://www.feelcomfee.com/content/dam/comfee-aem/de/produkte/klimatisieren-heizen/mddf-20den7/comfee-MDDF-20DEN7-Datenblatt.pdf#page=2';
+  const requests = [
+    {method:'initialize', params:{}},
+    {method:'resources/list'},
+    {method:'resources/templates/list', params:{}},
+    {method:'resources/read', params:{uri}},
+    {method:'resources/list', params:{cursor:'stale-cursor'}},
+    {method:'resources/templates/list', params:{cursor:'stale-cursor'}},
+    {method:'resources/list', params:[]},
+    {method:'resources/templates/list', params:[]},
+    {method:'resources/read', params:{}},
+    {method:'resources/read', params:{uri:42}},
+    {method:'resources/read', params:{uri:uri+'/'}},
+    {method:'resources/read', params:{uri:'https://example.invalid/evidence'}},
+  ].map((request,index) => ({jsonrpc:'2.0', id:index+1, ...request}));
+
+  const bodies = [[], ['--compact']].map(args => {
+    const messages = readStdio(requests, args);
+    assert.equal(messages.length, requests.length);
+    assert(messages.every(message => message.jsonrpc === '2.0'));
+    const byId = new Map(messages.map(reply => [reply.id, reply]));
+    const [initial, listing, templates, read, ...errors] = requests.map(({id}) => byId.get(id));
+    assert.deepEqual(initial.result.capabilities, {tools:{},resources:{}});
+    const {resources, nextCursor} = listing.result;
+    assert.equal(resources.length, 1);
+    assert.equal(resources[0].uri, uri);
+    assert.equal(resources[0].mimeType, mimeType);
+    assert.match(resources[0].name, /\S/);
+    assert.equal(nextCursor, undefined);
+    assert.deepEqual(templates.result, {resourceTemplates:[]});
+    assert.equal(read.result.contents.length, 1);
+    const {text} = read.result.contents[0];
+    assert.equal(typeof text, 'string');
+    assert.deepEqual(read.result, {contents:[{uri,mimeType,text}]});
+    assert.deepEqual(errors.map(reply => reply.error?.code), [-32602,-32602,-32602,-32602,-32602,-32602,-32002,-32002]);
+    return text;
+  });
+
+  assert.equal(bodies[0], bodies[1]);
+  const text = bodies[0].replace(/[^\S\r\n]+/g, ' ');
+  const lines = text.split('\n');
+  for (const [temperature,litres,watts] of [['10',/\b3[,.]4\s*l\/tag\b/i,'180'],['20',/\b8[,.]5\s*l\/tag\b/i,'216']]) {
+    assert(lines.some(line => new RegExp(`\\b${temperature}\\s*°C`).test(line) && litres.test(line) && new RegExp(`\\b${watts}\\s*W\\b`).test(line)),
+      `The Meaco ${temperature} °C test condition, daily extraction and wattage must appear together`);
+  }
+  assert.match(text, /60\s*%/);
+  assert.match(text, /MeacoDry Arete One 20L/);
+  assert(lines.some(line => line.includes(meacoSource) && /20\.11\.2026|2026-11-20/.test(line)));
+  assert(lines.some(line => line.includes(comfeeSource) && /(?:06|20)\.11\.2026|2026-11-(?:06|20)/.test(line)));
+  assert.match(text, /MDDF-20DEN7\s+ohne\s+WF[^\n]*\boffen\b/i);
+  assert.match(text, /Ursache klären/);
+  assert.match(text, /Kauf verzichten/);
+  assert.match(text, /Tankalarm aktiv/);
+  const sourceHosts = new Set(['eu.meaco.com','www.meaco.com','www.meaco.de','www.feelcomfee.com','www.stadlerform.com','getecoback.com']);
+  for (const match of text.matchAll(/https?:\/\/[^\s)<>]+/g)) {
+    const url = new URL(match[0]);
+    assert.equal(url.protocol, 'https:');
+    assert(sourceHosts.has(url.hostname), `Unapproved source hostname ${url.hostname}`);
+    assert(!url.searchParams.has('tag') && !url.searchParams.has('ascsubtag'));
+    if (url.hostname === 'getecoback.com') assert.equal(url.pathname, '/guide/luftentfeuchter-keller.html');
+  }
+});
+
 const compactFind = 'ecoback_werkzeug_finden';
 const compactRun = 'ecoback_werkzeug_ausfuehren';
 const liveOnly = ['hitzewelle_vorschau', 'ratgeber_suche', 'ratgeber_lesen'];
@@ -229,6 +297,28 @@ test('compact lookup exposes the offline tool schema, source and guide for real 
   assert.match(drainage.model_evidence.source_url, /^https:\/\//);
   assert.deepEqual(replies[3].result, await callTool(tools[2].name, ownInputs));
   assert.notDeepEqual(replies[3].result, replies[2].result);
+});
+
+test('compact finder embeds the matching cellar evidence and leaves unrelated results unchanged', () => {
+  const [read, listing, relevant, ...unmatched] = compactReplies([
+    {method:'resources/read',params:{uri:cellarUri}},
+    {method:'resources/list'},
+    ...[
+      'Was leisten Comfee MDDF-20DEN7 und Meaco Arete One 20L bei 10 °C und 60 % im Keller?',
+      'Comfee MDDF-20DEN7-WF bei 10 °C',
+      'Wie lange darf ich mit 72 Litern duschen?',
+    ].map(frage => toolCall(compactFind,{frage})),
+  ]);
+  assert.equal(relevant.result.isError, false);
+  assert.deepEqual(relevant.result.structuredContent.resources, listing.result.resources);
+  assert.deepEqual(relevant.result.content.filter(part => part.type === 'resource'),
+    [{type:'resource',resource:read.result.contents[0]}]);
+  for (const {result} of unmatched) {
+    assert.equal(result.isError, false);
+    assert.equal(Object.hasOwn(result.structuredContent,'resources'), false);
+    assert.deepEqual(result.content.map(part => part.type), ['text']);
+  }
+  assert.equal(unmatched[1].result.structuredContent.tools[0].name, 'dusche_zeit_bei_wasserbudget');
 });
 
 test('compact stdio excludes live tools and reports invalid inputs in-band', async () => {

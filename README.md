@@ -76,6 +76,22 @@ enthalten die verfügbaren Quellen für die weitere Prüfung.
 Ohne `--compact` bleibt der vollständige Werkzeugkatalog verfügbar. Aktuelles
 Wetter und Ratgeber-Volltext sind im vollständigen Modus abrufbar.
 
+### Quellen für einen kalten Keller offline lesen
+
+Öffne im Ressourcenmenü deines MCP-Clients **Kellerentfeuchter bei 10 °C**.
+Die Übersicht zeigt, welche Herstellerwerte bei gleicher Luftfeuchte vergleichbar
+sind und wie du Gefälle, Pumpe und Tank vor dem Kauf prüfst. Sie enthält die
+Quellen, das Prüfdatum und die Grenzen der jeweiligen Modellangabe. Die kompakte
+Suche liefert die Übersicht auch bei passenden Fragen zu Modell und Prüfwerten.
+
+MCP-Clients können `ecoback://evidence/de/kellerentfeuchter` in beiden lokalen Modi
+über `resources/read` öffnen. Zum Prüfen aus dem heruntergeladenen Quellcode oder
+dem entpackten MCPB genügt ein Terminal mit Node.js 22 oder neuer.
+
+```sh
+printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"resources/read","params":{"uri":"ecoback://evidence/de/kellerentfeuchter"}}' | node src/server.mjs --compact
+```
+
 **Hosted endpoint** for clients that connect over HTTP.
 
 ```
