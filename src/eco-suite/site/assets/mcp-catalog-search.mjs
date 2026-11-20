@@ -189,7 +189,7 @@ function asksForLaundryCostComparison(terms) {
     terms.some(term => /^(?:luft)?entfeuchter(?:s|n)?$/.test(term)) &&
     terms.some(term => /^(?:(?:waesche|wasch)?ladung(?:en)?|trocknungsgang|trocknungsgaenge)$/.test(term)) &&
     terms.some(term => /^(?:kosten|kostet|stromkosten|stromgeld|euro|billiger|guenstiger)$/.test(term)) &&
-    !terms.some(term => /^(?:kaufpreis|anschaffung|amortis|rentier|rechnet)/.test(term));
+    !terms.some(term => /^(?:kaufpreis|anschaffung|amortis|rentier|rechnet|gleichzeitig$|ausgeschaltet$|abgeschaltet$)/.test(term));
 }
 
 export function findCatalogueTools(index, {query='', category='', name=null}={}) {

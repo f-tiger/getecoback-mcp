@@ -139,9 +139,10 @@ node src/find-tools.mjs --example waesche_trocknungskosten
 
 The first example explains what to check before routing a hose uphill and links
 to the model evidence. The second calculates shower duration for the sample water
-budget. For the laundry comparison, measure the kWh per load for each method and
-use your own electricity tariff. The tool leaves the result open if the two
-loads reach different levels of dryness.
+budget. For the laundry comparison, measure the kWh per load in separate runs
+and use your own electricity tariff. If both devices run together, measure their
+combined energy for that run. The tool leaves the comparison open if the two
+separately measured loads reach different levels of dryness.
 
 ## Tools
 
