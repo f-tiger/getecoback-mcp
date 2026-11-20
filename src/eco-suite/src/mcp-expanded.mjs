@@ -63,6 +63,12 @@ import {betriebszustandBelege} from './mcp-betriebszustand-belege.mjs';
 import {spuelstatusBelege} from './mcp-spuelstatus-belege.mjs';
 import {airfryerBehaelter} from './mcp-airfryer-behaelter.mjs';
 import {kompaktspuelBelege} from './mcp-kompaktspuel-belege.mjs';
+import {filterkannen} from './mcp-filterkannen.mjs';
+import {textilzeichen} from './mcp-textilzeichen.mjs';
+import {tuerspalt} from './mcp-tuerspalt.mjs';
+import {roboterpflege} from './mcp-roboterpflege.mjs';
+import {kuehlkauf} from './mcp-kuehlkauf.mjs';
+import {ledkauf} from './mcp-ledkauf.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -130,6 +136,12 @@ export const expandedDefinitions = [
   ['Spülstatus', spuelstatusBelege],
   ['Airfryer-Behälter', airfryerBehaelter],
   ['Kompaktspülen', kompaktspuelBelege],
+  ['Filterkannen', filterkannen],
+  ['Textilzeichen', textilzeichen],
+  ['Türbodenspalt', tuerspalt],
+  ['Roboterpflege', roboterpflege],
+  ['Kühlgerätekauf', kuehlkauf],
+  ['LED-Kaufprüfung', ledkauf],
 ].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));
