@@ -126,6 +126,7 @@ const taskWords = new Map([
   ['dusche_zeit_bei_wasserbudget', 'duschen litern liter wasserbudget duschdauer lange'],
   ['saugroboter_kabelroute_vorbereiten', 'roboter kabel faehrt ueberfaehrt kabelsalat'],
   ['kellerentfeuchter_pruefpunkt_abgleichen', 'prueftemperatur entfeuchtungsleistung entzieht liter watt grad luftfeuchtigkeit prozent pruefbedingungen'],
+  ['tado_x_oventrop_ventiladapter_pruefen', 'oventrop ventil heizungsventil heizkoerperventil unidh unil vindo th gewinde gewindesteigung 30mm m30 adapterring 1011445 4026755228717'],
   ['entfeuchter_ablaufcheck', 'abflussschlauch ablaufschlauch abfluss auslass keller oben hoeher fuehren ableiten kondensat'],
   ['luftreiniger_ersatzfilter_zuordnung', 'passt ersatzfilter luftreinigermodell luftreiniger filternummer'],
   ['waesche_trockenweg_sortierplan', 'liegeplaetze leine liegend liegen haengend'],

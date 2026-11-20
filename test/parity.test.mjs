@@ -118,15 +118,27 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 2008 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 2009 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,2008);
+  assert.equal(expandedDefinitions.length,2009);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);
       assert.equal(local.isError,false,name);
       assert.deepEqual(local.structuredContent,remote.structuredContent,name);
     }));
+  }
+});
+
+test('the German tado X Oventrop adapter check agrees with the hosted source', async () => {
+  const name = 'tado_x_oventrop_ventiladapter_pruefen';
+  const input = {ventilmodell:'unidh',gewinde:'m30_1_0',ventilzustand:'thermostatisch_unauffaellig'};
+  for (const change of [{}, {ventilmodell:'unil'}, {ventilmodell:'vindo_th',gewinde:'m30_1_5'},
+    {gewinde:'m30_1_5'}, {gewinde:'unbekannt'}, {ventilmodell:'anders_oder_unbekannt'},
+    {ventilzustand:'manuell'}, {ventilzustand:'beschaedigt_oder_undicht'}, {ventilzustand:'unbekannt'}]) {
+    const args = {...input,...change};
+    const [local, hosted] = await Promise.all([callTool(name,args),remoteCall(name,args)]);
+    assert.deepEqual(local, hosted);
   }
 });
 
