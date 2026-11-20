@@ -2101,10 +2101,15 @@ Not engineering, legal or subsidy advice.
 
 ## Hosted and local versions
 
-The hosted Registry entry is version 1.13.0. The local stdio source is version 1.11.0. The [tool directory](https://getecoback.com/mcp.html#tools) lists the distinct household tasks and marks the compatible legacy overlap.
+[`server.json`](server.json) records the expected hosted Registry version. The local stdio version comes from [`package.json`](package.json). The [tool directory](https://getecoback.com/mcp.html#tools) lists the independent household tasks and marks the compatible legacy overlap.
 The drainage rules and reviewed German-market model sources come from
 [`sites/getecoback`](https://github.com/f-tiger/agi-site/tree/main/sites/getecoback).
 Follow the returned `nextCursor` in `tools/list` to discover later pages.
 
-The parity tests compare deterministic results with the hosted server, including
-downhill drainage, separate pump accessories and missing measurements.
+`npm run test:local` runs the stdio protocol and every reviewed deterministic
+example offline. Pull requests and main pushes use this check.
+
+`npm run test:hosted` checks the exact hosted version before comparing the tool
+directory and deterministic answers, including the drainage cases. The daily
+and manually dispatched tests run both suites. `npm test` runs both suites
+before npm publication.

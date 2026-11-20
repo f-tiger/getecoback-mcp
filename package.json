@@ -16,6 +16,8 @@
   },
   "scripts": {
     "test": "node --test \"test/*.test.mjs\"",
+    "test:local": "node test/local.test.mjs",
+    "test:hosted": "node test/parity.test.mjs",
     "sync": "node sync.mjs"
   },
   "keywords": [
