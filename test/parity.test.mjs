@@ -76,8 +76,9 @@ test("stdio server answers initialize and tools/list", {timeout: 10000}, async (
   child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: {} }) + "\n");
   child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }) + "\n");
   child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "btu_empfehlung", arguments: { qm: 20 } } }) + "\n");
-  child.stdin.write(JSON.stringify({jsonrpc:"2.0",id:4,method:"tools/list",params:{cursor:"1.5.0:100"}})+"\n");
-  child.stdin.write(JSON.stringify({jsonrpc:"2.0",id:5,method:"tools/list",params:{cursor:"1.5.0:200"}})+"\n");
+  child.stdin.write(JSON.stringify({jsonrpc:"2.0",id:4,method:"tools/list",params:{cursor:"1.6.0:100"}})+"\n");
+  child.stdin.write(JSON.stringify({jsonrpc:"2.0",id:5,method:"tools/list",params:{cursor:"1.6.0:200"}})+"\n");
+  child.stdin.write(JSON.stringify({jsonrpc:"2.0",id:6,method:"tools/list",params:{cursor:"1.6.0:300"}})+"\n");
   child.stdin.end();
   const [status] = await exited;
   assert.equal(status,0);
@@ -87,13 +88,15 @@ test("stdio server answers initialize and tools/list", {timeout: 10000}, async (
   assert.equal(init.result.serverInfo.name, "getecoback-raumklima");
   const list = msgs.find((m) => m.id === 2);
   assert.equal(list.result.tools.length,100);
-  assert.equal(list.result.nextCursor,"1.5.0:100");
+  assert.equal(list.result.nextCursor,"1.6.0:100");
   const remainder = msgs.find(m=>m.id===4).result;
-  assert.equal(remainder.nextCursor,"1.5.0:200");
+  assert.equal(remainder.nextCursor,"1.6.0:200");
   const last = msgs.find(m=>m.id===5).result;
-  assert.equal(last.nextCursor,undefined);
-  assert.equal(last.tools.length,92);
-  assert.deepEqual([...list.result.tools,...remainder.tools,...last.tools].map(t=>t.name),TOOLS.map(t=>t.name));
+  assert.equal(last.nextCursor,"1.6.0:300");
+  const fourth = msgs.find(m=>m.id===6).result;
+  assert.equal(fourth.nextCursor,undefined);
+  assert.equal(fourth.tools.length,89);
+  assert.deepEqual([...list.result.tools,...remainder.tools,...last.tools,...fourth.tools].map(t=>t.name),TOOLS.map(t=>t.name));
   const call = msgs.find((m) => m.id === 3);
   assert.match(call.result.content[0].text, /BTU/);
 });
@@ -159,9 +162,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 282 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 379 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,282);
+  assert.equal(expandedDefinitions.length,379);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);
