@@ -103,6 +103,8 @@ test('German per-load cost comparisons find the existing measured laundry tool',
   for (const [query, previousFirst] of [
     ['Was kostet eine Ladung nur im Wäschetrockner bei meinem Stromtarif?',undefined],
     ['Wäschetrockner oder Luftentfeuchter: Nach wie vielen Wintern rechnet sich der Kaufpreis?',undefined],
+    ['Was kostet eine Ladung Wäsche, wenn Trockner und Luftentfeuchter gleichzeitig laufen?','waesche_wochenbedarf_leine_und_trockner'],
+    ['Was kostet es pro Ladung, wenn ich nur den Trockner nutze und den Luftentfeuchter ausgeschaltet lasse?','wasch_trockner_zweiladung_uebergabestau'],
     ['Trockner oder Luftentfeuchter: Welche Methode trocknet meine Wäsche schneller?','waesche_wochenbedarf_leine_und_trockner'],
     ['Wie haenge ich die Waesche auf dem Waeschestaender auf, damit sie ohne Trockner schneller trocknet?','waesche_wochenbedarf_leine_und_trockner'],
     ['Luftentfeuchter','entfeuchter_ablaufcheck'],
