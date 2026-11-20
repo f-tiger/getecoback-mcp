@@ -1,5 +1,11 @@
 # EcoBack Raumklima — MCP server
 
+**MCP-Werkzeuge für Wohnklima und Stromkosten in Deutschland.** Ordne die
+gemessene Temperatur und Luftfeuchte in deinem Keller ein oder vergleiche die
+Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
+
+[Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline)
+
 <!-- count -->2003<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
