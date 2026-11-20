@@ -48,6 +48,11 @@ import {punktwaerme} from './mcp-punktwaerme.mjs';
 import {luftkuehlerpraxis} from './mcp-luftkuehlerpraxis.mjs';
 import {trocknungswaerme} from './mcp-trocknungswaerme.mjs';
 import {gartenalltag} from './mcp-gartenalltag.mjs';
+import {gefrierpraxis} from './mcp-gefrierpraxis.mjs';
+import {spuelerEinbau} from './mcp-spueler-einbau.mjs';
+import {waschTrockenSaeule} from './mcp-wasch-trocken-saeule.mjs';
+import {lueftungsKaufpraxis} from './mcp-lueftungs-kaufpraxis.mjs';
+import {ersatzteilnachweis} from './mcp-ersatzteilnachweis.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -100,6 +105,11 @@ export const expandedDefinitions = [
   ['Luftkühler', luftkuehlerpraxis],
   ['Wäsche mit Wärme', trocknungswaerme],
   ['Gartenalltag', gartenalltag],
+  ['Gefrierpraxis', gefrierpraxis],
+  ['Geschirrspüler-Einbau', spuelerEinbau],
+  ['Wäschesäule', waschTrockenSaeule],
+  ['Lüftungskauf', lueftungsKaufpraxis],
+  ['Ersatzteilnachweis', ersatzteilnachweis],
 ].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));
