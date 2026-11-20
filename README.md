@@ -18,20 +18,22 @@ The tool table below is not hand-written: `sync.mjs` rebuilds it from the live s
 
 ## Connect
 
-**Local MCPB bundle** for clients that support MCPB installation. Download
-[EcoBack Local Household Tools 1.17.0](https://github.com/f-tiger/agi-site/releases/download/fleet-mcp-registry-2026-10-10/ecoback-local-tools-1.17.0.mcpb)
-and install it with your client's MCPB option. It requires Node.js 22 or later.
-The [local Registry entry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fecoback-local-tools/versions/latest)
-lists the current bundle URL and SHA-256 checksum. Calculations run locally.
+**Local MCPB bundle** for clients that support MCPB installation. The
+[official local Registry listing](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fecoback-local-tools/versions/latest)
+gives the current download URL and SHA-256 checksum. Install the downloaded
+archive with your client's MCPB option. It requires Node.js 22 or later.
+Calculations run locally.
 Weather and selected guide lookups use public endpoints when requested.
 
 <details>
 <summary>Run the downloaded bundle from a terminal</summary>
 
-Extract the MCPB archive and try the drainage check with Node.js 22 or later.
+Set `bundle` to the path of the downloaded MCPB archive. Extract it and try the
+drainage check with Node.js 22 or later.
 
 ```sh
-unzip -q ecoback-local-tools-1.17.0.mcpb -d ecoback-local
+bundle='/path/to/the-downloaded.mcpb'
+unzip -q "$bundle" -d ecoback-local
 printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"entfeuchter_ablaufcheck","arguments":{"drain":"level_or_uphill","model":"meaco-one-20"}}}' | node ecoback-local/src/server.mjs
 ```
 
