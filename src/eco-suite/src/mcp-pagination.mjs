@@ -18,7 +18,8 @@ export function pageTools(tools, cursor, version) {
   return page;
 }
 
-export async function collectToolPages(readPage) {
+export async function collectToolPages(readPage,{maxPages=21}={}) {
+  if (!Number.isSafeInteger(maxPages) || maxPages < 1) throw new RangeError('Invalid tools/list page limit');
   const tools = [];
   const seenNames = new Set();
   const cursors = new Set();
@@ -35,7 +36,7 @@ export async function collectToolPages(readPage) {
     }
     cursor = page.nextCursor;
     if (cursor === undefined) return tools;
-    if (typeof cursor !== 'string' || !cursor || cursors.has(cursor) || cursors.size >= 20) {
+    if (typeof cursor !== 'string' || !cursor || cursors.has(cursor) || cursors.size >= maxPages - 1) {
       throw new Error('Invalid or repeated tools/list cursor');
     }
     cursors.add(cursor);

@@ -79,6 +79,9 @@ import {mikrowellenBelege} from './mcp-mikrowellen-belege.mjs';
 import {kuechenwaagenBelege} from './mcp-kuechenwaagen-belege.mjs';
 import {wasserkocherBelege} from './mcp-wasserkocher-belege.mjs';
 import {toasterBelege} from './mcp-toaster-belege.mjs';
+import {kaercherFensterlippe} from './mcp-kaercher-fensterteile.mjs';
+import {kaercherFenstersaugerTools} from './mcp-kaercher-fenstersauger.mjs';
+import {glassvacBelege} from './mcp-glassvac-belege.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -162,6 +165,7 @@ export const expandedDefinitions = [
   ["Küchenwaagen", kuechenwaagenBelege],
   ["Wasserkocherbelege", wasserkocherBelege],
   ["Toasterbelege", toasterBelege],
+  ['Fenstersauger', [kaercherFensterlippe, ...kaercherFenstersaugerTools, ...glassvacBelege]],
 ].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));
