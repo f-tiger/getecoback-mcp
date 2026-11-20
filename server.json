@@ -3,7 +3,7 @@
   "name": "io.github.f-tiger/hvac-btu-heat-klimaanlage",
   "description": "getecoback.com: German household tools for rooms, weather, energy, kitchen and device care.",
   "websiteUrl": "https://getecoback.com/mcp.html",
-  "version": "1.23.0",
+  "version": "1.24.0",
   "remotes": [
     {
       "type": "streamable-http",

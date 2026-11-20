@@ -118,15 +118,28 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 2009 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 2010 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,2009);
+  assert.equal(expandedDefinitions.length,2010);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);
       assert.equal(local.isError,false,name);
       assert.deepEqual(local.structuredContent,remote.structuredContent,name);
     }));
+  }
+});
+
+test('the German PAC N90 label and full-run electricity measurement agree between hosted and stdio', async () => {
+  const name = 'pac_n90_energielabel_zu_stromkosten';
+  const input = {ean:8004399512351,modell:'PAC N90 ECO Silent',arbeitspreis_eur_kwh:0.30,
+    messung_vollstaendig:true,messenergie_kwh:1.2,messdauer_min:90};
+  for (const change of [{}, {ean:0}, {ean:8004399512352}, {modell:'abweichend'}, {modell:'unbekannt'},
+    {arbeitspreis_eur_kwh:-1}, {arbeitspreis_eur_kwh:-0.5}, {messung_vollstaendig:false},
+    {messdauer_min:0}, {messdauer_min:90.5}, {messenergie_kwh:0}]) {
+    const args = {...input,...change};
+    const [local, hosted] = await Promise.all([callTool(name,args),remoteCall(name,args)]);
+    assert.deepEqual(local,hosted);
   }
 });
 

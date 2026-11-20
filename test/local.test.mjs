@@ -38,6 +38,38 @@ test('offline lookup preserves every exact name and input schema', () => {
   }
 });
 
+test('both stdio profiles find and evaluate the exact German N90 label offline', () => {
+  const name = 'pac_n90_energielabel_zu_stromkosten';
+  const cite = 'https://getecoback.com/guide/delonghi-pac-n90-test.html';
+  const query = 'DeLonghi PAC N90 ECO Silent Energielabel Stromkosten 8004399512351';
+  const input = {ean:8004399512351,modell:'PAC N90 ECO Silent',arbeitspreis_eur_kwh:0.30,
+    messung_vollstaendig:true,messenergie_kwh:1.2,messdauer_min:90};
+  const run = (flags, requests) => {
+    const payload = requests.map((request,index) => JSON.stringify({jsonrpc:'2.0',id:index+1,...request})).join('\n')+'\n';
+    const result = runLocalCommand(server,flags,payload);
+    assert.equal(result.status,0,result.stderr);
+    return result.stdout.trim().split('\n').map(line => JSON.parse(line).result);
+  };
+  const [full] = run([], [{method:'tools/call',params:{name,arguments:input}}]);
+  const [found, compact] = run(['--compact'],[
+    {method:'tools/call',params:{name:'ecoback_werkzeug_finden',arguments:{frage:query}}},
+    {method:'tools/call',params:{name:'ecoback_werkzeug_ausfuehren',arguments:{name,eingaben:input}}},
+  ]);
+  assert.equal(found.structuredContent.tools[0].name,name);
+  assert.equal(full.isError,false);
+  assert.deepEqual(full,compact);
+  const output = full.structuredContent;
+  assert.equal(output.citation_url,cite);
+  assert.equal(output.guide_url,cite+'#n90-energielabel');
+  assert.equal(output.label_eu_kwh_je_60_min,0.9);
+  assert.equal(output.label_kuehlleistung_kw,2.5);
+  assert.equal(output.label_referenz_eur_je_60_min,0.27);
+  assert.equal(output.messzeitraum_eur,0.36);
+  assert.equal(output.messwert_eur_je_stunde,0.24);
+  assert.match(output.energielabel_url,/assetId=209150&download=true$/);
+  assert.doesNotMatch(JSON.stringify(output),/https:\/\/[^"]*amazon\.|[?&]tag=/i);
+});
+
 test('offline finder and adapter check keep exact tado X valve evidence', async () => {
   const name = 'tado_x_oventrop_ventiladapter_pruefen';
   const guide = 'https://getecoback.com/guide/smarte-heizkoerperthermostate-lohnen-sich.html';
