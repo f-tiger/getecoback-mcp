@@ -61,6 +61,21 @@ answers still open their websites separately.
 Pull requests and pushes to main verify the local CLI and its deterministic examples
 offline. Daily and manual checks also compare the exact hosted version and answers.
 
+### Find tools offline
+
+From a downloaded copy of this repository, search by a German question or by an
+exact MCP tool name.
+
+```sh
+node src/find-tools.mjs 'Kann ich den Abflussschlauch nach oben führen?'
+node src/find-tools.mjs 'Wie lange darf ich mit 72 Litern duschen?'
+```
+
+The command searches the local catalogue without contacting the website. It
+returns up to five results as JSON with the tool name, input schema and any
+recorded guide and example inputs. It uses the reviewed German ranking rules
+from the EcoBack site repository. [Ranking source](https://github.com/f-tiger/agi-site/blob/d3464896ede6e50fc418af2d2f67962ba55f188e/sites/getecoback/site/assets/mcp-catalog-search.mjs)
+
 ## Tools
 
 | Tool | What it answers |
