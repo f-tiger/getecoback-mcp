@@ -42,6 +42,12 @@ import {mehrgeraetebetrieb} from './mcp-mehrgeraetebetrieb.mjs';
 import {gebrauchtgeraete} from './mcp-gebrauchtgeraete.mjs';
 import {kuechenressourcen} from './mcp-kuechenressourcen.mjs';
 import {klimaverlauf} from './mcp-klimaverlauf.mjs';
+import {mobileRaeume} from './mcp-mobile-raeume.mjs';
+import {arbeitsplatzMesspraxis} from './mcp-arbeitsplatz-messpraxis.mjs';
+import {punktwaerme} from './mcp-punktwaerme.mjs';
+import {luftkuehlerpraxis} from './mcp-luftkuehlerpraxis.mjs';
+import {trocknungswaerme} from './mcp-trocknungswaerme.mjs';
+import {gartenalltag} from './mcp-gartenalltag.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -88,6 +94,12 @@ export const expandedDefinitions = [
   ['Gebrauchtgeräte', gebrauchtgeraete],
   ['Küchenressourcen', kuechenressourcen],
   ['Klimaverlauf', klimaverlauf],
+  ['Wohnmobil', mobileRaeume],
+  ['Arbeitsplatz-Messpraxis', arbeitsplatzMesspraxis],
+  ['Lokale Wärme', punktwaerme],
+  ['Luftkühler', luftkuehlerpraxis],
+  ['Wäsche mit Wärme', trocknungswaerme],
+  ['Gartenalltag', gartenalltag],
 ].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));
