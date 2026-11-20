@@ -18,6 +18,8 @@ const finder = fileURLToPath(new URL('../src/find-tools.mjs', import.meta.url));
 const cellarUri = 'ecoback://evidence/de/kellerentfeuchter';
 const bracketTool = 'midea_portasplit_fensterhalterung_pruefen';
 const bracketCitation = 'https://getecoback.com/guide/midea-portasplit-ausverkauft-alternativen.html';
+const bracketGuide = bracketCitation + '#kaufpruefung';
+const bracketEntry = bracketCitation + '?mcp_entry=portasplit-fensterhalterung#kaufpruefung';
 const roofWithoutBracket = {
   angebot_ean:4048164116478,
   fenster:'dachfenster',
@@ -278,7 +280,9 @@ test('stdio handles initialize, the complete paginated catalogue, reviewed calls
   assert.equal(decision.isError, false);
   assert.equal(decision.structuredContent.status, 'passende_halterung_vor_kauf_klaeren');
   assert.equal(decision.structuredContent.universalhalterung_ean, 4048164118687);
-  assert.equal(decision.structuredContent.guide_url, bracketCitation + '#kaufpruefung');
+  assert.equal(decision.structuredContent.citation_url, bracketCitation);
+  assert.equal(decision.structuredContent.guide_url, bracketGuide);
+  assert.equal(decision.structuredContent.entry_url, bracketEntry);
   assert.equal(replies.get(unknown).error.code, -32602);
 });
 
@@ -459,6 +463,27 @@ test('compact stdio excludes live tools and reports invalid inputs in-band', asy
   const nativeError = await callTool(name, {budget_l:72});
   assert.equal(nativeError.isError, true);
   assert.deepEqual(invalid.result, nativeError);
+});
+
+test('PortaSplit keeps one fixed first-party entry through each decision state', async () => {
+  const cases = [
+    [{}, 'passende_halterung_vor_kauf_klaeren'],
+    [{universalhalterung:'ean_separat_vorhanden'}, 'halterungsbeleg_vorhanden'],
+    [{universalhalterung:'offen'}, 'lieferumfang_klaeren'],
+    [{angebot_ean:0}, 'modellnummer_abgleichen'],
+    [{fenster:'anders_oder_offen'}, 'fenstertyp_mit_anleitung_abgleichen'],
+  ];
+  for (const [input,status] of cases) {
+    const result = await callTool(bracketTool, {...roofWithoutBracket, ...input});
+    assert.equal(result.isError, false, status);
+    assert.equal(result.structuredContent.status, status);
+    assert.equal(result.structuredContent.citation_url, bracketCitation);
+    assert.equal(result.structuredContent.guide_url, bracketGuide);
+    assert.equal(result.structuredContent.entry_url, bracketEntry);
+  }
+  const entryOverride = await callTool(bracketTool, {...roofWithoutBracket, entry_url:bracketCitation});
+  assert.equal(entryOverride.isError, true);
+  assert.equal(entryOverride.structuredContent, undefined);
 });
 
 test('advertised tools have bilingual descriptions and valid required input names', () => {

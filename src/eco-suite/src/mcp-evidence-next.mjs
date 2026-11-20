@@ -1,4 +1,5 @@
 import {createRequire} from 'node:module';
+import {PORTASPLIT_ENTRY_PAGE, PORTASPLIT_ENTRY_URL, PORTASPLIT_GUIDE_URL} from './portasplit-entry.mjs';
 const require=createRequire(import.meta.url);
 const dehumidifiers = require('../data/dehum-catalog.json');
 const thermostats = require('../data/thermostat-catalog.json');
@@ -9,7 +10,6 @@ const method = '/wie-wir-empfehlen.html';
 const cold = '/guide/luftentfeuchter-keller.html';
 const thermo = '/guide/smarte-heizkoerperthermostate-lohnen-sich.html';
 const air = '/guide/luftreiniger-ratgeber.html';
-const portaSplitAlternatives = '/guide/midea-portasplit-ausverkauft-alternativen.html';
 
 const bool = description => ({type:'boolean', description});
 const choice = (description, ...values) => ({type:'string', enum: values, description});
@@ -111,8 +111,8 @@ export const evidenceNext = [
   {
     name:'midea_portasplit_fensterhalterung_pruefen',
     description:'Halterung, Universalhalterung und Lieferumfang der originalen Midea PortaSplit für Dreh-Kippfenster, Dachfenster und französische Balkonfenster prüfen — Check the original German Midea PortaSplit bracket and seller bundle before purchase.',
-    page:portaSplitAlternatives,
-    guide_url:'https://getecoback.com'+portaSplitAlternatives+'#kaufpruefung',
+    page:PORTASPLIT_ENTRY_PAGE,
+    guide_url:PORTASPLIT_GUIDE_URL,
     properties:{
       angebot_ean:number('EAN aus dem konkreten deutschen Angebot oder vom Typenschild, als 13-stellige Zahl. 0 wenn unbekannt.',0,9999999999999),
       fenster:choice('Fenstertyp am vorgesehenen Aufstellort.', 'dreh_kippfenster','dachfenster','franzoesischer_balkon','anders_oder_offen'),
@@ -140,11 +140,12 @@ export const evidenceNext = [
         quelle_aufstellung:'https://www.midea.com/de/klimatisieren-heizen/portasplit/installation',
         quelle_universalhalterung:'https://www.midea.com/content/dam/midea-aem/de/klimatisieren-heizen/portasplit/universalhalterung/PortaSplit-UM-universal-bracket.pdf',
         quellen_geprueft_am:'2026-11-20',
+        entry_url:PORTASPLIT_ENTRY_URL,
         grenze:'Ein bestätigter Lieferumfang ersetzt weder die Prüfung der konkreten Fenstermaße und Befestigung nach Anleitung noch eine gegebenenfalls erforderliche Erlaubnis. Bei offenem Modell, fehlender Halterung oder ungeklärter Aufstellung mit dem Kauf warten.',
       };
     },
     example:{args:{angebot_ean:4048164116478,fenster:'dachfenster',standardhalterung:'im_angebot',universalhalterung:'fehlt'},
-      expect:{status:'passende_halterung_vor_kauf_klaeren',halterung_im_herstellerbeispiel:'universalhalterung',universalhalterung_ean:4048164118687}},
+      expect:{status:'passende_halterung_vor_kauf_klaeren',halterung_im_herstellerbeispiel:'universalhalterung',universalhalterung_ean:4048164118687,entry_url:PORTASPLIT_ENTRY_URL}},
   },
   {
     name:'pac_n90_ean_abgleichen',
