@@ -16,6 +16,14 @@ const { version } = JSON.parse(readFileSync(new URL('../package.json', import.me
 const server = fileURLToPath(new URL('../src/server.mjs', import.meta.url));
 const finder = fileURLToPath(new URL('../src/find-tools.mjs', import.meta.url));
 const cellarUri = 'ecoback://evidence/de/kellerentfeuchter';
+const bracketTool = 'midea_portasplit_fensterhalterung_pruefen';
+const bracketCitation = 'https://getecoback.com/guide/midea-portasplit-ausverkauft-alternativen.html';
+const roofWithoutBracket = {
+  angebot_ean:4048164116478,
+  fenster:'dachfenster',
+  standardhalterung:'im_angebot',
+  universalhalterung:'fehlt',
+};
 
 test('offline lookup preserves every exact name and input schema', () => {
   for (const {name, inputSchema} of TOOLS) {
@@ -44,6 +52,13 @@ test('German questions find tools beyond the first page and keep reviewed exampl
   const filter = findTools('Auf dem Tisch liegt der iRobot-Filterpack 4785887. Mein Roomba j7+ hat keinen Combo-Zusatz. Nennt die deutsche Packliste mein Modell?');
   assert.equal(filter.tools[0].name, 'roboter_ersatzfilter_exakte_de_zuordnung');
   assert(TOOLS.findIndex(tool => tool.name === filter.tools[0].name) >= MCP_PAGE_SIZE);
+
+  const holder = findTools('Midea PortaSplit Dachfenster Halterung').tools[0];
+  assert.equal(holder.name, bracketTool);
+  assert.equal(holder.category, 'Quellen & Kaufprüfung');
+  assert.equal(holder.citation_url, bracketCitation);
+  assert.deepEqual(holder.example_arguments, roofWithoutBracket);
+  assert.deepEqual(holder.inputSchema.required, Object.keys(roofWithoutBracket));
 
   const toaster = 'Bosch TAT8613 Krümelschublade';
   assert.deepEqual(findTools(toaster.normalize('NFD')), findTools(toaster));
@@ -102,11 +117,10 @@ test('a named window vacuum model keeps a replacement blade and battery on their
 });
 
 test('offline finder emits JSON and handles an omitted query', () => {
-  const found = spawnSync(process.execPath, [finder, 'Wie lange darf ich mit 72 Litern duschen?'],
-    {encoding:'utf8', timeout:10000});
+  const found = runLocalCommand(finder, ['Midea PortaSplit Dachfenster Halterung']);
   assert.equal(found.status, 0, found.stderr);
-  assert.equal(JSON.parse(found.stdout).tools[0].name, 'dusche_zeit_bei_wasserbudget');
-  const missing = spawnSync(process.execPath, [finder], {encoding:'utf8', timeout:10000});
+  assert.equal(JSON.parse(found.stdout).tools[0].name, bracketTool);
+  const missing = runLocalCommand(finder, []);
   assert.equal(missing.status, 2);
   assert.match(missing.stderr, /Usage:/);
 });
@@ -160,7 +174,7 @@ test('German per-load cost comparisons find the existing measured laundry tool',
 });
 
 test('offline CLI examples run exact reviewed inputs and reject incomplete or live-only requests', () => {
-  const example = (...args) => spawnSync(process.execPath, [finder, '--example', ...args], {encoding:'utf8', timeout:10000});
+  const example = (...args) => runLocalCommand(finder, ['--example', ...args]);
   const drainage = example('entfeuchter_ablaufcheck');
   assert.equal(drainage.status, 0, drainage.stderr);
   const drain = JSON.parse(drainage.stdout);
@@ -182,35 +196,44 @@ test('offline CLI examples run exact reviewed inputs and reject incomplete or li
   }
 });
 
-function readStdio(jobs, serverArgs = []) {
+function runLocalCommand(entry, args, inputText = '') {
   // Regular descriptors exercise the real process without relying on libuv child sockets.
   const work = mkdtempSync(join(tmpdir(), 'ecoback-stdio-'));
-  let input, output;
+  let input, output, errors;
   try {
-    const inputPath = join(work, 'input.ndjson');
-    const outputPath = join(work, 'output.ndjson');
-    writeFileSync(inputPath, jobs.map(job => JSON.stringify(job)).join('\n') + '\n');
+    const inputPath = join(work, 'stdin');
+    const outputPath = join(work, 'stdout');
+    const errorPath = join(work, 'stderr');
+    writeFileSync(inputPath, inputText);
     input = openSync(inputPath, 'r');
     output = openSync(outputPath, 'w');
+    errors = openSync(errorPath, 'w');
     const preload = join(work, 'deny-network.cjs');
     writeFileSync(preload, `const deny = () => { process.stderr.write('Unexpected network call in stdio test\\n'); process.exit(89); };
 globalThis.fetch = deny;
 require('node:net').Socket.prototype.connect = deny;
 require('node:dgram').Socket.prototype.send = deny;
 `);
-    const child = spawnSync(process.execPath, ['--require', preload, server, ...serverArgs],
-      {stdio:[input, output, 'inherit'], timeout:10000});
+    const child = spawnSync(process.execPath, ['--require', preload, entry, ...args],
+      {stdio:[input, output, errors], timeout:10000});
     assert.equal(child.error, undefined);
-    assert.equal(child.status, 0);
-    return readFileSync(outputPath, 'utf8').trim().split('\n').map(line => JSON.parse(line));
+    return {status:child.status, stdout:readFileSync(outputPath, 'utf8'), stderr:readFileSync(errorPath, 'utf8')};
   } finally {
     if (input !== undefined) closeSync(input);
     if (output !== undefined) closeSync(output);
+    if (errors !== undefined) closeSync(errors);
     rmSync(work, {recursive:true, force:true});
   }
 }
 
-test('stdio handles initialize, the complete paginated catalogue, BTU and unknown tool frames', async () => {
+function readStdio(jobs, serverArgs = []) {
+  const input = jobs.map(job => JSON.stringify(job)).join('\n') + '\n';
+  const child = runLocalCommand(server, serverArgs, input);
+  assert.equal(child.status, 0, child.stderr);
+  return child.stdout.trim().split('\n').map(line => JSON.parse(line));
+}
+
+test('stdio handles initialize, the complete paginated catalogue, reviewed calls and unknown tool frames', async () => {
   const jobs = [];
   function send(method, params) {
     const id = jobs.length + 1;
@@ -228,6 +251,7 @@ test('stdio handles initialize, the complete paginated catalogue, BTU and unknow
     cursor = pageTools(TOOLS, cursor, version).nextCursor;
   }
   const btu = send('tools/call', {name:'btu_empfehlung', arguments:{qm:20}});
+  const holder = send('tools/call', {name:bracketTool, arguments:roofWithoutBracket});
   const unknown = send('tools/call', {name:'does_not_exist', arguments:{}});
   const messages = readStdio(jobs);
   assert.equal(messages.length, jobs.length);
@@ -250,6 +274,11 @@ test('stdio handles initialize, the complete paginated catalogue, BTU and unknow
   assert.deepEqual(catalogue, TOOLS);
   assert.equal(replies.get(btu).result.isError, false);
   assert.match(replies.get(btu).result.content[0].text, /7\.000 BTU/);
+  const decision = replies.get(holder).result;
+  assert.equal(decision.isError, false);
+  assert.equal(decision.structuredContent.status, 'passende_halterung_vor_kauf_klaeren');
+  assert.equal(decision.structuredContent.universalhalterung_ean, 4048164118687);
+  assert.equal(decision.structuredContent.guide_url, bracketCitation + '#kaufpruefung');
   assert.equal(replies.get(unknown).error.code, -32602);
 });
 

@@ -6,7 +6,7 @@ Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
 [Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
-<!-- count -->2015<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2016<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -160,6 +160,7 @@ exact MCP tool name.
 node src/find-tools.mjs 'Kann ich den Abflussschlauch nach oben führen?'
 node src/find-tools.mjs 'Wie lange darf ich mit 72 Litern duschen?'
 node src/find-tools.mjs 'Wäschetrockner oder Luftentfeuchter – was kostet das Trocknen pro Ladung?'
+node src/find-tools.mjs 'Midea PortaSplit Dachfenster Halterung'
 ```
 
 The command searches the local catalogue without contacting the website. It
@@ -365,6 +366,7 @@ separately measured loads reach different levels of dryness.
 | `angebot_lagerstatus_zitieren` | Qualify an availability quote by exact offer and observation date. |
 | `angebote_gesamtpreis_vergleichen` | Compare delivered purchase totals for matched quotes. |
 | `portasplit_gebraucht_belegliste` | Review the evidence needed before considering a used PortaSplit. |
+| `midea_portasplit_fensterhalterung_pruefen` | Check the original German Midea PortaSplit bracket and seller bundle before purchase. |
 | `pac_n90_ean_abgleichen` | Check the advertised model and GTIN for the documented German PAC N90 ECO Silent. |
 | `auslands_datenblatt_de_angebot` | Check how an overseas datasheet applies to a German offer. |
 | `thermostat_funkzentrale_abgleichen` | Match an existing hub to a documented smart radiator thermostat ecosystem. |
@@ -2216,7 +2218,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->2015<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2016<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
