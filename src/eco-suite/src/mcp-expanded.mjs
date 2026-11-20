@@ -4,6 +4,10 @@ import {coolingSuite} from './mcp-cooling-suite.mjs';
 import {winterSuite} from './mcp-winter-suite.mjs';
 import {efficiencySuite} from './mcp-efficiency-suite.mjs';
 import {fitSuite} from './mcp-fit-suite.mjs';
+import {energyNext} from './mcp-energy-next.mjs';
+import {climateNext} from './mcp-climate-next.mjs';
+import {careNext} from './mcp-care-next.mjs';
+import {evidenceNext} from './mcp-evidence-next.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -12,6 +16,10 @@ export const expandedDefinitions = [
   ['Heizen', winterSuite],
   ['Strom & Haushalt', efficiencySuite],
   ['Passform', fitSuite],
+  ['Energie prüfen', energyNext],
+  ['Raumkomfort prüfen', climateNext],
+  ['Geräte pflegen', careNext],
+  ['Quellen & Kaufprüfung', evidenceNext],
 ].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));

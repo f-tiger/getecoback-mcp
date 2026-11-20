@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "market": "DE",
+  "checked": "2026-11-12",
+  "max_age_days": 90,
+  "products": [
+    {
+      "id": "tado-x-starter",
+      "name": "tado° Smartes Heizkörper-Thermostat X – Starter Kit",
+      "role": "Neues tado° X-System mit enthaltener Bridge",
+      "system": "Bridge X liegt diesem Starter Kit bei. Ein bereits vorhandener, kompatibler Thread Border Router kann eine andere Paketwahl ermöglichen; die genaue Freigabe prüfen.",
+      "package": "Ein Thermostatkopf, Bridge X und sechs Adapter. USB-C-Ladekabel nicht enthalten. Ein Einzelkopf oder Trio-Pack ist nicht automatisch dasselbe Starter Kit.",
+      "care": "Abnehmbarer, per USB-C ladbarer Akku. Die kostenlose App enthält Zeitpläne; zusätzliche Automatisierungen können das optionale AI-Assist-Abo benötigen. Gewünschte Funktion vor dem Kauf prüfen.",
+      "limit": "tado° X und die V3+-Geräte/Internet Bridge sind nicht miteinander kompatibel. Die V3+-Ventiltabelle auf dieser Seite bestätigt keine Passung für X.",
+      "source": "https://shop.tado.com/products/smart-radiator-thermostat-x-starter-kit-1",
+      "source_label": "tado°: X Starter Kit, Packung und Kompatibilität",
+      "query": "tado Smartes Heizkörper Thermostat X Starter Kit Bridge X",
+      "status": "verified"
+    },
+    {
+      "id": "bosch-ii-m",
+      "name": "Bosch Heizkörper-Thermostat II [+M]",
+      "role": "Vorhandenes Bosch-System oder geprüftes Matter-System nutzen",
+      "system": "Im Bosch-System ist ein Bosch Smart Home Controller nötig. Für ein fremdes Matter-System verlangt die Anleitung einen eingerichteten Matter Controller mit Thread-Unterstützung und dessen App. Fehlt dem Matter Controller die integrierte Thread-Kommunikation, ist zusätzlich ein Thread Border Router nötig.",
+      "package": "Die [+M]-Variante gezielt prüfen. Heizkörper-Thermostat II ohne [+M] wird nicht auf dieselbe Weise direkt in ein Matter-System eingebunden. Einen benötigten Controller separat zum Kopf kalkulieren.",
+      "care": "Batterien und gegebenenfalls separate Fensterkontakte mit einplanen. Funktionen unterscheiden sich zwischen dem Bosch-System und der direkten Matter-Einbindung; die Funktionsübersicht des Herstellers abgleichen.",
+      "limit": "Matter bedeutet hier nicht Betrieb ohne passende Zentrale. Den Ventilanschluss anhand der Bosch-Anleitung prüfen; die tado°-Zuordnungen gelten nicht für dieses Modell.",
+      "source": "https://www.bosch-smarthome.com/de/de/produkte/heizung/heizkoerper-thermostat/",
+      "source_label": "Bosch: Modellvarianten und Systemfunktionen",
+      "manual": "https://www.bosch-smarthome.com/res/web/produkt/heizkoerper-thermostat2/pdf/8-750-002-924_BTH-RAD_OM_11L.pdf",
+      "manual_label": "Bosch: Anleitung II [+M], Matter-/Thread-Anforderungen",
+      "query": "Bosch Heizkörper Thermostat II +M",
+      "status": "verified"
+    },
+    {
+      "id": "fritz-302",
+      "name": "FRITZ!Smart Thermo 302 · Artikel 20003120",
+      "role": "Passende FRITZ!Box mit DECT bereits vorhanden",
+      "system": "Laut Produktseite: FRITZ!Box mit DECT-Basis und FRITZ!OS ab 6.83; FRITZ!Box 7312 und 7412 sind ausgenommen. Das genaue Routermodell vor dem Kauf prüfen.",
+      "package": "Der Hersteller nennt einen Thermo 302, drei AA-Batterien und einen Danfoss-RA-Adapter. Keine FRITZ!Box enthalten. Andere Ventiltypen separat in der Montagehilfe prüfen.",
+      "care": "Betrieb mit drei AA-Batterien und DECT-ULE. Der Hersteller schließt Nass- und Feuchträume aus. Das Gerät ist kein Ersatz für eine passende Zentrale.",
+      "limit": "Artikelnummer 20003120 und Paketinhalt abgleichen. Nicht allein aus dem Namen FRITZ! oder einem M30-Anschluss auf System- oder Ventilkompatibilität schließen.",
+      "source": "https://fritz.com/products/fritz-smart-thermo-302-20003120",
+      "source_label": "FRITZ!: Thermo 302, Voraussetzungen und Lieferumfang",
+      "query": "FRITZ Smart Thermo 302 20003120",
+      "status": "verified"
+    }
+  ]
+}
