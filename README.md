@@ -6,7 +6,7 @@ Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
 [Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
-<!-- count -->2017<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2018<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -210,6 +210,7 @@ separately measured loads reach different levels of dryness.
 | `hygrometer_messbereiche` | Check whether two humidity readings overlap within stated measurement tolerances. |
 | `hygrometer_messort_pruefen` | Check whether hygrometer placement is suitable for tracking room-air humidity. |
 | `entfeuchter_kalt_messvergleich` | Normalize two dehumidifier collection measurements to a day at the same humidity. |
+| `kellerentfeuchter_pruefpunkt_abgleichen` | Match a measured cellar condition to a documented German dehumidifier test point. |
 | `entfeuchter_kalt_modellbeleg` | Retrieve verified cold-room evidence and limitations for an exact model. |
 | `entfeuchter_tank_leerintervall` | Estimate tank-emptying interval from collected water and time. |
 | `entfeuchter_leerer_tank_check` | Troubleshoot an empty dehumidifier tank using the actual setting, temperature and drain mode. |
@@ -2219,7 +2220,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->2017<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2018<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.

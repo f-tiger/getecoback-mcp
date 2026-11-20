@@ -425,7 +425,7 @@ test('compact lookup exposes the offline tool schema, source and guide for real 
   assert.notDeepEqual(replies[3].result, replies[2].result);
 });
 
-test('compact finder embeds the matching cellar evidence and leaves unrelated results unchanged', () => {
+test('compact finder embeds matching cellar evidence and runs the documented test-point tool', async () => {
   const [read, listing, relevant, ...unmatched] = compactReplies([
     {method:'resources/read',params:{uri:cellarUri}},
     {method:'resources/list'},
@@ -439,6 +439,33 @@ test('compact finder embeds the matching cellar evidence and leaves unrelated re
   assert.deepEqual(relevant.result.structuredContent.resources, listing.result.resources);
   assert.deepEqual(relevant.result.content.filter(part => part.type === 'resource'),
     [{type:'resource',resource:read.result.contents[0]}]);
+  const found = relevant.result.structuredContent.tools[0];
+  assert.equal(found.name, 'kellerentfeuchter_pruefpunkt_abgleichen');
+  assert.deepEqual(found.inputSchema, TOOLS.find(tool => tool.name === found.name).inputSchema);
+  assert.equal(found.citation_url, 'https://getecoback.com/guide/luftentfeuchter-keller.html');
+  assert.equal(found.guide_url, found.citation_url + '#kalter-keller');
+
+  const cases = [
+    [{},'hersteller_pruefpunkt',3.4,180],
+    [{temperatur_c:20},'hersteller_pruefpunkt',8.5,216],
+    [{temperatur_c:15},'wertepaar_offen',null,null],
+    [{relative_feuchte_pct:59},'wertepaar_offen',null,null],
+    [{modell:'comfee-mddf20'},'wertepaar_offen',null,null],
+  ];
+  const inputs = cases.map(([change]) => ({...found.example_arguments,...change}));
+  const decisions = compactReplies(inputs.map(eingaben => toolCall(compactRun,{name:found.name,eingaben})));
+  for (const [index, [,status,litres,watts]] of cases.entries()) {
+    const {result} = decisions[index];
+    assert.deepEqual(result, await callTool(found.name,inputs[index]));
+    assert.equal(result.isError, false);
+    const data = result.structuredContent;
+    assert.deepEqual([data.status,data.liter_pro_tag,data.leistungsaufnahme_w], [status,litres,watts]);
+    assert.equal(data.quellenmarkt, 'DE');
+    assert.equal(data.quellenpruefung, '2026-11-20');
+    assert.equal(data.citation_url, found.citation_url);
+    assert.equal(data.guide_url, found.guide_url);
+    assert(read.result.contents[0].text.includes(data.quelle));
+  }
   for (const {result} of unmatched) {
     assert.equal(result.isError, false);
     assert.equal(Object.hasOwn(result.structuredContent,'resources'), false);

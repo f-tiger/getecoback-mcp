@@ -21,6 +21,20 @@ function dewPoint(celsius, relativeHumidity) {
 const coldModels = catalog.products.filter(model => model.status === 'verified' &&
   ['meaco-one-20', 'meaco-two-12', 'stadler-lukas'].includes(model.id));
 
+const cellarGuide = '/guide/luftentfeuchter-keller.html';
+const cellarTestSources = {
+  'meaco-one-20': {
+    model:'MeacoDry Arete One 20L',
+    source:'https://eu.meaco.com/products/meacodry-arete-one-20l-luftentfeuchter-luftreiniger',
+    points:[{c:10, rh:60, litres:3.4, watts:180}, {c:20, rh:60, litres:8.5, watts:216}],
+  },
+  'comfee-mddf20': {
+    model:'Comfee MDDF-20DEN7 ohne WF',
+    source:'https://www.feelcomfee.com/content/dam/comfee-aem/de/produkte/klimatisieren-heizen/mddf-20den7/comfee-MDDF-20DEN7-Datenblatt.pdf#page=2',
+    points:[],
+  },
+};
+
 export const moistureSuite = [
   {
     name:'fenster_oberflaeche_taucheck',
@@ -187,6 +201,42 @@ export const moistureSuite = [
       };
     },
     example:{args:{cold_l:1,cold_h:8,warmer_l:4,warmer_h:12,comparable_humidity_and_settings:true},expect:{difference_l_per_day:5}},
+  },
+  {
+    name:'kellerentfeuchter_pruefpunkt_abgleichen',
+    description:'Welche Entzugsleistung in Litern pro Tag und wie viel Watt nennt der Hersteller bei meiner gemessenen Kellertemperatur und Luftfeuchte? Prüfpunkte für Meaco Arete One 20L und Comfee MDDF-20DEN7 bei 10 oder 20 Grad und 60 Prozent vergleichen — Match a measured cellar condition to a documented German dehumidifier test point.',
+    page:cellarGuide,
+    guide_url:'https://getecoback.com' + cellarGuide + '#kalter-keller',
+    properties:{
+      modell:choice('Genaue Ausführung laut Typenschild: MeacoDry Arete One 20L oder Comfee MDDF-20DEN7 ohne WF.', Object.keys(cellarTestSources)),
+      temperatur_c:number('Gemessene Lufttemperatur am Messort in °C.', -20, 50),
+      relative_feuchte_pct:number('Am selben Ort und zur selben Zeit gemessene relative Luftfeuchte in Prozent.', 0, 100),
+      wiederholt_gemessen:bool('Hast du Temperatur und Feuchte über mehrere Tage am gleichen Ort beobachtet?'),
+      befund:choice('Bisherige Beobachtung im Keller.', ['unauffaellig', 'feuchte_auffaellig', 'wassereintritt_oder_schaden']),
+    },
+    calculate({modell, temperatur_c, relative_feuchte_pct, wiederholt_gemessen, befund}) {
+      const source = cellarTestSources[modell];
+      const evidence = {modell:source.model, liter_pro_tag:null, leistungsaufnahme_w:null, quellenmarkt:'DE',
+        quellenpruefung:'2026-11-20', quelle:source.source};
+      if (befund === 'wassereintritt_oder_schaden') {
+        return {...evidence, status:'ursache_klaeren', hinweis:'Bei eindringendem Wasser, nassen Wänden oder Schimmel zuerst die Ursache fachlich klären. Den Kauf zurückstellen.'};
+      }
+      if (!wiederholt_gemessen) {
+        return {...evidence, status:'zuerst_messen', hinweis:'Temperatur und Feuchte mehrere Tage am gleichen Ort messen. Ein einzelner Messwert begründet keinen Kauf.'};
+      }
+      if (befund === 'unauffaellig') {
+        return {...evidence, status:'kein_kaufbedarf_belegt', hinweis:'Bei unauffälligen Beobachtungen ist aus diesen Messwerten kein Bedarf für einen Entfeuchter belegt.'};
+      }
+      const point = source.points.find(row => row.c === temperatur_c && row.rh === relative_feuchte_pct);
+      if (!point) {
+        return {...evidence, status:'wertepaar_offen', hinweis:'Für diese Ausführung und genau deine Bedingungen ist hier kein Wertepaar aus Wasserentzug und Leistungsaufnahme belegt. Frage beim Hersteller nach. Eine Nennangabe oder ein benachbarter Prüfpunkt genügt dafür nicht.'};
+      }
+      return {...evidence, status:'hersteller_pruefpunkt', temperatur_c:point.c, relative_feuchte_pct:point.rh,
+        liter_pro_tag:point.litres, leistungsaufnahme_w:point.watts,
+        hinweis:'Hersteller-Prüfwert bei den angegebenen Bedingungen. Luftwechsel, Feuchtenachschub und Abtauphasen beeinflussen den tatsächlichen Entzug im Keller. Ursache und Wasserablauf vor der Auswahl prüfen.'};
+    },
+    example:{args:{modell:'meaco-one-20', temperatur_c:10, relative_feuchte_pct:60, wiederholt_gemessen:true, befund:'feuchte_auffaellig'},
+      expect:{status:'hersteller_pruefpunkt', liter_pro_tag:3.4, leistungsaufnahme_w:180}},
   },
   {
     name:'entfeuchter_kalt_modellbeleg',
