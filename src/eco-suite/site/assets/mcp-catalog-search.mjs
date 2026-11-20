@@ -21,7 +21,7 @@ const questionWords = new Set((
 const taskWords = new Map([
   ["fenstersauger_kaercher_fluessigkeitsgrenze_und_tank", "multi edition aufsaugen tank fuellstand tankvolumen tankgroesse pfuetze verschuettet verschuettete fluessigkeit 25ml 40ml mengenobergrenze"],
   ["fenstersauger_wv3_wv8_led_muster_einordnen", "blinkfolge blinkt blinken leds zweimal kurz blitz motor kontrollleuchte untere lampe ladevorgang"],
-  ["fenstersauger_wv3_wv8_akkuwechsel_service_oder_reserve", "comfort precision black signature line zweiten zweiter zweitakku reserveakku akkupack einsetzen waehrend fensterputzen akku austauschbar"],
+  ["fenstersauger_wv3_wv8_akkuwechsel_service_oder_reserve", "comfort signature austauschen zweiten zweiter zweitakku reserveakku akkupack einsetzen waehrend fensterputzen akku austauschbar"],
   ["fenstersauger_kaercher_glasreiniger_schaum_spiritus", "fensterreiniger schaumreiniger glasreiniger reinigungsmittel detergent zusatz"],
   ["fenstersauger_wv3_wv8_hochglanz_glas_temperatur_probe", "mikrofaserbezug wischbezug hochglanzflaeche empfindlich probestelle gefroren heisse scheibe oberflaechentemperatur"],
   ["waschmittel_dosiertabelle_wasserhaerte_intervall", "versorger versorgungsgebiet calciumcarbonat mmol gesamthaerte wasserhaerte haertebereich dosiertabelle dosierspalte schwankung grenzwert spalte"],

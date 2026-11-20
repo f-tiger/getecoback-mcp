@@ -85,6 +85,22 @@ test('the same two-flash question distinguishes the WV 3 and WV 8 articles', asy
   assert.equal(wv8.structuredContent.tabellenbedeutung, 'akkutemperatur_zu_hoch_oder_zu_tief');
 });
 
+test('a named window vacuum model keeps a replacement blade and battery on their own tasks', () => {
+  const blade = 'fenstersauger_170mm_abziehlippe_geraetefamilie';
+  const battery = 'fenstersauger_wv3_wv8_akkuwechsel_service_oder_reserve';
+  const cases = [
+    ['Passt die 170-mm-Abziehlippe 2.633-104.0 an meinen Kärcher WV 8 Signature Line?', blade],
+    ['Passt die 170-mm-Abziehlippe 2.633-104.0 an meinen Kärcher WV 3 Comfort Precision+ Black?', blade],
+    ['Lässt sich der Akku beim WV 8 Signature Line austauschen?', battery],
+    ['Lässt sich der Akku beim WV 3 Comfort Precision+ Black austauschen?', battery],
+  ];
+  const replies = compactReplies(cases.map(([frage]) => toolCall(compactFind, {frage})));
+  for (const [i, [query, expected]] of cases.entries()) {
+    assert.equal(findTools(query).tools[0]?.name, expected, query);
+    assert.equal(replies[i].result.structuredContent.tools[0]?.name, expected, query);
+  }
+});
+
 test('offline finder emits JSON and handles an omitted query', () => {
   const found = spawnSync(process.execPath, [finder, 'Wie lange darf ich mit 72 Litern duschen?'],
     {encoding:'utf8', timeout:10000});
