@@ -6,6 +6,8 @@
 
 import { readFileSync, writeFileSync } from "node:fs";
 
+import {collectToolPages} from './src/eco-suite/src/mcp-pagination.mjs';
+
 const URL_MCP = process.env.MCP_URL || "https://getecoback.com/mcp/v1";
 
 async function rpc(method, params) {
@@ -34,7 +36,7 @@ function englishHalf(desc) {
   return (i > -1 ? desc.slice(i + 2) : desc).trim();
 }
 
-const { tools } = await rpc("tools/list", {});
+const tools = await collectToolPages(cursor=>rpc("tools/list",cursor ? {cursor}:{}));
 const rows = tools
   .map((t) => `| \`${t.name}\` | ${englishHalf(t.description).replace(/\|/g, "\\|")} |`)
   .join("\n");

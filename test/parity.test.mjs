@@ -15,6 +15,7 @@ import {once} from "node:events";
 import {createInterface} from "node:readline";
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import {collectToolPages} from '../src/eco-suite/src/mcp-pagination.mjs';
 import { TOOLS, callTool } from "../src/tools.mjs";
 
 const CI_HEADERS = { "content-type": "application/json", accept: "application/json, text/event-stream", "user-agent": "getecoback-ci/mirror-parity" };
@@ -75,6 +76,7 @@ test("stdio server answers initialize and tools/list", {timeout: 10000}, async (
   child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: {} }) + "\n");
   child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }) + "\n");
   child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "btu_empfehlung", arguments: { qm: 20 } } }) + "\n");
+  child.stdin.write(JSON.stringify({jsonrpc:"2.0",id:4,method:"tools/list",params:{cursor:"1.4.0:100"}})+"\n");
   child.stdin.end();
   const [status] = await exited;
   assert.equal(status,0);
@@ -83,7 +85,11 @@ test("stdio server answers initialize and tools/list", {timeout: 10000}, async (
   const init = msgs.find((m) => m.id === 1);
   assert.equal(init.result.serverInfo.name, "getecoback-raumklima");
   const list = msgs.find((m) => m.id === 2);
-  assert.equal(list.result.tools.length, TOOLS.length);
+  assert.equal(list.result.tools.length,100);
+  assert.equal(list.result.nextCursor,"1.4.0:100");
+  const remainder = msgs.find(m=>m.id===4).result;
+  assert.equal(remainder.nextCursor,undefined);
+  assert.deepEqual([...list.result.tools,...remainder.tools].map(t=>t.name),TOOLS.map(t=>t.name));
   const call = msgs.find((m) => m.id === 3);
   assert.match(call.result.content[0].text, /BTU/);
 });
@@ -122,9 +128,15 @@ test("every tool declares a bilingual description and a schema", () => {
 
 // Fail as soon as a tool is added or retired; matching counts cannot detect drift.
 test('local advertised tool names match the hosted contract', async()=>{
- const res=await fetch(REMOTE,{method:'POST',headers:CI_HEADERS,signal:AbortSignal.timeout(20000),body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/list',params:{}})});
- assert.equal(res.status,200);const data=await res.json();assert.equal(data.error,undefined);
- assert.deepEqual(TOOLS.map(x=>x.name).sort(),data.result.tools.map(x=>x.name).sort());
+ const hosted=await collectToolPages(async cursor=>{
+   const res=await fetch(REMOTE,{method:'POST',headers:CI_HEADERS,signal:AbortSignal.timeout(20000),
+     body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/list',params:cursor?{cursor}:{}})});
+   assert.equal(res.status,200);
+   const data=await res.json();
+   assert.equal(data.error,undefined);
+   return data.result;
+ });
+ assert.deepEqual(TOOLS.map(x=>x.name).sort(),hosted.map(x=>x.name).sort());
  assert.equal((await callTool('balkonspeicher_foerderung',{})).isError,true,'Retired advice must not reappear');
 });
 
@@ -143,9 +155,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 90 added tools have hosted and stdio parity on the documented examples", async () => {
+test("all 186 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,90);
+  assert.equal(expandedDefinitions.length,186);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);

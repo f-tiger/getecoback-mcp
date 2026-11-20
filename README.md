@@ -1,6 +1,6 @@
 # EcoBack Raumklima — MCP server
 
-<!-- count -->100<!-- /count --> tools for **indoor climate and household energy in Germany/EU**: how many BTU a
+<!-- count -->196<!-- /count --> tools for **indoor climate and household energy in Germany/EU**: how many BTU a
 room needs, how long a portable-AC window seal has to be, whether a heatwave is coming,
 what a device costs to run, whether a dehumidifier can drain uphill and which moisture checks to make. The tools also search and retrieve published guides.
 
@@ -146,6 +146,102 @@ Worker, and ports drift silently.
 | `maehroboter_gartencheck` | Check narrow routes, measured slopes and navigation conditions. |
 | `ersatzteil_druck_eignung` | Triage a small missing part or organizer for 3D printing. |
 | `saugwischer_reinigungsmittel_freigabe` | Check approved cleaning solution and dilution for the exact equipment and surface. |
+| `stromzaehler_wechsel_protokoll` | Reconcile energy across a documented meter replacement. |
+| `stromzaehler_doppelregister_abgleichen` | Cross-check two import tariff registers against the total register. |
+| `stromzaehler_stichtag_einordnen` | Interpolate an unobserved meter reading with bounds from two dated readings. |
+| `strommessung_zeitabdeckung` | Audit interval coverage before treating an electricity log as complete. |
+| `strommessgeraet_kostenfehler` | Correct a meter cost display calculated with the wrong tariff. |
+| `messreihe_haushaltsgeraet_ausreisser` | Flag an unusual repeat measurement without discarding it automatically. |
+| `steckdosenmessgeraet_einsatzgrenze` | Check documented plug-meter capacity and load-type approval before measuring. |
+| `stromtarif_grundpreis_tage` | Check a partial-period fixed charge under a day-based billing method. |
+| `stromtarif_boersenpreis_endpreis` | Translate a wholesale quote and your known surcharges into an estimated gross unit price. |
+| `stromtarif_verbrauchsgewichteter_preis` | Calculate the unit price you actually paid from interval energy and gross prices. |
+| `stromtarif_teilgarantie_szenario` | Stress-test the annual cost when only part of a tariff is covered by a price guarantee. |
+| `stromtarif_vorauszahlung_kapital` | Estimate the opportunity cost of paying a full year up front. |
+| `stromrechnung_steuerbasis_abgleich` | Reconcile net, gross and the stated tax rate for one bill line. |
+| `stromtarif_bonus_bedingungen_check` | Identify unresolved bonus conditions before budgeting a conditional credit. |
+| `stromtarif_niedertarif_mindestanteil` | Find how much consumption must fall in the low-rate band to match a flat offer. |
+| `spuelmaschine_beladung_vergleichen` | Compare different dishwasher load sizes for the same number of clean place settings. |
+| `kuehlschrank_temperaturprotokoll` | Check repeated thermometer readings against your target range before changing settings. |
+| `led_lichtstrom_und_watt_vergleich` | Compare lamp efficacy only for alternatives that deliver comparable intended light. |
+| `wasserkocher_mehrmenge_szenario` | Estimate how much energy goes into repeatedly heating water you do not use. |
+| `geraet_reparaturpreis_grenze` | Find the repair quote at which repairing and replacing would have equal costs over a shared horizon. |
+| `waesche_schleudern_gesamtenergie` | Compare washer spin settings on total wash-to-dry energy from measured loads. |
+| `waschtrockner_label_nutzungsmix` | Interpret both ratings on a washer-dryer without double-counting the wash in combined cycles. |
+| `strommessung_va_w_einordnen` | Distinguish apparent power from the active power used for energy billing. |
+| `stromverbrauch_lastfenster_audit` | Identify the highest average-demand window without confusing a long window with a high peak. |
+| `klimageraet_geraeusch_hintergrund` | Estimate the unit contribution from matched on/off sound recordings. |
+| `klimageraet_geraeusch_zeitmittel` | Combine distinct sound measurement periods into one time-weighted LAeq. |
+| `schlafzimmer_hitzestunden_messreihe` | Estimate hot hours and degree-hours from four equally spaced readings. |
+| `schlafplatz_luftstrom_messen` | Compare measured bed-level air speed after changing airflow direction. |
+| `balkon_schattenkante_schaetzen` | Project a balcony shade edge at a known solar elevation. |
+| `sonnenschutzfolie_glasfreigabe` | Screen glazing and installation-side evidence for a solar film. |
+| `dachfenster_schwenkraum_rechnen` | Check the measured roof-window swing envelope before adding a seal frame. |
+| `raum_temperaturschichtung_messen` | Check for a vertical air temperature gradient at one indoor location. |
+| `klima_zu_und_rueckluft_messen` | Estimate supply-to-return temperature difference from paired AC readings. |
+| `klima_waermeabgabe_kreislauf` | Estimate hot-side heat rejection from matched cooling capacity and electrical input. |
+| `klimaanlage_mietwohnung_unterlagencheck` | Identify missing model, placement and approval documents before an installation decision. |
+| `befeuchter_weissen_belag_einordnen` | Triage potential mineral residue from a humidifier without diagnosing its origin. |
+| `entfeuchter_geruch_eingrenzen` | Triage dehumidifier odour with observation and manual-approved actions. |
+| `bad_feuchte_erholung_protokoll` | Check bathroom humidity recovery against the measured baseline. |
+| `wand_oberflaechenfaktor_abschaetzen` | Calculate the measured surface-to-air temperature factor. |
+| `heizwaerme_gradtag_szenario` | Normalize heating-only energy to a reference degree-day period. |
+| `thermostat_betrieb_ohne_cloud` | Check documented offline controls independently of app or hub access. |
+| `heizluefter_abschaltung_muster` | Triage observed portable heater shutdown behavior. |
+| `infrarot_sichtlinie_arbeitsplatz` | Check an unobstructed line of sight for radiant heating placement. |
+| `bad_heizgeraet_freigabe_unterlagen` | Identify missing bathroom-specific documentation before considering an electric heater. |
+| `warmwasser_aufheizzeit_ideal` | Estimate an ideal hot-water recovery time from delivered heat. |
+| `dusche_temperatur_streuung` | Summarize observed tap-temperature stability from three readings. |
+| `wandfeuchte_beobachtung_dokumentieren` | Identify missing chronology and observations for a damp-wall assessment. |
+| `lueftung_co2_abklingtest` | Estimate apparent air changes from measured CO₂ decay and known outdoor background. |
+| `saugroboter_kartenabdeckung` | Estimate route coverage from observed floor areas after a robot pass. |
+| `saugroboter_akkupause_zeitfenster` | Check whether a robot run with a recharge fits a home availability window. |
+| `saugroboter_ergebnis_stichprobe` | Compare residual dirt after one versus two passes using equivalent checks. |
+| `saugroboter_buerste_geraeusch` | Triage a new brush sound without running an unsafe or partly assembled robot. |
+| `saros10r_filter_trocknungsfenster` | Apply the documented Saros 10R minimum filter drying time before reuse. |
+| `saugwischer_akkuflaeche` | Estimate wet-cleaning area per usable charge from a measured pass. |
+| `saugwischer_randstreifen_flaeche` | Estimate additional manual edge coverage after a wet-cleaner pass. |
+| `saugwischer_wasserbilanz` | Compare dispensed and recovered water in a controlled wet-cleaning test. |
+| `saugwischer_ersatzwalze_artikelabgleich` | Compare a replacement roller with official model and part documentation. |
+| `saugwischer_mittelmenge` | Scale an approved manual dilution to the actual tank fill. |
+| `luftreiniger_filtervorrat` | Check spare filter stock against the planned replacement dates and supply lead time. |
+| `luftreiniger_filterkosten_laufzeit` | Estimate annual replacement media costs using observed intervals. |
+| `luftreiniger_filterwechsel_luftstrom` | Check basic installation conditions when airflow drops immediately after filter replacement. |
+| `luftreiniger_schadstoff_zweck` | Identify whether a room problem involves particles, odor or outdoor air exchange. |
+| `luftreiniger_partikel_probe` | Interpret a paired room particle test with matched starting readings. |
+| `luftbefeuchter_weisser_belag` | Check whether a white deposit may be linked to ultrasonic humidification. |
+| `luftbefeuchter_neustart_pflege` | Check a humidifier before reuse after standing water or storage. |
+| `luftbefeuchter_stellplatz_risiko` | Check for a safer humidifier location from observed placement conditions. |
+| `luftbefeuchter_verdunster_dochtpflege` | Triage low output in a wick-based humidifier before replacing consumables. |
+| `poolroboter_entnahme_fenster` | Check the observed lifting load and handling route for routine pool-robot retrieval. |
+| `poolroboter_korb_pflegezeitfenster` | Reserve a post-run window for cleaning and storing the pool-robot filter basket. |
+| `maehroboter_steigungsprofil` | Compare measured grade with the exact limit for mowing area, boundary or passage. |
+| `maehroboter_maehfenster` | Estimate whether a mowing plan fits user-supplied permitted and supervised time windows. |
+| `schubladentrenner_zuschnitt` | Size a non-load-bearing drawer divider prototype from internal dimensions and clearance. |
+| `geraet_testzitat_einordnen` | Qualify a best-in-test claim by model, test group and date. |
+| `haendler_link_modellnachweis` | Identify what a merchant link establishes about the exact model. |
+| `angebot_lagerstatus_zitieren` | Qualify an availability quote by exact offer and observation date. |
+| `angebote_gesamtpreis_vergleichen` | Compare delivered purchase totals for matched quotes. |
+| `portasplit_gebraucht_belegliste` | Review the evidence needed before considering a used PortaSplit. |
+| `pac_n90_ean_abgleichen` | Check the advertised model and GTIN for the documented German PAC N90 ECO Silent. |
+| `auslands_datenblatt_de_angebot` | Check how an overseas datasheet applies to a German offer. |
+| `thermostat_funkzentrale_abgleichen` | Match an existing hub to a documented smart radiator thermostat ecosystem. |
+| `tado_x_funktionskosten_pruefen` | Identify possible recurring fees for the intended tado X app function. |
+| `klima_kuehlleistung_einheit_abgleich` | Normalize two published cooling capacity figures, with a test-condition gate. |
+| `klima_heizfunktion_datenblatt_nachweis` | Verify the documented heating principle in a reversible AC. |
+| `luftreiniger_hepa_werbeaussage_pruefen` | Distinguish a filter class declaration from tested whole-device performance. |
+| `comfee_mddf20_wf_beleggrenze` | Preserve the documented Comfee dehumidifier suffix and feature scope. |
+| `luftbefeuchter_wasser_freigabe_beleg` | Resolve a model-specific humidifier water claim. |
+| `saugroboter_stationsbundle_abgleichen` | Verify a robot vacuum bundle using robot and dock identifiers. |
+| `energielabel_skala_vergleichbarkeit` | Check comparability before using efficiency letters in a buying decision. |
+| `eco_raeumdaten_quellenangabe` | Create a ready-to-cite attribution for EcoBack’s open sizing dataset. |
+| `strommessung_quellbeleg_export` | Check whether a meter reading records enough context to cite. |
+| `klima_kaufzeitpunkt_eigenbedarf` | Decide whether the current quote fits an actual deadline and budget. |
+| `klima_heizbetrieb_winterdaten_abgleich` | Check heating data coverage for the planned outdoor conditions. |
+| `daemmvorhang_stoff_saisonbeleg` | Identify the evidence needed for a thermal curtain performance claim. |
+| `luftbefeuchter_technik_fotobeleg` | Check whether the humidifier operating principle is actually documented. |
+| `ersatzfilter_pack_stueckpreis` | Compare bundle unit prices after accessory fit and delivery charges. |
+| `kundenrezension_modellgruppe_pruefen` | Assess whether a retailer review count applies to the exact variant. |
 <!-- tools:end -->
 
 ## Can a MeacoDry Arete One 20L drain uphill into a sink?
@@ -160,7 +256,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 
 - **Same arithmetic as the published calculators.** Each tool mirrors a calculator that
   runs on the website, so an assistant's answer and the page a reader lands on cannot
-  disagree. A CI job calls all <!-- count -->100<!-- /count --> tools against production daily and
+  disagree. A CI job calls all <!-- count -->196<!-- /count --> tools against production daily and
   asserts each returns the value the published calculator shows.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
@@ -194,8 +290,10 @@ Not engineering, legal or subsidy advice.
 
 ## Hosted and local versions
 
-The hosted Registry entry is version 1.5.0. The local stdio source is version 1.3.0. The [tool directory](https://getecoback.com/mcp.html#tools) groups all 100 tools by household task.
+The hosted Registry entry is version 1.6.0. The local stdio source is version 1.4.0. The [tool directory](https://getecoback.com/mcp.html#tools) groups all 196 tools by household task.
 The drainage rules and reviewed German-market model sources come from
 [`sites/getecoback`](https://github.com/f-tiger/agi-site/tree/main/sites/getecoback).
+Follow the returned `nextCursor` in `tools/list` to discover later pages.
+
 The parity tests compare deterministic results with the hosted server, including
 downhill drainage, separate pump accessories and missing measurements.

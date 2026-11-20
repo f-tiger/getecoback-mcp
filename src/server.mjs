@@ -10,7 +10,9 @@ import { createInterface } from "node:readline";
 import { TOOLS, callTool } from "./tools.mjs";
 
 const PROTOCOL_VERSION = "2025-06-18";
-const SERVER_INFO = { name: "getecoback-raumklima", version: "1.3.0" };
+import {pageTools} from './eco-suite/src/mcp-pagination.mjs';
+
+const SERVER_INFO = { name: "getecoback-raumklima", version: "1.4.0" };
 
 function send(msg) {
   process.stdout.write(JSON.stringify(msg) + "\n");
@@ -43,7 +45,8 @@ async function handle(msg) {
     return result(id, {});
   }
   if (method === "tools/list") {
-    return result(id, { tools: TOOLS });
+    const page = pageTools(TOOLS,params?.cursor,SERVER_INFO.version);
+    return page ? result(id,page) : failure(id,-32602,"invalid or expired tools cursor");
   }
   if (method === "tools/call") {
     const name = params?.name;
