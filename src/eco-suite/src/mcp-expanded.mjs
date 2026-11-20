@@ -69,6 +69,16 @@ import {tuerspalt} from './mcp-tuerspalt.mjs';
 import {roboterpflege} from './mcp-roboterpflege.mjs';
 import {kuehlkauf} from './mcp-kuehlkauf.mjs';
 import {ledkauf} from './mcp-ledkauf.mjs';
+import {kaffeePflegebelege} from './mcp-kaffee-pflegebelege.mjs';
+import {waschdosierungBelege} from './mcp-waschdosierung-belege.mjs';
+import {spuelmittelBelege} from './mcp-spuelmittel-belege.mjs';
+import {bodenstaubsaugerBelege} from './mcp-bodenstaubsauger-belege.mjs';
+import {dampfbuegelBelege} from './mcp-dampfbuegel-belege.mjs';
+import {stabmixerBelege} from './mcp-stabmixer-belege.mjs';
+import {mikrowellenBelege} from './mcp-mikrowellen-belege.mjs';
+import {kuechenwaagenBelege} from './mcp-kuechenwaagen-belege.mjs';
+import {wasserkocherBelege} from './mcp-wasserkocher-belege.mjs';
+import {toasterBelege} from './mcp-toaster-belege.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -142,6 +152,16 @@ export const expandedDefinitions = [
   ['Roboterpflege', roboterpflege],
   ['Kühlgerätekauf', kuehlkauf],
   ['LED-Kaufprüfung', ledkauf],
+  ["Kaffeemaschinenpflege", kaffeePflegebelege],
+  ["Waschmitteldosierung", waschdosierungBelege],
+  ["Spülmittel und Wasserhärte", spuelmittelBelege],
+  ["Bodenstaubsaugerpflege", bodenstaubsaugerBelege],
+  ["Dampfbügelgeräte", dampfbuegelBelege],
+  ["Stabmixer und Zubehör", stabmixerBelege],
+  ["Mikrowellenbelege", mikrowellenBelege],
+  ["Küchenwaagen", kuechenwaagenBelege],
+  ["Wasserkocherbelege", wasserkocherBelege],
+  ["Toasterbelege", toasterBelege],
 ].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));

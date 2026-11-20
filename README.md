@@ -1,6 +1,6 @@
 # EcoBack Raumklima — MCP server
 
-<!-- count -->1800<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2003<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -1851,6 +1851,209 @@ Worker, and ports drift silently.
 | `led_lebensdauer_l70b50_garantie_unterscheiden` | Identify what a lifespan claim can support before relying on it for one lamp. |
 | `led_ersatz_geschlossenes_gehaeuse_umgebung_beleg` | Check the specific enclosure condition instead of generalizing an indoor-use claim. |
 | `led_arbeitsflaeche_drei_luxpunkte_gegen_basis` | Check a matched centre-and-edge lux comparison before treating a spot as an even task light. |
+| `delonghi_dlsc002_filter_variante_aussehen_ersatzkauf` | Check a documented De’Longhi filter design difference before buying another filter. |
+| `kaffeevollautomat_wasserfilter_lieferumfang_start_ohne_nachkauf` | Distinguish catalogued, optional and delivered water filters before an initial purchase. |
+| `kaffeevollautomat_intenza_aquaclean_filterfamilie_modellpruefung` | Match the candidate coffee filter family to the exact German model. |
+| `delonghi_magnifica_filter_stillstand_drei_wochen` | Check the separate installed-filter limits for idle and ordinary use. |
+| `philips_aquaclean_orange_blinkt_blau_filteranzeige` | Interpret a Philips AquaClean indicator using the observed appliance history. |
+| `philips_gebrauchtkaffee_aquaclean_filterlos_oder_einstieg` | Resolve a used Philips filter purchase against the documented activation prerequisites. |
+| `philips_aquaclean_durchfluss_kaffeetassen_wechselintervall` | Check independently documented time and throughput for an AquaClean filter change. |
+| `delonghi_magnifica_entkalkungslampe_rot_blinkt_dauerlicht` | Distinguish due and active descaling by the verified De’Longhi indicator. |
+| `kaffeevollautomat_filter_im_tank_vor_entkalkungsprogramm` | Check the verified filter prerequisite before descaling begins. |
+| `kaffeevollautomat_reinigungstablette_entkalker_artikel_aufgabe` | Check whether the named consumable matches the planned maintenance task. |
+| `kaffeevollautomat_bruehgruppe_reinigungsroutine_modellwechsel` | Compare brew-group care cadence after switching an exact model. |
+| `kaffeevollautomat_milchsystem_lattego_dampf_oder_tasse` | Match a real milk workflow to the household requirement. |
+| `kaffeevollautomat_automatikspuelung_milchsystem_pflegebeleg` | Distinguish a machine rinse from documented cleaning of removable milk components. |
+| `bosch_tie20301_latte_macchiato_glas_hoehe_einsetzen` | Check the model’s documented glass height and an observed straight insertion. |
+| `kaffeevollautomat_doppeltasse_zwei_kaffees_zwei_milchgetraenke` | Verify whether a double-cup mode covers coffee or two milk drinks. |
+| `philips_kaffeesatzbehaelter_leer_anzeige_bleibt_zaehler` | Separate a stale grounds-counter signal from the observed contents. |
+| `philips_milch_kaffee_getraenkemenge_groesste_stufe_speichern` | Check which volume setting can be saved for a specific beverage. |
+| `philips_vorgemahlener_entkoffeinierter_kaffee_einzeltasse` | Check a decaf pre-ground serving without substituting the bean hopper. |
+| `philips_wasserhaerte_teststreifen_rote_quadrate_aromamenue` | Validate a water-hardness setting separately from beverage aroma strength. |
+| `philips_abtropfschale_wasser_spuelwasser_oder_aussen` | Scope an observed water location to a documented rinse, without diagnosing a leak. |
+| `delonghi_magnifica_kaffee_pause_wiedergebrauch_spuelen` | Read the rinse guidance for resuming use after a documented idle period. |
+| `philips_signaltoene_bedienfeld_ein_aus_start_ausnahme` | Check whether the available panel mute covers a specific sound requirement. |
+| `waschmittel_dosiertabelle_wasserhaerte_intervall` | Identify every hardness column supported by a recorded local interval. |
+| `waschmittel_packung_alter_dosierplan_abgleich` | Reconcile a saved detergent dose with the package currently in use. |
+| `bosch_wgb244a40_idos_45kg_basis_oder_istmenge` | Distinguish the Bosch base setting from an actual cycle dose. |
+| `bosch_wgb244a40_idos_pulver_manuell_kollision` | Detect duplicate main-detergent paths before starting. |
+| `bosch_wgb244a40_idos_behaelter2_rolle_ruecksetzung` | Verify the base setting after changing the tank role. |
+| `bosch_wgb244a40_idos_zwei_fluessigmittel_tankwahl` | Determine which of two configured detergent tanks is selected. |
+| `waschmaschine_vorwaesche_bosch_miele_dosierweg` | Check the documented main detergent route when prewash is selected. |
+| `bosch_wgb244a40_idos_schalter_bleibt_gespeichert` | Identify which prior operator changes persist. |
+| `bosch_wgb244a40_sportswear_weichspueler_auswahl` | Check the exact sport-cycle constraints without inferring dose from a full tank. |
+| `miele_wwr880_cap_oder_pod_richtiger_eingabeweg` | Identify the documented input path for a laundry pod or a Miele cap. |
+| `miele_wwr880_caps_anzahl_und_vorwaeschefunktion` | Check that cap count and purpose fit one wash programme. |
+| `miele_wwr880_twindos_ultraphase_gegenfach_reset` | Review the opposite compartment after replacing the matched product pair. |
+| `miele_wwr880_twindos_verschmutzung_und_spuelmenge` | Identify the two process inputs affected by the selectable soil level. |
+| `miele_wwr880_twindos_neue_kartusche_anzeige_zaehler` | Separate the counter reset from the physical cartridge volume. |
+| `waschmaschine_idos_twindos_nachfuellanzeige_lesen` | Separate status signals from exact remaining volume and wash outcome. |
+| `miele_wwr880_hauptwasch_cap_twindos_anzeige` | Check the documented display exception when a main-wash cap disables TwinDos dosing. |
+| `bosch_wgb244a40_idos_nachfuellen_gleiches_mittel` | Identify when a product change needs the documented detergent drawer preparation. |
+| `miele_wwr880_singlewash_halbladung_dosiergrenze` | Compute the documented small-load reference from the package half-load dose. |
+| `miele_wwr880_ultraphase_original_h1_h2_werkstabelle` | Read separate original UltraPhase setup references without inferring real consumption. |
+| `miele_wwr880_programm_waschmittelklasse_fussnote` | Decode the detergent types and physical forms recommended for named programmes. |
+| `miele_wwr880_wasser_plus_und_zusatzspuelgang` | Distinguish higher level from a selected extra rinse. |
+| `miele_wwr880_cap_restwasser_nach_programmende` | Distinguish the described residual water from proof that the whole cap dose was delivered. |
+| `miele_wwr880_baumwolle_vorwaeschzeit_stufen` | Read the timed cotton prewash phase without treating it as total cycle duration. |
+| `spueler_haertebereich_versorger_geraetestufe` | Check if household inlet evidence is suitable for a device-specific hardness table. |
+| `bosch_spueler_haertetabelle_eingabeeinheit_grenze` | Look up the exact Bosch hardness setting without interpolating across printed rows. |
+| `miele_g7673_schwankende_wasserhaerte_oberwert` | Read what the exact Miele manual calls for with a verified inlet range. |
+| `spueler_multitab_salzgrenze_packung_geraet` | Intersect verified detergent and device limits before considering that use case. |
+| `spueler_salzprodukt_etikett_geraetemodell` | Check catalog or package wording for the specified model. |
+| `spueler_salzbehaelter_erstbefuellung_nachfuellen` | Separate the documented first-fill water instruction from the refill case. |
+| `spueler_salz_klarspueler_reiniger_fachbeleg` | Identify the correct compartment on documented appliances without handling a mix-up. |
+| `miele_g7673_solo_nach_multitab_mangelanzeige` | Identify the missing refill evidence when changing from a multi-function cleaner to solo detergent. |
+| `spueler_klarspueler_schlieren_flecken_beobachten` | Scope the manual’s rinse-aid adjustment clues to observed results. |
+| `spueler_reinigerdosis_fachmarke_fuellmaximum` | Distinguish package dose, chamber capacity and the fallback exact-model guidance. |
+| `miele_g7673_powerdisk_auto_oder_manuell` | Resolve the active detergent path before adding anything. |
+| `spueler_tabrest_kurzprogramm_oder_blockade` | Keep multiple plausible explanations for a partially dissolved dishwasher tab. |
+| `spueler_vorbereitung_grobe_reste_auto_sensor` | Separate scraping, rinsing under the tap and the machine’s internal prewash. |
+| `miele_g7673_zweites_zwischenspuelen_eco_ausnahme` | Check whether the persistent extra can apply to the selected program. |
+| `bosch_kompakt_regeneration_variante_eco_basis` | Read the exact compact dishwasher laboratory row, without mapping it onto a calendar. |
+| `bosch_sbv4ebx00d_fluessigreiniger_vorspuelen_zeitvorwahl` | Match the liquid-detergent route to confirmed prewash and delay settings. |
+| `miele_g7673_salzmangel_nach_befuellen_einordnen` | Interpret a refill notice that persists immediately after filling without diagnosing a sensor. |
+| `spueler_klarspueler_menuewert_und_abgabe_trennen` | Interpret a rinse-aid display without treating it as a measurement of actual delivery. |
+| `miele_g7673_autodos_mengenwahl_zielkonflikt` | Use the exact Miele manual’s qualitative tradeoff under confirmed conditions. |
+| `spueler_nach_salzbehaelter_oeffnen_spuelbezug` | Identify the documented after-fill or opened-cap case for the exact dishwasher manual. |
+| `miele_g7673_kunststoff_verfaerbung_naturfarbstoffe` | Check whether documented food-pigment staining is a plausible explanation on the exact Miele model. |
+| `spuelreiniger_blauer_engel_de_uz_201_produktbeleg` | Check an environmental label’s documented product match separately from machine compatibility. |
+| `spueler_weichwasser_ohne_salz_geraetemodell` | Use the model-specific soft-water boundary without relying on a multi-function tablet. |
+| `bosch_sks62e32eu_glastruebung_ablesbarer_beleg` | Decide which evidence branch applies without diagnosing irreversible damage. |
+| `spueler_geschirr_material_vor_einraeumen_beleg` | Screen documented dishware and material limitations before loading. |
+| `miele_hyclean_beutel_vollstaendige_modellzeile` | Match an exact German Miele vacuum model to its documented bag family |
+| `miele_zwei_sauger_vorrat_beutel_abluftfilter_getrennt` | Check which consumable role two Miele vacuums can share |
+| `miele_gn_packbedarf_drei_teile_aus_bestand` | Compare verified GN pack contents against actual remaining needs |
+| `miele_abluftfilter_serienausstattung_gegen_nachruestliste` | Separate documented factory filter, optional part and current installation |
+| `miele_guard_l1_abluftfilter_gitter_wechselrichtung` | Identify the grille requirement for the documented HS22 filter conversion |
+| `miele_timestrip_rot_aktivierung_filteranzeige` | Read a documented time-strip state separately from the vacuum display |
+| `miele_guard_l1_abluftanzeige_reset_vor_wechsel` | Decide whether the documented appliance reminder reset has its preconditions |
+| `miele_beutelsignal_feinstaub_fusseln_abgleichen` | Reconcile early or delayed bag-full signals with the recorded material |
+| `miele_guard_l1_beutelanzeige_pruefbedingungen` | Confirm the observed Guard L1 bag-indicator measurement setup |
+| `miele_guard_l1_tu_halteplatte_sperrklinke` | Locate the missing TU seating proof before replacing a bag |
+| `miele_guard_l1_lifetime_motorschutz_gegen_packungsfilter` | Separate HS22 lifetime motor filter care from legacy pack inserts |
+| `miele_turboteq_305_teppich_drehzahl_abgleich` | Localize a documented air-driven TurboTeQ slowdown |
+| `miele_beutelsauger_leistungsverlust_grosse_teile` | Localize a documented onset of restriction after bulky material |
+| `miele_guard_l1_parksystem_pause_oder_aufbewahrung` | Match the documented HS22 parking position to the intended use |
+| `miele_guard_app_registrierung_gegen_wechselmeldung` | Check whether app registration actually proves a connected replacement notification |
+| `miele_boost_cx1_maxmarkierung_behaelter` | Inspect the documented bagless container fill line |
+| `miele_boost_cx1_gepflegte_flaeche_reinigungsmedium` | Separate surface-specific care media for the documented Boost CX1 filter assembly |
+| `miele_boost_cx1_filtermatte_lage_entnahmeoese` | Verify documented orientation of a dry Boost CX1 filter mat |
+| `miele_boost_cx1_feinstaubfilter_oder_abluftteil` | Match related replacement part names to the actual filter stage |
+| `miele_boost_cx1_fadenheber_oder_bodenduesenersatz` | Distinguish a worn replaceable lint strip from the nozzle itself |
+| `miele_guard_l1_kombiduese_fuge_polster_bestand` | Identify an existing combined nozzle by its documented two positions |
+| `miele_guard_l1_saugpinsel_handgriff_2_0_abnahmebeleg` | Scope detachable dusting brush evidence to the documented Comfort 2.0 handle |
+| `philips_buegelgeraet_kalksystem_typenschild_abgleich` | Identify the documented descaling system from the exact model plate. |
+| `philips_buegeleisen_hartes_wasser_dokumentempfehlung` | Match the DST7040 manual to the known local water hardness. |
+| `philips_azur_wassermischung_gleichteile_abmessen` | Compare two measured amounts against the Azur manual’s equal-parts rule. |
+| `philips_azur_wasserzusatz_anleitung_abgrenzung` | Check a single liquid or additive against the Azur manual. |
+| `philips_buegelgeraet_tankangabe_vs_gemessene_max_marke` | Keep stated tank size separate from a measured reservoir mark. |
+| `philips_perfectcare_wassertank_entnahme_eigenes_exemplar` | Verify a detachable tank requirement and specimen evidence. |
+| `philips_buegeldampf_dauerstoss_druck_vergleichsart` | Compare matching steam specification types without equating different units. |
+| `philips_perfectcare_gewicht_handteil_station_verpackung` | Apply a personal weight budget to the handpiece, combined station or retail box. |
+| `philips_perfectcare_trageverriegelung_exemplarbeleg` | Separate the stated carry lock feature from an observed lock state. |
+| `philips_perfectcare_statusleuchte_wasser_vs_entkalkung` | Identify the next documentation section by the confirmed indicator. |
+| `philips_azur_autoabschaltung_ruhelage_dokumentwert` | Read the specified idle threshold for the two documented resting positions. |
+| `philips_azur_calc_pflegefenster_kalender_und_anlass` | Separate the manual’s calendar maintenance range from an observed trigger. |
+| `philips_azur_spray_dampfart_beobachtung_zuordnen` | Attribute an observed spray or steam event to its confirmed control and position. |
+| `philips_azur_sohle_pflegeaussage_eigener_nachweis` | Classify a proposed soleplate cleaning method against the Azur manual. |
+| `philips_perfectcare_bewegungssensor_automatik_beobachtung` | Attribute an event to automatic steam only when its trigger was observed. |
+| `philips_perfectcare_zweistundenangabe_eigene_arbeitszeit` | Isolate observed active time from the maker’s up-to-two-hours statement. |
+| `philips_perfectcare_aufbewahrung_schlauchfach_klett` | Document the distinct hose and cable storage evidence. |
+| `philips_azur_tropfstopp_eigene_beobachtung` | Log observed droplet origin independently of the Drip Stop feature. |
+| `philips_perfectcare_ersatzteil_tank_auffangkappe_artikelcode` | Verify the listed spare reservoir or collector cap reference. |
+| `philips_perfectcare_bereitlicht_nachfuellanzeige_protokoll` | Distinguish readiness from a water alert using recorded display order. |
+| `philips_perfectcare_schlauchpfad_reichweite_reserve` | Compare the workspace path and user reserve with the listed hose length. |
+| `philips_perfectcare_energiesparangabe_normal_max_bezug` | Match the maker’s energy comparison to the stated modes and test basis. |
+| `philips_azur_lagerung_leer_beobachtung_schrittgrenze` | Record whether the documented empty-tank storage item is actually observed. |
+| `philips_perfectcare_refill_zeitpunkt_anforderung_beleg` | Separate the refill capability from a continuous-flow assumption. |
+| `bosch_ergomixx_e_nummer_ausfuehrung_handbuch` | Route a full German Bosch ErgoMixx E-number to the correct manual and service page. |
+| `bosch_ergomixx_set_lieferumfang_zubehoerrolle` | Check the listed accessory role in an exact German Bosch ErgoMixx bundle. |
+| `bosch_ergomixx_mixfuss_oder_universalzerkleinerer_aufgabe` | Route cooked blending and named raw chopping jobs to the appropriate Bosch attachment. |
+| `bosch_mixfuss_ersatzgefaess_boden_und_behaelterrolle` | Check the bottom and vessel role before using another vessel with the Bosch blending shaft. |
+| `stabmixer_heisses_mixgut_temperatur_und_kochstelle` | Compare measured ingredient temperature and hob status with the exact Bosch or Braun blending guidance. |
+| `bosch_msm67170_eis_crush_l_messer_und_menge` | Check the documented Bosch L chopper ice-blade setup and example portion for the MSM67170. |
+| `bosch_msm67170_abschalten_ueberlast_wartezeit` | Read the manual’s cooling interval for a confirmed Bosch MSM67170 shutdown during use. |
+| `bosch_ms6cb61v1_vakuumbox_volumen_quellenkonflikt` | Surface the conflicting container capacities in the Bosch MS6CB61V1 German spec sheet. |
+| `bosch_mixfuss_trocknen_lagerung_befund` | Record upright draining and subsequent dryness separately for a Bosch blending shaft. |
+| `stabmixer_aufsatzwechsel_stillstand_netztrennung` | Check that both a stopped drive and disconnection are documented before an attachment change. |
+| `bosch_ergomixx_fresh_vakuum_behaelter_oder_beutel_anzeige` | Distinguish the manual’s different vacuum indicators for a Bosch Fresh container and zip bag. |
+| `bosch_ergomixx_fresh_zipbeutel_vorinhalt_wiederverwendung` | Read Bosch Fresh bag reuse limits from recorded previous contents, cleaning and drying. |
+| `bosch_ergomixx_fresh_vitamaxx_behaelter_kompatibilitaet` | Look up the VitaMaxx accessories explicitly listed for Bosch ErgoMixx Fresh. |
+| `braun_mq30_mqs230_kupplung_wellenschnitt_gerade` | Compare the actual coupling profile of the Braun MQ 30 and MQS 230 choppers. |
+| `braun_zerkleinerer_ca_mc_hc_bc_behaelterkennzeichen` | Identify a Braun chopper by its documented ca, mc, hc or bc vessel code. |
+| `braun_zerkleinerer_eis_bc_mc_und_messer_unterscheidung` | Distinguish the Braun ice-use conditions by vessel code and dedicated ice blade. |
+| `braun_mq7035xbi_mc_zutatenmenge_markierung` | Compare ingredient weights and the visible max line for the Braun mc 500 ml chopper. |
+| `braun_mq7035xbi_puerierbecher_kleinmenge_mixglocke` | Compare the observed liquid level for a small batch with Braun’s immersed blending-foot illustration. |
+| `braun_zerkleinerer_laufzeit_pause_erst_nach_dokumentiertem_ende` | Compare a recorded chopper run and elapsed pause with the matching ca or mc manual row. |
+| `braun_mq7035xbi_doppelruehrbesen_teigart_ruehraufgabe` | Classify light mixing work and heavy kneading for the Braun double beater. |
+| `braun_mq7035xbi_doppelruehrbesen_mixbecher_veto` | Check the manufacturer’s explicit supplied-beaker exclusion for the Braun double beater. |
+| `braun_mq7035xbi_doppelruehrbesen_rund_sechskant_beleg` | Match the two documented Braun beater markings to their round and hexagonal sockets. |
+| `stabmixer_getriebedeckel_reinigung_spuelmaschine` | Check dishwasher, rinse or wipe guidance for the exact Bosch or Braun part. |
+| `braun_zerkleinerer_topf_mikrowelle_piktogramm_bezug` | Read Braun’s microwave exclusion for the mapped chopper bowl and leave other vessels unresolved. |
+| `braun_zerkleinerer_ungewoehnliche_vibration_drehzahl_stop` | Classify vibration and speed-loss observations for the two documented Braun choppers. |
+| `bosch_bfl524ms0_nische_geraetemass_unterscheiden` | Distinguish cabinet opening, outer body and cavity dimensions. |
+| `bosch_bfl524_einbaumoebel_hitzebestaendigkeit_luftweg_belege` | Check documented furniture temperatures and unobstructed ventilation. |
+| `mikrowelle_gefaess_drehkreis_griffe_zentriert` | Check handle-inclusive rotational clearance of a centered rectangular vessel. |
+| `mikrowelle_deckelgriff_lichte_hoehe_tuerdurchlass` | Check vertical passage and in-use lid clearance. |
+| `bosch_mikrowelle_bfl_bel_grill_modellbeleg` | Distinguish the solo microwave and grill variant before purchase. |
+| `bosch_bfl524ms0_watt_anschlusswert_und_garleistung` | Separate cooking output, rated input and energy measured in use. |
+| `bosch_bfl524_watt_stufe_maximale_zeiteinstellung` | Read the maximum selectable timer for each microwave output setting. |
+| `bosch_bfl524ms0_inverter_maximalleistung_dauer_keine_garprognose` | Interpret the model-specific long-run power reduction without inventing timing. |
+| `bosch_bfl524_autopilot_portion_und_programmtabelle` | Look up the listed food category and weight range for the exact AutoPilot programme. |
+| `bosch_bfl524_autoprogramm_deckel_auftauen_garen` | Check whether the named Bosch programme lists an uncovered or covered vessel. |
+| `bosch_bfl524_rundung_eingabeschritt_gewichtsgrenze` | Keep rounded programme input separate from measured food weight. |
+| `bosch_bfl524_memory_einzelschritt_oder_automatik` | Check whether the intended routine fits the single memory slot. |
+| `bosch_bfl524_automatik_signal_waehrend_programm` | Distinguish a mid-programme intervention signal from a confirmed finish. |
+| `bosch_bfl524_kuehlgeblaese_nachlauf_kein_weitergaren_beleg` | Distinguish documented cooling fan run-on from active heating. |
+| `bosch_bfl524_kondenswasser_ort_und_wiederkehr_abgleich` | Record ordinary post-run condensation separately from unexplained moisture. |
+| `bosch_bfl524_demo_modus_anzeige_ohne_garfunktion` | Recognize the documented showroom mode without diagnosing a failure. |
+| `bosch_bfl524_drehteller_originalteil_index_und_mass` | Check the listed tray size separately from exact spare-part compatibility. |
+| `bosch_bfl524_glas_drehteller_zustand_betriebssperre` | Gate use on an undamaged and properly seated manufacturer tray. |
+| `bosch_bfl524_reinigungsunterstuetzung_leichte_verschmutzung` | Determine the documented scope of Bosch cleaning assistance. |
+| `bosch_bfl524_reiniger_tuerscheibe_geraetefront_bedienfeld` | Match the cleaning method to the exact front, pane or control surface. |
+| `bosch_bfl524_drehteller_schleifen_aussenpruefung` | Identify the documented user-observable cause of tray scraping. |
+| `bosch_mikrowelle_garraumtuer_schaden_betrieb_anhalten` | Decide when to pause operation for professional assessment of a visible door defect. |
+| `mikrowelle_gefaessfreigabe_korpus_deckel_dekor_unterscheiden` | Treat lid, decoration and vessel approval as separate operating evidence. |
+| `beurer_ks34_artikelnummer_wiegeoberflaeche` | Resolve the documented contact surface from the exact German variant. |
+| `beurer_ks34_tara_bruttolast_tragkraft` | Count gross load against the documented limit even after tare. |
+| `beurer_ks34_wiegebereich_fuenf_gramm_und_einteilung` | Treat the smallest specified weighing load separately from the display graduation. |
+| `beurer_ks34_halteanzeige_protokollspeicher_unterschied` | Check whether a visible held reading can satisfy a history requirement. |
+| `beurer_ks34_magic_led_schwarzes_display_beobachtung` | Interpret the observable idle display behaviour independently of a possible fault. |
+| `beurer_ks34_milliliter_fluid_unze_anzeigemodus` | Check whether the desired volume unit is actually supported. |
+| `beurer_ks34_reinigung_feuchtes_tuch_kein_wasserbad` | Check the surface-cleaning method against the matching instructions. |
+| `beurer_ks34_wiederholungsmessung_aufstellung_funkumfeld` | Record setup and possible field interference without diagnosing a fault. |
+| `beurer_ks34_aaa_batteriesatz_mix_abgleichen` | Check the documented cell count, type and matched-battery condition. |
+| `beurer_ks34_aufbewahrung_feuchte_waerme_ort` | Screen the proposed storage location for documented exposure limits. |
+| `beurer_ks34_anzeigeabweichung_eigene_referenz_nicht_kalibrierung` | Record one reading difference without claiming a calibration or guaranteed tolerance. |
+| `beurer_ks34_versandgewicht_unverpackt_quellenabweichung` | Keep packed and unpacked weights and source revisions separate. |
+| `beurer_ks34_privathaushalt_oder_gewerbliche_verwendungsgrenze` | Check the manufacturer’s household-use limitation before selecting a scale. |
+| `wasserkocher_twk8613p_360_sockel_originalbasis` | Check original kettle-base evidence without assuming cross-model interchangeability. |
+| `wasserkocher_twk8613p_wasser_milch_instant_einfuellen` | Check the manufacturer’s kettle liquid scope against the household use case. |
+| `wasserkocher_twk8613p_temperatur_blinkt_leuchtet` | Decode selected and reached temperature indicators during the documented heating phase. |
+| `wasserkocher_twk8613p_sollwert_aenderung_wasser_bereits_waermer` | Check the documented live setpoint-change rule against a measured temperature. |
+| `wasserkocher_twk8613p_keep_warm_vor_heizende_aktivieren` | Check activation timing and indicator evidence for the Bosch hold mode. |
+| `wasserkocher_twk8613p_abheben_basis_kochen_neustart` | Determine how a documented lift interrupts a kettle heating run. |
+| `wasserkocher_twk8613p_abkuehlen_fuenf_minuten_nach_gebrauch` | Check the separate five-minute cooldown requirement between kettle uses. |
+| `wasserkocher_twk8613p_hoehenlage_2000_aufsicht` | Verify the documented altitude and observation conditions for the proposed use site. |
+| `wasserkocher_twk8613p_min_max_markierungen_ablesbar` | Check legible on-device fill-limit markings before using an exact kettle. |
+| `wasserkocher_twk8613p_vor_siedepunkt_abschaltung_sollwert` | Check whether an early-looking stop belongs to a lower setting or needs manufacturer review. |
+| `wasserkocher_twk8613p_deckel_kalksieb_gebrauchsbeleg` | Confirm two documented kettle assembly conditions before use. |
+| `wasserkocher_twk8613p_spuelmaschine_basis_kanne_sieb` | Separate forbidden dishwasher use from component-specific care evidence. |
+| `wasserkocher_twk8613p_entkalken_taeglicher_betrieb_intervall` | Check usage-dependent kettle maintenance without inventing a fixed day count. |
+| `wasserkocher_twk8613p_kondenswasser_basis_wasserbeobachtung` | Scope base moisture against the Bosch condensation note without inferring an electrical fault. |
+| `wasserkocher_twk8613p_schrankbetrieb_dampf_aufstellort` | Check the kettle’s documented in-cabinet restriction for a proposed location. |
+| `bosch_twk8613p_doppelwand_oberflaeche_beruehrbarkeit` | Distinguish the double-wall feature from a measured touch-temperature result. |
+| `bosch_tat8613_schlitzanzahl_scheibenmass_abgrenzen` | Check slot count and distinguish it from fit evidence. |
+| `bosch_tat8613_broetchenaufsatz_integriert_ersatzbeleg` | Identify the published rack configuration before buying an accessory. |
+| `bosch_tat8613_aufbacken_max_stufe_aufsatzbedingungen` | Verify the rack mode and its published maximum level. |
+| `bosch_tat8613_auftauen_aufwaermen_ersichtlicher_modus` | Match the selected control to the known bread state. |
+| `bosch_tat8613_roestband_brotsorte_eine_scheibe` | Read the guide’s browning bands without predicting the result. |
+| `bosch_tat8613_zwei_leds_roestgrad_ablesen` | Decode consecutive odd markings while the selected level is shown. |
+| `bosch_tat8613_memory_nach_stromunterbrechung` | Read what the memory function preserves after power interruption. |
+| `bosch_tat8613_roestvorgang_stopp_ende_highlift` | Distinguish early user cancellation, the observed end and the extraction aid. |
+| `bosch_tat8613_kruemelschublade_oder_broetchenaufsatz_pflege` | Match the documented cleaning method to the observed location. |
+| `bosch_tat8613_kruemelschublade_vor_betrieb_vorhanden` | Check the removable tray as required equipment. |
 <!-- tools:end -->
 
 ## Can a MeacoDry Arete One 20L drain uphill into a sink?
@@ -1864,7 +2067,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->1800<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2003<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
