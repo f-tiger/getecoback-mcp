@@ -73,8 +73,18 @@ node src/find-tools.mjs 'Wie lange darf ich mit 72 Litern duschen?'
 
 The command searches the local catalogue without contacting the website. It
 returns up to five results as JSON with the tool name, input schema and any
-recorded guide and example inputs. It uses the reviewed German ranking rules
-from the EcoBack site repository. [Ranking source](https://github.com/f-tiger/agi-site/blob/d3464896ede6e50fc418af2d2f67962ba55f188e/sites/getecoback/site/assets/mcp-catalog-search.mjs)
+recorded canonical citation, guide section and example arguments. It uses the
+reviewed German ranking rules from the EcoBack site repository. [Ranking source](https://github.com/f-tiger/agi-site/blob/d3464896ede6e50fc418af2d2f67962ba55f188e/sites/getecoback/site/assets/mcp-catalog-search.mjs)
+
+Run the drainage example directly from the same checkout to see what to check
+before routing a hose uphill.
+
+```sh
+printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"entfeuchter_ablaufcheck","arguments":{"drain":"level_or_uphill","model":"meaco-one-20"}}}' | node src/server.mjs
+```
+
+The local reply includes the model evidence and a link to the drainage section.
+Check the pump and accessories for the exact German model before buying.
 
 ## Tools
 

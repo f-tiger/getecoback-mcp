@@ -1,5 +1,6 @@
 import { pathToFileURL } from 'node:url';
 import { TOOLS } from './tools.mjs';
+import { drainDecision, drainTool } from './drain.mjs';
 import { catalogueExample, expandedCatalog } from './eco-suite/src/mcp-expanded.mjs';
 import { findCatalogueTools, indexCatalogue } from './eco-suite/site/assets/mcp-catalog-search.mjs';
 
@@ -14,13 +15,17 @@ export function findTools(query) {
   const matches = normalized ? findCatalogueTools(index, {query: normalized}) : [];
   const tools = matches.slice(0, 5).map(tool => {
     const { citation_url, example } = catalogueExample(tool.name);
+    const drainArguments = tool.name === drainTool.name ? {drain:'level_or_uphill', model:'meaco-one-20'} : null;
+    const drain = drainArguments ? drainDecision(drainArguments).structuredContent : null;
+    const guide_url = drain?.guide_url ?? expandedByName.get(tool.name)?.guide_url;
     return {
       name: tool.name,
       description: tool.description,
       category: tool.category,
       inputSchema: tool.inputSchema,
-      citation_url: citation_url ?? null,
-      example_arguments: example?.arguments ?? null,
+      citation_url: drain?.citation_url ?? citation_url ?? null,
+      ...(guide_url ? {guide_url} : {}),
+      example_arguments: drainArguments ?? example?.arguments ?? null,
     };
   });
   return { totalMatches: matches.length, tools };

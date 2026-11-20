@@ -24,9 +24,15 @@ test('offline lookup preserves every exact name and input schema', () => {
   }
 });
 
-test('German questions find tools beyond the first page and keep reviewed examples', () => {
-  const drainage = findTools('Kann ich den Abflussschlauch nach oben führen?');
-  assert.equal(drainage.tools[0].name, 'entfeuchter_ablaufcheck');
+test('German questions find tools beyond the first page and keep reviewed examples', async () => {
+  const drainage = findTools('Kann ich den Abflussschlauch nach oben führen?').tools[0];
+  assert.equal(drainage.name, 'entfeuchter_ablaufcheck');
+  assert.deepEqual(drainage.example_arguments, {drain:'level_or_uphill', model:'meaco-one-20'});
+  const proof = (await callTool(drainage.name, drainage.example_arguments)).structuredContent;
+  assert.equal(proof.outcome, 'pump_check');
+  assert.equal(drainage.citation_url, proof.citation_url);
+  assert.equal(drainage.guide_url, proof.guide_url);
+  assert.equal(drainage.guide_url, drainage.citation_url + '?utm_source=eco-mcp&utm_medium=referral&utm_campaign=keller-ablauf#ablauf-vor-kauf');
 
   const shower = findTools('Wie lange darf ich mit 72 Litern duschen?').tools[0];
   assert.equal(shower.name, 'dusche_zeit_bei_wasserbudget');
