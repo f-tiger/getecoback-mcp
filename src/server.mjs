@@ -12,7 +12,10 @@ import { TOOLS, callTool } from "./tools.mjs";
 const PROTOCOL_VERSION = "2025-06-18";
 import {pageTools} from './eco-suite/src/mcp-pagination.mjs';
 
-const SERVER_INFO = { name: "getecoback-raumklima", version: "1.17.1" };
+const SERVER_INFO = { name: "getecoback-raumklima", version: "1.17.2" };
+const assistant = process.argv.slice(2).includes('--compact') ? await import('./assistant-tools.mjs') : null;
+const availableTools = assistant?.ASSISTANT_TOOLS ?? TOOLS;
+const runTool = assistant?.callAssistantTool ?? callTool;
 
 function send(msg) {
   process.stdout.write(JSON.stringify(msg) + "\n");
@@ -36,6 +39,7 @@ async function handle(msg) {
       protocolVersion: PROTOCOL_VERSION,
       capabilities: { tools: {} },
       serverInfo: SERVER_INFO,
+      ...(assistant ? {instructions: assistant.INSTRUCTIONS} : {}),
     });
   }
   if (method === "notifications/initialized" || method === "initialized") {
@@ -45,16 +49,16 @@ async function handle(msg) {
     return result(id, {});
   }
   if (method === "tools/list") {
-    const page = pageTools(TOOLS,params?.cursor,SERVER_INFO.version);
+    const page = pageTools(availableTools,params?.cursor,SERVER_INFO.version);
     return page ? result(id,page) : failure(id,-32602,"invalid or expired tools cursor");
   }
   if (method === "tools/call") {
     const name = params?.name;
-    if (!TOOLS.some((t) => t.name === name)) {
+    if (!availableTools.some((t) => t.name === name)) {
       return failure(id, -32602, `Unknown tool: ${name}`);
     }
     try {
-      return result(id, await callTool(name, params?.arguments));
+      return result(id, await runTool(name, params?.arguments));
     } catch (e) {
       // A tool failure is reported in-band so the client can show it to the
       // user, rather than as a protocol error that looks like a broken server.

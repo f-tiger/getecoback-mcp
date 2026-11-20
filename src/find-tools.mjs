@@ -11,9 +11,10 @@ const index = indexCatalogue(TOOLS.map(tool => {
   return { ...tool, category: expanded?.category ?? 'Raumklima', page: expanded?.page };
 }));
 
-export function findTools(query) {
+export function findTools(query, include) {
   const normalized = query.normalize('NFC').trim();
-  const matches = normalized ? findCatalogueTools(index, {query: normalized}) : [];
+  const ranked = normalized ? findCatalogueTools(index, {query: normalized}) : [];
+  const matches = include ? ranked.filter(tool => include(tool.name)) : ranked;
   const tools = matches.slice(0, 5).map(tool => {
     const { citation_url, example } = catalogueExample(tool.name);
     const drainArguments = tool.name === drainTool.name ? {...drainExample} : null;

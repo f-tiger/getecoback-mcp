@@ -59,6 +59,23 @@ Node.js 22 or later, point your MCP client at `src/server.mjs` in the downloaded
 No package installation is required for this setup. Source and guide links in tool
 answers still open their websites separately.
 
+### Kompakter Einstieg für KI-Assistenten
+
+Starte den heruntergeladenen Quellcode mit `--compact`, wenn dein MCP-Client am
+Anfang nur wenige Werkzeuge laden soll. Der Assistent sieht zwei Werkzeuge. Mit
+`ecoback_werkzeug_finden` sucht er nach einer Frage wie „Kann ich den
+Abflussschlauch nach oben führen?“. Er erhält bis zu fünf Treffer mit Eingabefeldern
+und vorhandenen Quellen. Mit `ecoback_werkzeug_ausfuehren` ruft er das passende
+Werkzeug mit deinen Messwerten auf. Beide Schritte laufen lokal; die Antworten
+enthalten die verfügbaren Quellen für die weitere Prüfung.
+
+```json
+{ "mcpServers": { "getecoback": { "command": "node", "args": ["/absolute/path/to/getecoback-mcp/src/server.mjs", "--compact"] } } }
+```
+
+Ohne `--compact` bleibt der vollständige Werkzeugkatalog verfügbar. Aktuelles
+Wetter und Ratgeber-Volltext sind im vollständigen Modus abrufbar.
+
 **Hosted endpoint** for clients that connect over HTTP.
 
 ```

@@ -89,7 +89,7 @@ test('offline CLI examples run exact reviewed inputs and reject incomplete or li
   }
 });
 
-function readStdio(jobs) {
+function readStdio(jobs, serverArgs = []) {
   // Regular descriptors exercise the real process without relying on libuv child sockets.
   const work = mkdtempSync(join(tmpdir(), 'ecoback-stdio-'));
   let input, output;
@@ -99,7 +99,14 @@ function readStdio(jobs) {
     writeFileSync(inputPath, jobs.map(job => JSON.stringify(job)).join('\n') + '\n');
     input = openSync(inputPath, 'r');
     output = openSync(outputPath, 'w');
-    const child = spawnSync(process.execPath, [server], {stdio:[input, output, 'inherit'], timeout:10000});
+    const preload = join(work, 'deny-network.cjs');
+    writeFileSync(preload, `const deny = () => { process.stderr.write('Unexpected network call in stdio test\\n'); process.exit(89); };
+globalThis.fetch = deny;
+require('node:net').Socket.prototype.connect = deny;
+require('node:dgram').Socket.prototype.send = deny;
+`);
+    const child = spawnSync(process.execPath, ['--require', preload, server, ...serverArgs],
+      {stdio:[input, output, 'inherit'], timeout:10000});
     assert.equal(child.error, undefined);
     assert.equal(child.status, 0);
     return readFileSync(outputPath, 'utf8').trim().split('\n').map(line => JSON.parse(line));
@@ -120,6 +127,7 @@ test('stdio handles initialize, the complete paginated catalogue, BTU and unknow
   const initialize = send('initialize', {});
   const listIds = new Map();
   let cursor;
+  assert.equal(TOOLS.length, 2003);
   const expectedPages = Math.ceil(TOOLS.length / MCP_PAGE_SIZE);
   for (let page = 0; page < expectedPages; page++) {
     const id = send('tools/list', cursor === undefined ? {} : {cursor});
@@ -151,6 +159,96 @@ test('stdio handles initialize, the complete paginated catalogue, BTU and unknow
   assert.equal(replies.get(btu).result.isError, false);
   assert.match(replies.get(btu).result.content[0].text, /7\.000 BTU/);
   assert.equal(replies.get(unknown).error.code, -32602);
+});
+
+const compactFind = 'ecoback_werkzeug_finden';
+const compactRun = 'ecoback_werkzeug_ausfuehren';
+const liveOnly = ['hitzewelle_vorschau', 'ratgeber_suche', 'ratgeber_lesen'];
+const toolCall = (name, args) => ({method:'tools/call', params:{name, arguments:args}});
+
+function compactReplies(requests) {
+  const jobs = requests.map((request, index) => ({jsonrpc:'2.0', id:index + 1, ...request}));
+  const replies = readStdio(jobs, ['--compact']);
+  const byId = new Map(replies.map(reply => [reply.id, reply]));
+  assert.equal(replies.length, jobs.length);
+  return jobs.map(job => {
+    assert.ok(byId.has(job.id), `Missing reply to request ${job.id}`);
+    return byId.get(job.id);
+  });
+}
+
+test('compact stdio advertises only the finder and executor without pagination', () => {
+  const [list, invalidCursor, direct] = compactReplies([
+    {method:'tools/list', params:{}},
+    {method:'tools/list', params:{cursor:pageTools(TOOLS, undefined, version).nextCursor}},
+    toolCall('entfeuchter_ablaufcheck', {drain:'downhill'}),
+  ]);
+  const tools = list.result.tools;
+  assert.deepEqual(tools.map(tool => tool.name).sort(), [compactRun, compactFind]);
+  assert.equal(list.result.nextCursor, undefined);
+  const schemas = Object.fromEntries(tools.map(tool => [tool.name, tool.inputSchema]));
+  assert.deepEqual(schemas[compactFind].required, ['frage']);
+  assert.equal(schemas[compactFind].properties.frage.type, 'string');
+  assert.equal(schemas[compactFind].properties.frage.minLength, 1);
+  assert.equal(schemas[compactFind].properties.frage.maxLength, 500);
+  assert.deepEqual([...schemas[compactRun].required].sort(), ['eingaben', 'name']);
+  assert.equal(schemas[compactRun].properties.name.type, 'string');
+  assert.equal(schemas[compactRun].properties.eingaben.type, 'object');
+  assert.equal(invalidCursor.error.code, -32602);
+  assert.equal(direct.error.code, -32602);
+});
+
+test('compact lookup exposes the offline tool schema, source and guide for real questions', async () => {
+  const cases = [
+    ['  Kann ich den Abflussschlauch nach oben führen?  ', 'entfeuchter_ablaufcheck', {drain:'level_or_uphill', model:'meaco-one-20'}],
+    ['trockner_programm_trockenmasse', 'trockner_programm_trockenmasse', {trockenmasse_kg:5, programm_max_kg:4, kapazitaetsbasis:true}],
+    ['Wie lange darf ich mit 72 Litern duschen?', 'dusche_zeit_bei_wasserbudget', {budget_l:72, durchfluss_l_min:9}],
+  ];
+  const found = compactReplies(cases.map(([frage]) => toolCall(compactFind, {frage})));
+  const tools = found.map((reply, index) => {
+    const [query, name, example] = cases[index];
+    const tool = reply.result.structuredContent.tools[0];
+    assert.equal(tool.name, name);
+    assert.deepEqual(tool, findTools(query).tools[0]);
+    assert.deepEqual(tool.inputSchema, TOOLS.find(entry => entry.name === name).inputSchema);
+    assert.deepEqual(tool.example_arguments, example);
+    return tool;
+  });
+  const ownInputs = {budget_l:40, durchfluss_l_min:8};
+  const replies = compactReplies([
+    ...tools.map(tool => toolCall(compactRun, {name:tool.name, eingaben:tool.example_arguments})),
+    toolCall(compactRun, {name:tools[2].name, eingaben:ownInputs}),
+  ]);
+  for (const [index, tool] of tools.entries()) {
+    assert.deepEqual(replies[index].result, await callTool(tool.name, tool.example_arguments));
+    assert.equal(replies[index].result.isError, false);
+  }
+  const drainage = replies[0].result.structuredContent;
+  assert.equal(drainage.outcome, 'pump_check');
+  assert.equal(drainage.guide_url, drainage.citation_url + '?utm_source=eco-mcp&utm_medium=referral&utm_campaign=keller-ablauf#ablauf-vor-kauf');
+  assert.match(drainage.model_evidence.source_url, /^https:\/\//);
+  assert.deepEqual(replies[3].result, await callTool(tools[2].name, ownInputs));
+  assert.notDeepEqual(replies[3].result, replies[2].result);
+});
+
+test('compact stdio excludes live tools and reports invalid inputs in-band', async () => {
+  const searches = compactReplies(liveOnly.map(frage => toolCall(compactFind, {frage})));
+  for (const reply of searches) {
+    const result = reply.result.structuredContent;
+    assert.ok(result.tools.every(tool => !liveOnly.includes(tool.name)));
+    assert.ok(Number.isInteger(result.totalMatches));
+  }
+  const invalidRequests = [
+    ...[...liveOnly, 'missing_tool', '__proto__', compactRun].map(name => toolCall(compactRun, {name, eingaben:{}})),
+    ...[{}, {frage:12}, {frage:'  '}, {frage:'a'.repeat(501)}].map(args => toolCall(compactFind, args)),
+    ...[{}, {name:'btu_empfehlung'}, {name:'btu_empfehlung', eingaben:[]}, {name:'btu_empfehlung', eingaben:null}].map(args => toolCall(compactRun, args)),
+  ];
+  for (const reply of compactReplies(invalidRequests)) assert.equal(reply.result?.isError, true);
+  const name = 'dusche_zeit_bei_wasserbudget';
+  const [invalid] = compactReplies([toolCall(compactRun, {name, eingaben:{budget_l:72}})]);
+  const nativeError = await callTool(name, {budget_l:72});
+  assert.equal(nativeError.isError, true);
+  assert.deepEqual(invalid.result, nativeError);
 });
 
 test('advertised tools have bilingual descriptions and valid required input names', () => {
