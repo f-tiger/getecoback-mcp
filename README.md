@@ -1,6 +1,6 @@
 # EcoBack Raumklima — MCP server
 
-<!-- count -->1580<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->1677<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -59,8 +59,8 @@ Worker, and ports drift silently.
 | `klimaanlage_stromkosten` | Running cost of an air conditioner or any appliance: watts × hours × electricity price × compressor duty cycle. What does it cost to run per hour, per day, per month? |
 | `heizleistung_watt` | Required heating power in watts for a room, from floor area and insulation standard (60/80/100 W/m² for new build, existing, old building), including running cost per full-load hour. |
 | `taupunkt_lueften` | Compare outdoor dew point (Magnus approximation) with a wall estimate 2 °C below room temperature. A drying decision also needs indoor humidity and a measured coldest surface. |
-| `ratgeber_suche` | citable sources for the answer. |
-| `ratgeber_lesen` | Returns the full plain text of one guide from getecoback.com so the answer can be written from the source and cited. Pass a path or URL from ratgeber_suche. |
+| `ratgeber_suche` | Searches published guides with a readable Markdown mirror, returning title, canonical URL and task-specific summary. Every result can be passed to ratgeber_lesen. |
+| `ratgeber_lesen` | Reads the cleaned Markdown of a published guide, with reviewed source links, assumptions and limits. Long excerpts are explicitly marked and link the full text. Pass an exact canonical path or URL from ratgeber_suche, without query or fragment. |
 | `strommessung_hochrechnen` | Project meter readings across representative days. |
 | `geraetewechsel_rechnen` | Compare the cost of keeping an appliance with replacing it. |
 | `waesche_trocknungskosten` | Compare measured energy costs for equally dry laundry. |
@@ -1631,6 +1631,103 @@ Worker, and ports drift silently.
 | `altgeraete_symbol_anlage_drei_weglese` | Tell a separate-collection mark from the marked route to a collection point. |
 | `altgeraete_annahme_und_weiterverwendung_beleg` | Avoid inferring reuse or recycling from a handover receipt alone. |
 | `altgeraete_abholversuch_grund_und_erneute_zusage` | Triage an unsuccessful pickup using the documented obstacle and latest reassignment. |
+| `induktion_km7464f_de_kochboden_zonenauswahl` | Find documented zone envelopes for a cookware base |
+| `induktion_zwei_gefaesse_exklusive_zonen_belegung` | Solve a simultaneous two-vessel zone assignment |
+| `induktion_anzeige_u_beobachtungszweige` | Triage recorded induction cookware recognition evidence |
+| `induktion_erkennung_wechselseitige_probe_zuordnung` | Interpret a paired cookware–zone recognition swap |
+| `induktion_powerflex_aktivierte_rechte_zonen_beleg` | Confirm whether observed right-side zones were actually linked |
+| `induktion_km7464f_modus_wattangabe_zonenbezug` | Match a quoted watt figure to an exact zone and mode |
+| `induktion_zonenpaar_leistungsabgabe_signalfolge` | Check observed power-sharing changes against the manual zone pair |
+| `induktion_booster_laufzeit_und_beobachtete_phase` | Distinguish an observed booster interval from subsequent operation |
+| `induktion_timer_akustisch_gegen_konkret_abgeschaltet` | Separate an audible timer event from zone shutoff |
+| `induktion_gefaessgriffe_kalte_aussenkontur_probe` | Evaluate the observed cold side-by-side footprint including handles |
+| `induktion_waermeverlauf_gefaess_als_versuchsfaktor` | Compare observed repeat timings while changing only the vessel |
+| `induktion_magnet_am_boden_hersteller_widerspruch` | Reconcile a cold base magnet observation and the exact cookware specification |
+| `induktion_stop_go_laufende_timer_pausenannahme` | Compare a recorded Stop&Go interval to the running timer |
+| `induktion_topferkennung_auswahl_und_stufe_getrennt` | Distinguish automatic cookware selection from a recorded assigned setting |
+| `induktion_ankochautomatik_fortkochstufe_zeitbeleg` | Read Auto Heat-up duration against its exact continuation setting |
+| `induktion_abschaltzeiten_kurzeste_restzeit_anzeigequelle` | Interpret the shared countdown when two shutdown timers run |
+| `induktion_vorfuehrgeraet_demomodus_heizbeleg` | Check second-hand or showroom heating evidence against demo mode |
+| `induktion_gefaessbestandsluecke_nutzungsbelege_priorisieren` | Prioritize a missing proof before replacing cookware |
+| `miele_h7460_bp_betriebswert_genaues_datenblatt` | Read the correct power and transition fields for material number 11105690. |
+| `oekodesign_standby_anwendungsbereich_kueche` | Identify which rule family a confirmed kitchen appliance belongs to. |
+| `oekodesign_standby_leistungsreferenz_stichtag` | Select the documentary Annex III power reference for a verified in-scope record. |
+| `oekodesign_standby_energiesparzeit_geraetefall` | Select the general or coffee-machine transition reference after documenting its stated conditions. |
+| `betriebszustand_funktion_led_uhr_netzausloeser` | Classify documented function evidence rather than guessing standby from wattage or a light. |
+| `betriebszustand_uhr_passive_anzeige_getrennt` | Separate independent analogue movement or retained display from a mains-powered clock function. |
+| `betriebszustand_nachlauf_vor_messbeginn` | Exclude transitional minutes when a quiet-state sample began too early. |
+| `betriebszustand_messwert_zwei_herstellerzeilen_trennen` | Check whether a reading has enough resolution to distinguish any of two documented reference values. |
+| `betriebszustand_netzwerkstatus_kehrtwende_nachweis` | Audit evidence for a remote wake without directing anyone to send a trigger. |
+| `betriebszustand_netzfunktion_mehraufwand_je_nutzen` | Relate measured extra energy to successful network-only events rather than uptime alone. |
+| `oekodesign_hina_klasse_aus_hauptfunktion` | Read the documentary HiNA class without promoting ordinary Wi-Fi equipment to high availability. |
+| `betriebszustand_automatikfeld_beobachtung_zeitband` | Assess whether an independently matched transition interval contains the stated delay. |
+| `betriebszustand_zeitbezug_letzte_relevante_nutzung` | Derive the observed measurement baseline after all recorded activity gates have cleared. |
+| `betriebszustand_netzports_dokumentwert_pruefbestand` | Check whether a saved port-state inventory can be compared with the declared all-ports reference. |
+| `betriebszustand_rundungsdifferenz_datenblatt_quellen` | Reconcile a detailed manufacturer value with a separately reported one-decimal figure. |
+| `betriebszustand_netzteil_grenze_wirkleistung` | Reconcile documented metering sides without treating output power as wall power. |
+| `betriebszustand_stichprobe_display_status_muster` | Expose when one display symbol groups multiple actual operating states. |
+| `betriebszustand_netzereignis_mehrverbrauch_anteilsbeleg` | Attribute matched low-state energy differences before assigning them to baseline demand. |
+| `betriebszustand_funktionsbedarf_watt_rang_sperre` | Compare candidate state values only among confirmed adequate modes. |
+| `betriebszustand_dokument_marktschnitt_setting_abweichung` | Compare actual saved timer settings across a verified revision without prescribing updates. |
+| `betriebszustand_log_abschnittsanteil_keine_stichprobenquote` | Identify a count-versus-duration ranking reversal under unequal sample density. |
+| `miele_g7673_spuelanzeige_phase_eco_feedback` | Identify forecast bars, completed-run actuals, totals or remaining time. |
+| `spuelgang_ende_marker_und_autoopen_beobachtung` | Distinguish a program completion marker from a door event. |
+| `miele_quickpowerwash_autoopen_zehnminuten_geltungsfall` | Restrict the ten-minute support note to its documented branch. |
+| `miele_g7673_einzellauf_anzeige_nach_ausschalten` | Preserve previously recorded values without reconstructing a cleared display. |
+| `spuelanzeige_zwei_personen_strom_wasser_zuordnung` | Join partial findings from two people without fabricating an absent value. |
+| `spuelprogramm_anzeige_istvergleich_extras_und_beladung` | Keep same-program displayed actuals comparable. |
+| `spuelprognose_balken_symbol_zwei_notizen_register` | Audit the labels on qualitative forecast notes. |
+| `spuelprognose_auswahlwechsel_balkenfoto_zeitzuordnung` | Determine which selection the saved view could belong to. |
+| `miele_g7673_optische_endanzeige_dunkel_geschlossen` | Interpret the documented closing-side lamp evidence with its conditions. |
+| `spuelstatus_unterbrechung_fortsetzung_neustart_abgrenzen` | Keep resumed operation distinct from a newly identified run. |
+| `spuelstatus_restzeit_und_echte_enduhrzeit_abgleich` | Compare a displayed expectation with a separately observed completion event. |
+| `miele_g7673_automatisch_aus_dokumentierter_bezug` | Scope the ten-minute automatic-off behavior without asserting that it happened. |
+| `miele_g7673_ende_trocknungsgeblaese_beobachtungsgrenze` | Separate the end marker from the post-run fan observation. |
+| `spuelanzeige_externer_zaehler_gleicher_messumfang` | Check whether an external meter and the display cover the same cycle. |
+| `spuelgesamtanzeige_intervall_geraetewechsel_beleg` | Avoid subtracting lifetime displays across replacement units. |
+| `spuelstatus_gesamtzaehler_programmmenge_laufnotizen` | Reconcile a documented run count against individual records. |
+| `spuelbeleg_doppelnotiz_gleiche_zahlen_laufidentitaet` | Preserve run identity rather than deduplicating by numeric equality. |
+| `spuelbeleg_fotoaufnahme_weitergabe_ausschalten` | Keep capture time distinct from message forwarding. |
+| `miele_g7673_einstellungen_wlan_ruecksetzbelege` | Determine retained evidence without initiating any reset. |
+| `spuelbeleg_umzug_geraetevermerk_von_raumlabel_trennen` | Keep moved-appliance evidence attached to the right physical unit. |
+| `spuelinformationsmenue_auslesefelder_geraetevermerk` | Select the proper information field for the intended reference. |
+| `miele_g7673_programmdauer_erste_auswahl_kaltwasserbasis` | Separate the first cold-water average from a running countdown. |
+| `spuelstatus_ende_um_timer_ende_zeittext_unterscheiden` | Identify whether a time label is a schedule, estimate or observed end. |
+| `spuelbeleg_verbrauch_dialog_und_zahlenablesung` | Check whether a captured prompt carries any actual consumption measurement. |
+| `philips_airfryer_ungeteiltes_stueck_nennvolumen` | Check an indivisible volume against the stated vessel scope. |
+| `philips_hd9875_90_gewichtsaussage_lebensmittelbezug` | Keep the documented frozen-fries mass claim tied to its stated example. |
+| `philips_na35x_backform_rahmenmasse_korbwahl` | Match an actual measured rectangular dish to the selected family basket. |
+| `philips_hd9945_korb_und_originalteil_beleg` | Check the actual HD9945 kit and its specified basket. |
+| `philips_hd9945_originalteile_und_fremdteile_pflege` | Keep the documented dishwasher claim attached to identified kit components. |
+| `philips_na352_sync_anzeige_und_eigene_endbeobachtung` | Compare synchronized display ends with documented task observations. |
+| `philips_na352_copy_status_gegen_sync_verwechseln` | Separate identical programmed settings from the scheduling function. |
+| `philips_na35x_max_marke_korb_beobachtung` | Compare the observed fill height with the same basket’s actual MAX mark. |
+| `philips_backform_erst_seitenfreiraum_belegen` | Verify that an apparent fit leaves observable space on all four sides. |
+| `philips_na35x_rundform_durchmesser_quellenluecke` | Keep a usable height reference when the round-dish size needs separate verification. |
+| `philips_hd9945_foermchenbedarf_kalt_gepruefte_stellplaetze` | Plan a cold mock-up using observed cup positions, not nominal package count. |
+| `philips_na352_sync_spaetere_anzeigen_weitergabe` | Preserve separate evidence when only one programmed end time changed. |
+| `philips_dualkorb_ungeteilte_form_kaltes_musterstueck` | Preserve shape evidence for a one-piece footprint without adding basket areas. |
+| `philips_na352_programmende_signal_ausgabe_unbekannt` | Resolve ambiguous end evidence instead of inferring the other basket’s state. |
+| `philips_backset_gebrauchsspuren_originalform_vergleichen` | Check whether observed rim changes invalidate an older exterior measurement. |
+| `philips_na352_sync_versetzter_beginn_beobachtung` | Separate observed start offset from the claim of a synchronized finish. |
+| `philips_na352_kit_einsatzzweck_statt_shoptitel` | Distinguish HD9945/01 bakeware and HD9920/00 rack-and-skewer evidence. |
+| `bosch_sks62e32eu_eco50_quellenwerte_rundung` | Read the exact model’s Eco 50 per-cycle figures and its rounded 100-cycle label. |
+| `bosch_sks62e32eu_programm_oder_zusatzfunktion` | Classify a named mode as the Eco test program, another program or an option. |
+| `bosch_sks62e32eu_geraeuschklasse_und_energieklasse` | Keep the noise class, energy class and sound-power declaration distinct. |
+| `kompaktspuel_nennkapazitaet_und_kochgeschirr_bezug` | Distinguish standard place-setting capacity from a recorded household load. |
+| `kompaktspuel_ladeprobe_passt_und_spruehraum_getrennt` | Separate loading, closure and documented spray clearance. |
+| `kompaktspuel_pflichtgeschirr_bereitstellung_zwei_ausgaben` | Find required groups left open after dishwasher and separately recorded completion. |
+| `kompaktspuel_vergleich_teilladung_gleichzahl_andere_gruppen` | Check required-group matching even when the two load counts are equal. |
+| `kompaktspuel_bestandsgeraet_kauf_bis_eigenbeleg` | Decide whether to keep the existing setup or pursue verification for a compact replacement. |
+| `bosch_sks62e32eu_korbmerkmal_oder_sonderzubehoer` | Distinguish a documented basket feature from separately listed special accessories. |
+| `kompaktspuel_drei_pflichtgruppen_kleinster_belegter_teilplan` | Find the smallest known split from three required dish groups and verified loading combinations. |
+| `kompaktspuel_nutzungstage_alltag_und_sonderladung` | Measure coverage of actual routine and occasional loads without counting unexamined days. |
+| `kompaktspuel_nicht_eingelegte_teile_auswahlgrund` | Distinguish excluded items from observed fit issues and untested items. |
+| `kompaktspuel_als_zweitgeraet_altgang_tatsaechlich_entfallen` | Check whether using a compact second unit actually displaced an existing run. |
+| `kompaktspuel_gemessener_wasseranteil_separater_pflichtteile` | Attribute measured water to required items omitted from the compact load. |
+| `kompaktspuel_trockenziel_kunststoff_und_sonstige_teilsets` | Record which required dish group still needed drying work after a documented Extra Dry run. |
+| `kompaktspuel_kaufentscheidung_pilot_mit_abbruchgrenze` | Preserve the observed loading limit of an intentionally stopped trial. |
+| `kompaktspuel_stromvergleich_teilaufgabe_untergrenze` | Test whether the measured compact subset already uses the energy of the full existing workload. |
 <!-- tools:end -->
 
 ## Can a MeacoDry Arete One 20L drain uphill into a sink?
@@ -1644,7 +1741,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->1580<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->1677<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.

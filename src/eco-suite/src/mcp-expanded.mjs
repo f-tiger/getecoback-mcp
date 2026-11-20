@@ -58,6 +58,11 @@ import {backofenzubehoer} from './mcp-backofenzubehoer.mjs';
 import {brausenZubehoer} from './mcp-brausen-zubehoer.mjs';
 import {geraeterollenBelege} from './mcp-geraeterollen-belege.mjs';
 import {altgeraeteRueckgabe} from './mcp-altgeraete-rueckgabe.mjs';
+import {induktionsgeschirrBelege} from './mcp-induktionsgeschirr-belege.mjs';
+import {betriebszustandBelege} from './mcp-betriebszustand-belege.mjs';
+import {spuelstatusBelege} from './mcp-spuelstatus-belege.mjs';
+import {airfryerBehaelter} from './mcp-airfryer-behaelter.mjs';
+import {kompaktspuelBelege} from './mcp-kompaktspuel-belege.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -120,6 +125,11 @@ export const expandedDefinitions = [
   ['Brausenzubehör', brausenZubehoer],
   ['Rollenzubehör', geraeterollenBelege],
   ['Altgeräte-Rücknahme', altgeraeteRueckgabe],
+  ['Induktionsgeschirr', induktionsgeschirrBelege],
+  ['Betriebszustände', betriebszustandBelege],
+  ['Spülstatus', spuelstatusBelege],
+  ['Airfryer-Behälter', airfryerBehaelter],
+  ['Kompaktspülen', kompaktspuelBelege],
 ].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));
