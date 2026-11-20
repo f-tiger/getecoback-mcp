@@ -120,6 +120,7 @@ exact MCP tool name.
 ```sh
 node src/find-tools.mjs 'Kann ich den Abflussschlauch nach oben führen?'
 node src/find-tools.mjs 'Wie lange darf ich mit 72 Litern duschen?'
+node src/find-tools.mjs 'Wäschetrockner oder Luftentfeuchter – was kostet das Trocknen pro Ladung?'
 ```
 
 The command searches the local catalogue without contacting the website. It
@@ -133,11 +134,14 @@ the sample arguments, the actual tool result and any recorded source link.
 ```sh
 node src/find-tools.mjs --example entfeuchter_ablaufcheck
 node src/find-tools.mjs --example dusche_zeit_bei_wasserbudget
+node src/find-tools.mjs --example waesche_trocknungskosten
 ```
 
 The first example explains what to check before routing a hose uphill and links
 to the model evidence. The second calculates shower duration for the sample water
-budget. Your MCP client can supply your own inputs to either tool.
+budget. For the laundry comparison, measure the kWh per load for each method and
+use your own electricity tariff. The tool leaves the result open if the two
+loads reach different levels of dryness.
 
 ## Tools
 
