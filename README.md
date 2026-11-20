@@ -1,6 +1,6 @@
 # EcoBack Raumklima — MCP server
 
-<!-- count -->1677<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->1800<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -1728,6 +1728,129 @@ Worker, and ports drift silently.
 | `kompaktspuel_trockenziel_kunststoff_und_sonstige_teilsets` | Record which required dish group still needed drying work after a documented Extra Dry run. |
 | `kompaktspuel_kaufentscheidung_pilot_mit_abbruchgrenze` | Preserve the observed loading limit of an intentionally stopped trial. |
 | `kompaktspuel_stromvergleich_teilaufgabe_untergrenze` | Test whether the measured compact subset already uses the energy of the full existing workload. |
+| `leitungswasser_filterkanne_bedarf_oder_abklaerung` | Identify whether a jug purchase is optional or source clarification comes first. |
+| `brita_maxtra_pro_kartuschenvariante_haertedaten_lesen` | Match manufacturer positioning without inferring reduction. |
+| `brita_maxtra_pro_wechsel_kalender_und_mengenbeleg` | Check which published replacement trigger is documented. |
+| `brita_aktivierung_trichterfuellung_nicht_liter` | Reconcile the different first-use evidence units. |
+| `brita_kartusche_namenswechsel_altbestand_abgleichen` | Identify an officially listed predecessor without copying its capacity claim. |
+| `brita_flow_perfectfit_merkmal_ausnahme` | Check whether the exact jug uses the documented PerfectFit mechanism. |
+| `brita_deckelanzeige_zeit_oder_zeit_und_menge` | Compare a time reminder against time-plus-volume indication. |
+| `brita_filterkanne_teil_und_spuelprogramm_beleg` | Compare dishwasher and hand-care evidence for the actual component. |
+| `brita_smart_light_blinken_nach_reset_oder_status` | Interpret the recorded LED in its event context. |
+| `brita_anzeigedeckel_getauscht_nutzungszaehler_zuordnung` | Keep paired indicator history separate from vessel identity. |
+| `brita_filterkanne_laengere_pause_zustand_protokoll` | Check the observed break state with the manual’s pause instructions. |
+| `brita_filterwasser_nachgiessen_erste_menge_zeitbezug` | Track the oldest remaining batch instead of treating a top-up as a fresh start. |
+| `brita_flow_style_gesamtvolumen_vorrat_trennen` | Flag purchases based on gross rather than filtered capacity. |
+| `brita_maxtra_pro_tropfenquelle_vor_wirkungsannahme` | Triage missing flow documentation before attributing a filter defect. |
+| `brita_maxtra_pro_karton_folie_feuchtebeobachtung` | Route observations about a new cartridge without judging suitability. |
+| `brita_microdisc_haertezweck_vs_maxtra_kanne` | Match an existing filter to its documented purpose. |
+| `brita_maxtra_kanne_eingangswasser_quellenrahmen` | Check documented feed-water scope without evaluating quality. |
+| `brita_kanne_nach_amtlicher_aufhebung_belegtrennung` | Record upkeep after a verified lifting of an official notice. |
+| `brita_flow_fester_standort_nachfuellen_und_zapfen` | Identify access limits when the station body fits. |
+| `brita_maxtra_pro_rueckgabe_uebergabe_quittung` | Track confirmed recycling handoff without inventing acceptance. |
+| `brita_kannenprotokoll_trichter_oben_vorrat_unten` | Distinguish pending top-chamber volume from filtered reserve. |
+| `brita_maxtra_mengenjournal_mit_zwischenstand_wechsel` | Keep the same cartridge total through a jug move and stop at the next cartridge. |
+| `waschzeichen_grad_balken_ablesen` | Read wash temperature and mechanical treatment from one symbol. |
+| `waschzeichen_handwaesche_umgebung_oder_40` | Distinguish both hand-wash symbols and no household washing. |
+| `bleichzeichen_dreieck_markierung_ablesen` | Decode all bleaching, oxygen-only bleaching or no bleaching. |
+| `trocknerzeichen_kreis_im_quadrat_punkte` | Decode normal, mild or prohibited drum drying. |
+| `naturtrocknen_quadrat_striche_schatten` | Decode flat or line drying, dripping wet and shade. |
+| `buegelzeichen_punkte_dampf_normausgabe` | Read ironing heat and steam markings with edition-aware ceilings. |
+| `fachpflegezeichen_kreis_p_f_w_unterscheiden` | Identify dry and wet professional care from the garment circle. |
+| `fachpflege_balken_mit_betriebsangebot_abgleichen` | Check that a quote names the same professional process and respects its mildness. |
+| `pflegeetikett_naturweg_bei_trocknerverbot` | Confirm a separate air-drying instruction when drum drying is prohibited. |
+| `pflegeetikett_foto_zeichenrand_und_balken` | Distinguish readable centers from cropped treatment bars. |
+| `pflegeetikett_fuenf_symbolgruppen_reihenfolge` | Check completeness and order of a five-position care row. |
+| `pflegeetikett_shoptext_widerspruch_am_stueck` | Determine what can be established when a seller contradicts a sewn-in garment tag. |
+| `pflegeetikett_zwei_eingenaehte_gesamtangaben_widerspruch` | Isolate a genuine whole-garment conflict. |
+| `pflegeetikett_schriftzusatz_und_symbol_bedingungen` | Keep a written garment preparation instruction separate from the symbol limit. |
+| `textilfaserangabe_und_pflegekennzeichnung_trennen` | Track the separate evidence for fibre composition and garment care. |
+| `pflegeetikett_import_legende_des_konkreten_zeichens` | Choose the proper care legend without inferring the system from a country. |
+| `pflegeetikett_shop_farb_und_artikelvariante_vor_kauf` | Qualify care evidence for a specific shopping variant. |
+| `bleichzeichen_gegen_waschmittel_herstellerdeklaration` | Check the declared bleaching class against a garment restriction. |
+| `pflegeetikett_clevercare_logo_und_symbolreihe_trennen` | Separate informational care tips from the garment limits. |
+| `pflegeetikett_fehlendes_eingenaehtes_etikett_suchweg` | Find a care authority when a garment appears to have no sewn-in label. |
+| `tuerzugluft_raumtuer_wohnungseingang_naechster_schritt` | Triage drafts at a room or apartment entrance door by its protection role and planned airflow before any change. |
+| `tuer_schutzkennzeichnung_bauunterlage_belegstatus` | Distinguish records for the exact door assembly from clues such as a closer or an unreadable label. |
+| `schutztuer_fachliche_anfrage_systembezug_unterlagen` | Identify missing details for a professional enquiry about the exact fire or smoke door assembly. |
+| `tuerschliesser_normale_endstellung_ereignisbeleg` | Record the visible final position of a self-closing door during normal use. |
+| `tuerbodenspalt_geplanter_ueberstroemweg_abluftzuordnung` | Read the documented transfer-air path for mechanical exhaust in a bathroom, kitchen, or WC. |
+| `tuerzugluft_abluft_an_aus_beobachtung` | Compare observed drafts during normal exhaust-on and exhaust-off periods with comparable door and window conditions. |
+| `tesa_tuerbodenprofil_belag_groesster_spalt` | Compare the largest of three measured door-bottom gaps and the flooring with the German tesa profile specification. |
+| `tesa_tuerbodendichtung_montage_rueckstandsfrei` | Read the German tesa specification for attachment and residue-free removal of the named door-bottom seal. |
+| `tuerbodendichtung_innenbeleg_ausseneinsatz_uebertragen` | Check whether separate evidence covers using an indoor door-bottom seal on an apartment entrance or exposed door. |
+| `tuerbodendoppeldichtung_05418_zwei_bodenseiten_abgleich` | Compare the flooring on both sides of an ordinary room door with the smooth-floor scope of the German tesa 05418 double seal. |
+| `tuerbodenspalt_schwellenoberkante_bezug` | Derive the door-bottom gap from door and threshold heights measured at the same point and reference level. |
+| `tuer_bodenberuehrung_bewegungsphase_ort` | Record where already observed contact occurred while opening or closing an ordinary door. |
+| `tuer_bestehender_kontakt_aenderung_zeitpunkt` | Classify whether previously recorded floor contact predated an authorised change to an ordinary room door. |
+| `tuergriff_kraft_wirksamer_hebel_moment` | Convert a documented opening force and its effective perpendicular lever arm to opening torque. |
+| `tuer_selbstschliessen_persoenlicher_durchgang_zeitbezug` | Compare a person's documented passage time with the observed time available at the same self-closing doorway. |
+| `tuerzugang_griff_manoevrieren_passage_getrennt` | Record handle reach, manoeuvring and passage separately for an already observed door use. |
+| `tuerzugluft_unterkante_und_falz_getrennte_stellen` | Record repeated drafts at the bottom edge, around the frame, or in both places on a closed door. |
+| `tuerbodenprodukt_spalthoehe_vs_buerstenlaenge_beleg` | Distinguish the manufacturer's maximum gap height for a tesa product from brush length, door width and seller wording. |
+| `tuer_zugluftstopper_lose_durchgangsbeobachtung` | Record whether a loose draught stopper stays outside the passage, moves into it or obstructs observed use. |
+| `rauchschutztuer_offenstellung_system_nachweis_zuordnung` | Distinguish documented system-specific hold-open equipment from a loose object or an unresolved condition on a protective door. |
+| `tuerzugluft_wiederholung_nutzung_kaufpruefung` | Check whether repeated drafts at a normally closed door cause a documented everyday problem before considering a purchase. |
+| `roboter_ersatzfilter_exakte_de_zuordnung` | Check the exact German compatibility listing for a robot replacement part |
+| `saros10r_zubehoerset_bedarf_nach_teilrollen` | Match a confirmed Saros 10R kit against separate missing part roles |
+| `dreame_station_orange_weiss_signalzustand` | Interpret a status light using the exact listed Dreame dock manual |
+| `roboter_aufladung_fenster_mit_start_und_ende` | Check completed charging evidence against the documented low-to-full reference |
+| `roomba_aufladefehler21_aufnahme_und_ladeverlust` | Compare a recorded on-dock charge loss with iRobot code 21 |
+| `roboter_stationskontakt_und_sensor_pflegemethode` | Separate documented care media for contacts and sensor windows |
+| `dreame_d10_absaugung_nicht_stoeren_verlauf` | Check whether recorded D10 auto-empty suppression matches the applicable DND state |
+| `roboter_zwischenladen_rueckkehrart_fortsetzung` | Explain why a documented cleaning run did not resume after docking |
+| `dreame_l10s_wasserstand_waschplatte_sichtbelege` | Isolate documented abnormal washboard drainage observations |
+| `dreame_l10s_resttropfen_tank_gegen_wiederkehrende_naesse` | Distinguish a documented tank-seat residual from recurring external wetness |
+| `dreame_l10s_andocken_rampenbeobachtung_ort` | Localize an observed docking failure without repeating an unsafe attempt |
+| `saros10r_waschdock_laufstart_und_stationswechsel` | Audit documented conditions for a Saros 10R automatic wash return |
+| `saros10r_trocknung_luftauslass_und_modus` | Check recorded Saros drying mode and outlet condition separately |
+| `saros10r_reinigungsfluessigkeit_kartusche_rolle` | Distinguish a supported Saros solution cartridge from the water tank |
+| `roomba_combo_j5_behaelterrolle_selbstentleerung` | Account for the documented bin-dependent self-empty function |
+| `roomba_absaugdock_app_taste_und_manueller_erfolg` | Distinguish the documented communication path when local evacuation works |
+| `roomba_absaugdock_rotes_blinken_und_neuversuche` | Interpret recorded AutoEmpty blockage signals without disassembly |
+| `roomba_combo10max_absaugstart_kurze_wartebeobachtung` | Check observation coverage for the Combo 10 Max auto-empty delay |
+| `roboter_filter_waschhinweis_nach_exakter_rolle` | Compare explicit washing instructions for a documented robot dust filter |
+| `roomba_j_volle_behaeltermeldung_nach_evakuierung` | Correlate Roomba error 36 with the observed result of the same evacuation |
+| `roomba_comboj9_stationstaste_sicherung_nachweis` | Check recorded dock-button lock evidence before diagnosing an unresponsive dock |
+| `roboter_stillstand_letzte_dokumentierte_ladung` | Check complete months since a documented storage charge |
+| `dreame_station_tank_oder_absaugfunktion_erwartung` | Verify whether the actual dock offers the expected water function |
+| `saros10r_pausenzeit_und_schlafzustand` | Interpret the Saros pause timeline independently of the charger |
+| `kuehlschrank_klimaklasse_sn_n_st_t_typenschild` | Decode refrigerator climate classes and retain uncertainty for a paired badge |
+| `kuehlkombi_kgn39vxct_winterschaltung_belegt` | Verify the named fridge-freezer winter-setting claim against its German EU sheet |
+| `kuehlgefrier_kombi_kuehlvolumen_gefrierliter_mindestbedarf` | Screen two distinct fridge-freezer volume requirements at once |
+| `kuehlschrank_drei_vier_sterne_einfrieren_fachtyp` | Interpret a documented freezer compartment type before buying |
+| `kuehlschrank_zwei_sterne_abteil_eingebettet_volumen` | Reconcile compartment volume without double-counting a two-star subsection |
+| `kuehlgeraet_verstellbarer_raumteiler_label_pruefstellung` | Locate the test state of an adjustable-volume refrigerator divider |
+| `kuehlkombi_wechselzone_zugleich_kuehl_gefrierbedarf` | Test mutual exclusivity of a convertible cooling zone at the buying stage |
+| `kuehlschrank_luftschallemissionsklasse_db_schwellen` | Read the noise class and special low-noise definition from the correct sound-power value |
+| `kuehlkombi_kgn39vxct_led_effizienzklasse_geraet` | Separate appliance and light-source efficiency ratings in an exact fiche |
+| `kuehlschrank_altes_a_plus_label_neues_eu_label_vergleich` | Check label generations without cross-walking old and new efficiency letters |
+| `kuehlschrank_effizienzklasse_gegen_absolute_jahres_kwh_rangfolge` | Identify a fridge efficiency-class versus annual-energy ranking inversion |
+| `kuehlschrank_eulabel_prueftemperatur_16_32_haushaltsprognose` | Identify label test conditions without inferring annual energy at a household temperature |
+| `kuehlschrank_eulabel_fachliter_erst_summieren_dann_runden` | Reconcile two compartment values with the rounded EU label total |
+| `kuehlkombi_kgn39vxct_vitafresh_kaltlagerfach_eulabel` | Distinguish a marketed refrigerator drawer from a declared regulatory compartment |
+| `kuehlkombi_kgn39vxct_kuehlkreislauf_getrennt_strom` | Interpret what the two documented cooling circuits actually establish |
+| `kuehlkombi_geraetetausch_uebergangsfenster_kuehl_gefrier` | Flag independent cold-storage coverage gaps through replacement |
+| `kuehlschrank_wechsel_geraetepaar_labelvergleich_bestand` | Reconcile a one-versus-two cabinet replacement energy scenario |
+| `kuehlkombi_freistehend_perfect_fit_nische_einbauart` | Separate a freestanding model niche claim from built-in installation evidence |
+| `kuehlschrank_kaltes_fach_grosse_schale_ablagebelegung` | Check simultaneous tray and shelf use in one witnessed refrigerator layout |
+| `kuehlschrank_kellerfach_kaltlagerfach_zieltemperatur_datenblatt` | Distinguish cellar, chill and fresh-food compartment test targets |
+| `led_ersatzfassung_schnittstelle_geraetehuelle` | Screen a household replacement against the existing fixture specifications. |
+| `led_leuchte_austauschpiktogramm_lichtquelle_betriebsgeraet` | Separate the declared user or professional replacement routes for both parts. |
+| `led_eu_label_lichtquelle_umgebendes_produkt` | Classify the label scope before comparing packaged offers. |
+| `led_eprel_qr_modellbeleg_verpackung` | Check the EPREL destination and model identity, not the mere presence of a QR code. |
+| `ledvance_par16_4099854059810_zwei_modellkennungen` | Disambiguate the two variants published for one exact retail GTIN. |
+| `led_halbwertswinkel_nutzlichtstrom_messkegel_90_120_360` | Interpret the 90°, 120° and 360° flux reporting scopes without confusing them with beam width. |
+| `led_lumen_candela_lux_bezugsraum_vergleichen` | Preserve photometric quantity and scope rather than converting one number blindly. |
+| `led_spot_halbwertskreis_geometrie_arbeitsflaeche` | Estimate the idealized beam footprint rather than inferring desk lux. |
+| `led_energielabel_1000_stunden_aufgerundet_pon` | Check rounding coherence rather than reading the label as exact watts or annual energy. |
+| `led_kelvin_farben_wiedergeben_getrennte_kaufziele` | Keep correlated colour temperature and Ra as separate buying criteria. |
+| `ledvance_par16_ac45730_merten_meg5137_dimmertest` | Retrieve the historical AC45730 × MEG5137-0000 result for one or four lamps only. |
+| `led_dimmen_minimum_start_schon_leuchtend` | Distinguish low-level restart from dimming an already operating lamp. |
+| `led_flimmermass_pstlm_svm_dimmlage_beleg` | Keep distinct temporal-light metrics tied to their declared operating state. |
+| `led_lebensdauer_l70b50_garantie_unterscheiden` | Identify what a lifespan claim can support before relying on it for one lamp. |
+| `led_ersatz_geschlossenes_gehaeuse_umgebung_beleg` | Check the specific enclosure condition instead of generalizing an indoor-use claim. |
+| `led_arbeitsflaeche_drei_luxpunkte_gegen_basis` | Check a matched centre-and-edge lux comparison before treating a spot as an even task light. |
 <!-- tools:end -->
 
 ## Can a MeacoDry Arete One 20L drain uphill into a sink?
@@ -1741,7 +1864,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->1677<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->1800<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
