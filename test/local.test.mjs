@@ -450,6 +450,85 @@ function compactReplies(requests) {
   });
 }
 
+test('offline stdio checks German N90 identity and separates it from energy-cost intent', () => {
+  const name = 'pac_n90_ean_abgleichen';
+  const costs = 'pac_n90_energielabel_zu_stromkosten';
+  const citation = 'https://getecoback.com/guide/delonghi-pac-n90-test.html';
+  const guide = citation + '#testlage';
+  const exact = 8004399512351;
+  const label = 'PAC N90 ECO Silent';
+  const queries = [
+    ['8004399512351', name],
+    ['De’Longhi PAC N90: Ist der Barcode 8004399512351 auf dem Typenschild richtig?', name],
+    ['Ist das Angebot für den DeLonghi PAC N90 dieselbe Modellvariante?', name],
+    ['Ist das Angebot mit 8004399512351 auch die ECO-Silent-Version?', name],
+    ['Stimmt die Typenbezeichnung De’Longhi PAC N90 im deutschen Angebot ohne ECO Silent?', name],
+    ['DeLonghi PAC N90 ECO Silent Energielabel Stromkosten 8004399512351', costs],
+    ['Was verbraucht das PAC N90 ECO Silent laut EAN 8004399512351 im Betrieb?', costs],
+    ['PAC N90 mit EAN 8004399512351: Leistungsaufnahme in W?', costs],
+  ];
+  const unrelated = [
+    'Welcher GTIN steht auf dem Typenschild des DeLonghi PAC EX105?',
+    'DeLonghi PAC EX105 Energielabel Stromkosten',
+  ];
+  const cases = [
+    [{ean: exact, modell: label}, 'modellangaben_passen'],
+    [{ean: exact, modell: 'abweichend'}, 'modellbezeichnung_klaeren'],
+    [{ean: exact, modell: 'unbekannt'}, 'modellbezeichnung_klaeren'],
+    [{ean: exact + 1, modell: label}, 'ean_abweicht'],
+    [{ean: 0, modell: label}, 'ean_fehlt'],
+    [{ean: 0, modell: 'unbekannt'}, 'ean_fehlt'],
+  ];
+  const invalid = [{ean: exact}, {ean: String(exact), modell: label},
+    {ean: exact + 0.5, modell: label}, {ean: 123456789012, modell: label},
+    {ean: exact * 10, modell: label}, {ean: exact, modell: 'PAC N90 ECO'},
+    {ean: -1, modell: label}];
+  const args = [...cases.map(([input]) => input), ...invalid];
+  const search = [...queries.map(([frage]) => frage), ...unrelated];
+  const compact = compactReplies([
+    ...search.map(frage => toolCall(compactFind, {frage})),
+    ...args.map(eingaben => toolCall(compactRun, {name, eingaben})),
+  ]);
+  for (const [index, [query, expected]] of queries.entries()) {
+    const hits = compact[index].result.structuredContent.tools;
+    const first = hits[0];
+    assert.deepEqual(first, findTools(query).tools[0]);
+    assert.equal(first?.name, expected, query);
+    assert.equal(first.citation_url, citation);
+    assert.equal(first.guide_url, expected === name ? guide : citation + '#n90-energielabel');
+    if (expected === name) {
+      assert.ok(!hits.some(tool => tool.name === costs), query);
+      assert.deepEqual(first.inputSchema.required, ['ean', 'modell']);
+      assert.deepEqual(first.inputSchema.properties.modell.enum, [label, 'abweichend', 'unbekannt']);
+    }
+  }
+  for (const [index, query] of unrelated.entries()) {
+    const hits = compact[queries.length + index].result.structuredContent.tools;
+    assert.ok(!hits.some(tool => [name, costs].includes(tool.name)), query);
+  }
+  const jobs = args.map((input, index) => ({jsonrpc: '2.0', id: index + 1, ...toolCall(name, input)}));
+  const full = new Map(readStdio(jobs).map(reply => [reply.id, reply.result]));
+  for (const [index] of args.entries()) {
+    const result = full.get(index + 1);
+    assert.deepEqual(result, compact[search.length + index].result);
+    if (index >= cases.length) {
+      assert.equal(result.isError, true);
+      assert.equal(result.structuredContent, undefined);
+      continue;
+    }
+    assert.equal(result.isError, false);
+    const data = result.structuredContent;
+    assert.deepEqual([data.referenz_ean, data.referenz_modell, data.status], [exact, label, cases[index][1]]);
+    assert.deepEqual([data.citation_url, data.guide_url], [citation, guide]);
+    assert.equal(data.hersteller_url, 'https://www.delonghi.com/de-de/s/PACN90ECOSILENT');
+    assert.equal(data.datenblatt_url,
+      'https://shop.sonepar.at/asset_external/downloads/pim/400901/datasheet_delonghi_PAC%20N90ECO.pdf');
+    assert.match(data.datenblatt_hinweis, /österreichischen.*Lieferumfang.*Bestand/);
+    assert.match(data.naechster_schritt, index === 0 ? /Abluftweg/ : /Typenschild/);
+    assert.doesNotMatch(result.content[0].text, /https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('offline stdio checks exact, touching and clipped hygrometer measurement ranges', () => {
   const name = 'hygrometer_messbereiche';
   const citation = 'https://getecoback.com/guide/luftfeuchtigkeit-richtig-messen.html';

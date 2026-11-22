@@ -13,6 +13,8 @@ const air = '/guide/luftreiniger-ratgeber.html';
 const n90Page = '/guide/delonghi-pac-n90-test.html';
 const n90Ean = 8004399512351;
 const n90Model = 'PAC N90 ECO Silent';
+const n90Support = 'https://www.delonghi.com/de-de/s/PACN90ECOSILENT';
+const n90Datasheet = 'https://shop.sonepar.at/asset_external/downloads/pim/400901/datasheet_delonghi_PAC%20N90ECO.pdf';
 const n90Label = 'https://library.delonghigroup.com/assetbank-delonghi/action/directLinkImage?assetId=209150&download=true';
 
 const bool = description => ({type:'boolean', description});
@@ -24,6 +26,7 @@ const rounded = value => Math.round(value * 100) / 100;
 const cellarMeasurement = (key, description) => number(description, ...CELLAR_VENTILATION_BOUNDS[key]);
 
 function n90ModelStatus(ean, modell) {
+  if (ean === 0) return 'ean_fehlt';
   if (ean !== n90Ean) return 'ean_abweicht';
   return modell === n90Model ? 'modellangaben_passen' : 'modellbezeichnung_klaeren';
 }
@@ -191,15 +194,21 @@ export const evidenceNext = [
   },
   {
     name:'pac_n90_ean_abgleichen',
-    description:'EAN und Modellangabe des PAC N90 ECO Silent gegen deutsche Unterlagen prüfen — Check the advertised model and GTIN for the documented German PAC N90 ECO Silent.',
+    description:'Modell, EAN 8004399512351 und Typenschild des De’Longhi PAC N90 ECO Silent vor dem Kauf abgleichen — Check the advertised model and GTIN for the documented German PAC N90 ECO Silent.',
     page:n90Page,
+    guide_url:'https://getecoback.com' + n90Page + '#testlage',
     properties:{
-      ean:number('Als Zahl geschriebene EAN vom Angebot oder Typenschild.',1000000000000,9999999999999),
+      ean:number('Als Zahl geschriebene 13-stellige EAN vom Angebot oder Typenschild. Bei fehlender EAN 0.',0,9999999999999),
       modell:choice('Zusätzliche Modellbezeichnung.', n90Model,'abweichend','unbekannt'),
     },
     calculate({ean,modell}) {
-      if (!Number.isSafeInteger(ean)) throw new RangeError('EAN');
-      return {referenz_ean:n90Ean,status:n90ModelStatus(ean,modell),
+      if (!Number.isSafeInteger(ean) || (ean !== 0 && ean < 1000000000000)) throw new RangeError('EAN');
+      const status = n90ModelStatus(ean,modell);
+      return {referenz_ean:n90Ean,referenz_modell:n90Model,status,
+        hersteller_url:n90Support,datenblatt_url:n90Datasheet,datenblatt_hinweis:'De’Longhi-Datenblatt beim österreichischen Vertriebspartner Sonepar; kein Nachweis für einen deutschen Lieferumfang oder aktuellen Bestand.',
+        naechster_schritt:status === 'modellangaben_passen' ?
+          'Lieferumfang, Aufstellung und Abluftweg für das konkrete deutsche Angebot separat prüfen.' :
+          'Vor einer Bestellung vollständige Modellbezeichnung und EAN am Typenschild oder beim Händler klären. Für abweichende Modelle die eigenen Unterlagen prüfen.',
         grenze:'Zwei passende Angaben identifizieren den dokumentierten Typ. Händler und Lieferumfang separat prüfen.'};
     },
     example:{args:{ean:8004399512351,modell:'PAC N90 ECO Silent'},expect:{status:'modellangaben_passen'}},
@@ -222,7 +231,7 @@ export const evidenceNext = [
       if (arbeitspreis_eur_kwh < 0 && arbeitspreis_eur_kwh !== -1) throw new RangeError('Arbeitspreis');
       if (!Number.isInteger(messdauer_min)) throw new RangeError('Messdauer');
 
-      const status = ean === 0 ? 'ean_fehlt' : n90ModelStatus(ean,modell);
+      const status = n90ModelStatus(ean,modell);
       const exactModel = status === 'modellangaben_passen';
       const tariffKnown = arbeitspreis_eur_kwh >= 0;
       const measurementReady = exactModel && messung_vollstaendig && messdauer_min > 0;
@@ -238,7 +247,7 @@ export const evidenceNext = [
         messzeitraum_eur:measurementReady && tariffKnown ? rounded(messenergie_kwh * arbeitspreis_eur_kwh) : null,
         messwert_eur_je_stunde:measurementReady && tariffKnown ? rounded(messenergie_kwh * arbeitspreis_eur_kwh * 60 / messdauer_min) : null,
         quellenmarkt:'DE', quellen_geprueft_am:'2026-11-20',
-        energielabel_url:n90Label, hersteller_url:'https://www.delonghi.com/de-de/s/PACN90ECOSILENT',
+        energielabel_url:n90Label, hersteller_url:n90Support,
         naechster_schritt:exactModel
           ? 'Eigenen Tarif und vollständige kWh-Messung des eigenen Laufs heranziehen. Reichen Verschattung und Lüften, zunächst ohne Kauf auskommen.'
           : 'Vor dem Kauf EAN und vollständige Variante am Typenschild oder beim Händler prüfen. Bei anderer Variante das zugehörige eigene Energieetikett suchen.',
