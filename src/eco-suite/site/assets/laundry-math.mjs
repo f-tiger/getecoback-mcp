@@ -22,6 +22,7 @@ export function laundryShareText(input,provenance='entered'){
  const result=laundry(input),{currency}=input;
  const energy=new Intl.NumberFormat('de-DE',{maximumFractionDigits:10});
  const cost=new Intl.NumberFormat('de-DE',{style:'currency',currency});
+ const amount=value=>cost.format(Number(value.toFixed(10)));
  const price=laundryTariff(input.price,currency);
  const dryerBasis=input.dryerBasis==='hundred'?'Labelwert je 100 Zyklen ÷ 100':'eingegebene kWh je Ladung';
  const dehumBasis=input.method==='estimate'?'aus mittlerer Leistung × Laufzeit geschätzt':'eingegebene kWh je Durchgang';
@@ -31,8 +32,8 @@ export function laundryShareText(input,provenance='entered'){
  return [
   'Direkte Stromkosten je vollständigem Trocknungsdurchgang',
   `${basis}. Trockner: ${dryerBasis}. Entfeuchter: ${dehumBasis}.`,
-  `Trockner: ${energy.format(result.dryer)} kWh × ${price}/kWh = ${cost.format(result.dryerCost)}`,
-  `Entfeuchter: ${energy.format(result.dehum)} kWh × ${price}/kWh = ${cost.format(result.dehumCost)}`,
+  `Trockner: ${energy.format(result.dryer)} kWh × ${price}/kWh = ${amount(result.dryerCost)}`,
+  `Entfeuchter: ${energy.format(result.dehum)} kWh × ${price}/kWh = ${amount(result.dehumCost)}`,
   comparison,
   'Raumheizung, Lüftungswärme, Kaufpreis und Zeit sind nicht enthalten.',
   `Rechenweg bei EcoBack: ${LAUNDRY_SHARE_URL}`,
