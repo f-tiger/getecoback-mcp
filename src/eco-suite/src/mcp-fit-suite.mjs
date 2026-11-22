@@ -10,6 +10,7 @@ import {SCHEMA, decide} from '../site/assets/family-workshop-rules.mjs';
 const robotPage = '/guide/saugroboter-kaufberatung.html';
 const floorPage = '/guide/saugwischer-kaufberatung.html';
 const filterPage = '/ersatzfilter.html';
+const filterUrl = 'https://getecoback.com' + filterPage;
 const workshopPage = '/familienwerkstatt.html';
 
 const number = (description, minimum, maximum) => ({type:'number', minimum, maximum, description});
@@ -207,6 +208,7 @@ export const fitSuite = [
     name:'luftreiniger_ersatzfilter_zuordnung',
     description:'Geprüften deutschen Ersatzfilter anhand der exakten Modellvariante zuordnen — Resolve manufacturer-documented replacement filters for exact German models.',
     page:filterPage,
+    guide_url:filterUrl+'#finder',
     properties:{model:choice('Exakte Modellkennung gemäß Typenschild. Andere Serien und Modellzusätze als unknown angeben.', ...filterCatalog.items.map(({id})=>id),'unknown')},
     calculate({model}) {
       const item = filterCatalog.items.find(entry=>entry.id === model);
@@ -214,9 +216,10 @@ export const fitSuite = [
       const state = availability(item);
       return {status:state.active ? 'documented_variant' : 'source_recheck', exact_model:item.models[0],
         filter_name:state.active ? item.name : null, part_number:state.active ? item.part_number || null : null,
-        manufacturer_source:item.source_url, source_checked:item.checked_at, limit:item.note};
+        manufacturer_source:item.source_url, source_checked:item.checked_at, limit:item.note,
+        model_guide_url:filterUrl+'#'+item.id};
     },
-    example:{args:{model:'unknown'},expect:{status:'identify_model'}},
+    example:{args:{model:'beurer-lr401'},expect:{exact_model:'LR 401',model_guide_url:filterUrl+'#beurer-lr401'}},
   },
   {
     name:'luftreiniger_filter_faelligkeit',

@@ -1,3 +1,4 @@
+import {exactGermanFilterModel} from './exact-filter-intent.mjs';
 import {asksForCellarVentilationCheck} from './cellar-ventilation-intent.mjs';
 import {asksForDehumidifierDrainRoute} from './dehumidifier-drain-intent.mjs';
 
@@ -362,7 +363,8 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   }
   const results = ranked.sort((a, b) => b.score - a.score).map(result => result.tool);
   let preferredName;
-  if (asksForDehumidifierDrainRoute(focus.query)) preferredName = 'entfeuchter_ablaufcheck';
+  if (exactGermanFilterModel(focus.query)) preferredName = 'luftreiniger_ersatzfilter_zuordnung';
+  else if (asksForDehumidifierDrainRoute(focus.query)) preferredName = 'entfeuchter_ablaufcheck';
   else if (cellarVentilation) preferredName = cellarVentilationTool;
   else if (fritzValve) preferredName = fritzValveTool;
   else if (singleLaundry) preferredName = singleLaundryTool;
