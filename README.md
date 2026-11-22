@@ -6,7 +6,7 @@ Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
 [Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
-<!-- count -->2022<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2023<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -363,6 +363,7 @@ separately measured loads reach different levels of dryness.
 | `maehroboter_steigungsprofil` | Compare measured grade with the exact limit for mowing area, boundary or passage. |
 | `maehroboter_maehfenster` | Estimate whether a mowing plan fits user-supplied permitted and supervised time windows. |
 | `schubladentrenner_zuschnitt` | Size a non-load-bearing drawer divider prototype from internal dimensions and clearance. |
+| `keller_lueften_taupunkt_messwerte` | Compare paired indoor/outdoor dew points and the coldest measured wall to assess basement drying and condensation. |
 | `geraet_testzitat_einordnen` | Qualify a best-in-test claim by model, test group and date. |
 | `haendler_link_modellnachweis` | Identify what a merchant link establishes about the exact model. |
 | `angebot_lagerstatus_zitieren` | Qualify an availability quote by exact offer and observation date. |
@@ -2224,7 +2225,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->2022<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2023<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.

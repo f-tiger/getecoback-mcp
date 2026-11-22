@@ -450,6 +450,85 @@ function compactReplies(requests) {
   });
 }
 
+test('both offline stdio profiles make cellar ventilation decisions from five measured values', () => {
+  const name = 'keller_lueften_taupunkt_messwerte';
+  const legacy = 'taupunkt_lueften';
+  const citation = 'https://getecoback.com/guide/keller-lueften-sommer.html';
+  const guide = citation + '#taupunkt';
+  const indoor = {innen_c:17,innen_rh_prozent:65};
+  const outside = {aussen_c:10,aussen_rh_prozent:80};
+  const initial = {...outside,...indoor,wand_c:15};
+  const cases = [
+    [{...initial,aussen_c:28,aussen_rh_prozent:60},['kondensationsrisiko',19.5,10.4,-4.5,-9.1,false]],
+    [initial,['probeweise_lueften',6.7,10.4,8.3,3.7,false]],
+    [{...initial,wand_c:7},['grenzbereich_nachmessen',6.7,10.4,0.3,3.7,true]],
+    [{...initial,aussen_c:20,aussen_rh_prozent:70,wand_c:16},['keine_trocknung',14.4,10.4,1.6,-4,false]],
+    [{...initial,aussen_rh_prozent:100,innen_c:20,wand_c:11},['grenzbereich_nachmessen',10,13.2,1,3.2,true]],
+  ];
+  const invalid = [{...outside,innen_c:17,wand_c:15},{...initial,innen_rh_prozent:0},{...initial,wand_c:'15'}];
+  const queries = [
+    'Soll ich meinen Keller jetzt lüften? Draußen 28 °C und 60 %, drinnen 17 °C und 65 %, Wand 15 °C.',
+    'Kann ich das Kellerfenster jetzt öffnen, draußen 10 °C und 80 %, innen 17 °C und 65 %, die Wand 15 °C?',
+  ];
+  const unrelated = [
+    'Wie lange soll ich meinen Keller lüften und wie oft?',
+    'Wie lüfte ich den Keller bei Radon?',
+    'Wie soll ich bei erhöhtem CO₂ im Keller lüften?',
+    'Wie soll ich bei erhöhtem CO2 im Keller lüften?',
+    'Darf ich bei Wassereintritt in den Keller lüften oder soll zuerst ein Gutachter kommen?',
+    'Keller feuchte Wand: Außen 28 Grad/60 %, innen 17 Grad/65 %. Was ist die Ursache der nassen Stelle?',
+    'Kann ich verschimmelte Kartons im Keller durch Lüften trocknen?',
+  ];
+  const inputs = [...cases.map(([args])=>args),...invalid];
+  const legacyArgs = {aussen_temp_c:18,aussen_luftfeuchte_prozent:60,innen_temp_c:16};
+  const compact = compactReplies([
+    ...[...queries,...unrelated].map(frage=>toolCall(compactFind,{frage})),
+    ...inputs.map(eingaben=>toolCall(compactRun,{name,eingaben})),
+    toolCall(compactRun,{name:legacy,eingaben:legacyArgs}),
+  ]);
+  for (const [index,frage] of queries.entries()) {
+    const first = compact[index].result.structuredContent.tools[0];
+    assert.equal(first?.name,name,frage);
+    assert.deepEqual(first,findTools(frage).tools[0]);
+    assert.equal(first.guide_url,guide);
+    assert.deepEqual(first.inputSchema.required,Object.keys(initial));
+  }
+  for (const [index,frage] of unrelated.entries()) {
+    const hits = compact[queries.length+index].result.structuredContent.tools;
+    assert.ok(!hits.some(tool=>tool.name===name),frage);
+  }
+  const jobs = [
+    ...inputs.map((args,index)=>({jsonrpc:'2.0',id:index+1,...toolCall(name,args)})),
+    {jsonrpc:'2.0',id:inputs.length+1,...toolCall(legacy,legacyArgs)},
+  ];
+  const standard = new Map(readStdio(jobs).map(reply=>[reply.id,reply.result]));
+  for (const [index] of inputs.entries()) {
+    const result = standard.get(index+1);
+    assert.deepEqual(result,compact[queries.length+unrelated.length+index].result);
+    if (index >= cases.length) {
+      assert.equal(result.isError,true);
+      assert.equal(result.structuredContent,undefined);
+      continue;
+    }
+    assert.equal(result.isError,false);
+    const data = result.structuredContent;
+    assert.deepEqual([
+      data.status,data.aussen_taupunkt_c,data.innen_taupunkt_c,data.abstand_wand_aussentaupunkt_c,
+      data.abstand_innen_aussentaupunkt_c,data.kondensation_innen_moeglich,
+    ],cases[index][1]);
+    assert.deepEqual([data.citation_url,data.guide_url,data.quellen_geprueft_am],[citation,guide,'2026-11-22']);
+    assert.equal(new URL(data.quellen_url).hostname,'www.umweltbundesamt.de');
+    assert.equal(new URL(data.verbraucherzentrale_url).hostname,'www.verbraucherzentrale.de');
+    assert.doesNotMatch(result.content[0].text,/https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+  const ordinaryLegacy = standard.get(inputs.length+1);
+  assert.deepEqual(ordinaryLegacy,compact.at(-1).result);
+  assert.equal(ordinaryLegacy.isError,false);
+  assert.equal(ordinaryLegacy.structuredContent,undefined);
+  assert.match(ordinaryLegacy.content[0].text,/Außenluft: 10,1 °C/);
+  assert.match(ordinaryLegacy.content[0].text,/geschätzten Wandtemperatur von 14,0 °C/);
+});
+
 test('both offline profiles find the short-uphill condensate route and preserve exact model evidence', () => {
   const name = 'entfeuchter_ablaufcheck';
   const citation = 'https://getecoback.com/guide/luftentfeuchter-keller.html';
