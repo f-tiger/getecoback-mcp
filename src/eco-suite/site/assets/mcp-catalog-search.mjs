@@ -1,6 +1,7 @@
 import {exactGermanFilterModel} from './exact-filter-intent.mjs';
 import {philipsHumidifierFilterSection} from './philips-humidifier-filter-intent.mjs';
 import {asksForElectricBlanketCost, isElectricBlanketQuestion} from './electric-blanket-cost-intent.mjs';
+import {asksForHygrometerComparison} from './hygrometer-comparison-intent.mjs';
 import {asksForCellarVentilationCheck} from './cellar-ventilation-intent.mjs';
 import {asksForDehumidifierDrainRoute} from './dehumidifier-drain-intent.mjs';
 
@@ -332,6 +333,8 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const blanketQuestion = isElectricBlanketQuestion(focus.query);
   const blanketCost = asksForElectricBlanketCost(focus.query);
   const blanketCostTool = 'heizdecke_stromkosten_nennleistung';
+  const hygrometerComparison = asksForHygrometerComparison(focus.query);
+  const hygrometerComparisonTool = 'hygrometer_messbereiche';
   const singleLaundry = asksForSingleLaundryCost(focus.query);
   const fritzValve = asksForFritzValveAdapter(focus.query);
   const termCount = terms.length;
@@ -340,6 +343,7 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
     if (entry.tool.name === cellarVentilationTool && !cellarVentilation) continue;
     if (entry.tool.name === philipsFilterTool && !philipsFilter) continue;
     if (entry.tool.name === blanketCostTool && !blanketCost) continue;
+    if (entry.tool.name === 'hygrometer_zweipunkt_referenz_abgleich' && hygrometerComparison) continue;
     if (entry.tool.name === 'pac_n90_energielabel_zu_stromkosten' && blanketQuestion) continue;
     if (entry.tool.name === fritzValveTool && !fritzValve) continue;
     if (fritzValve && (entry.tool.name === 'fritz_302_router_firmware_mindeststand' ||
@@ -376,6 +380,7 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   if (exactGermanFilterModel(focus.query)) preferredName = 'luftreiniger_ersatzfilter_zuordnung';
   else if (philipsFilter) preferredName = philipsFilterTool;
   else if (blanketCost) preferredName = blanketCostTool;
+  else if (hygrometerComparison) preferredName = hygrometerComparisonTool;
   else if (asksForDehumidifierDrainRoute(focus.query)) preferredName = 'entfeuchter_ablaufcheck';
   else if (cellarVentilation) preferredName = cellarVentilationTool;
   else if (fritzValve) preferredName = fritzValveTool;
