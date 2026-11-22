@@ -1,4 +1,5 @@
 import {WINDOW_ENTRY_URL} from './fenstersauger-entry.mjs';
+import {headFitsWindow, usableWindowWidth} from '../site/assets/window-width-math.mjs';
 
 const checked = '2026-11-20';
 const kaercher = 'https://www.karcher.com/de/de/home-and-garden/produkte/';
@@ -34,12 +35,12 @@ export const fenstersaugerSprossenKauf = {
   },
   calculate({lichte_breite_mm,spiel_pro_seite_mm,vorhandene_duese_mm,kauf_geplant}) {
     const messungVorhanden = lichte_breite_mm > 0;
-    const nutzbreite = messungVorhanden ? Math.max(0, lichte_breite_mm - 2 * spiel_pro_seite_mm) : null;
-    const vorhandeneDuesePasst = messungVorhanden && vorhandene_duese_mm > 0 ? vorhandene_duese_mm <= nutzbreite : null;
+    const nutzbreite = messungVorhanden ? usableWindowWidth(lichte_breite_mm, spiel_pro_seite_mm) : null;
+    const vorhandeneDuesePasst = messungVorhanden && vorhandene_duese_mm > 0 ? headFitsWindow(vorhandene_duese_mm, nutzbreite) : null;
     const passendePakete = messungVorhanden ? packages.map(paket => ({
       ...paket,
       arbeitsbreiten_mm:[...paket.arbeitsbreiten_mm],
-      passende_arbeitsbreiten_mm:paket.arbeitsbreiten_mm.filter(breite => breite <= nutzbreite),
+      passende_arbeitsbreiten_mm:paket.arbeitsbreiten_mm.filter(breite => headFitsWindow(breite, nutzbreite)),
     })).filter(paket => paket.passende_arbeitsbreiten_mm.length > 0) : [];
     const kaufvergleich = kauf_geplant && vorhandeneDuesePasst !== true && passendePakete.length > 0;
     let folgeschritt = 'vorhandenen_einwascher_oder_abzieher_pruefen';

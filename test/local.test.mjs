@@ -448,6 +448,44 @@ function compactReplies(requests) {
   });
 }
 
+test('both offline stdio profiles keep decimal window widths on the measured fit boundary', () => {
+  const name = 'fenstersauger_sprossenfenster_duesenbreite';
+  const entry = 'https://getecoback.com/produkte.html?mcp_entry=fenstersauger-breitencheck#fenstersauger-duesenbreite';
+  const cases = [
+    {
+      inputs:{lichte_breite_mm:143.7,spiel_pro_seite_mm:5.2,vorhandene_duese_mm:133.3,kauf_geplant:true},
+      usable:133.3, fits:true, offers:['06008B7000'],
+      step:'vorhandene_duese_zuerst_probesetzen',
+    },
+    {
+      inputs:{lichte_breite_mm:256.4,spiel_pro_seite_mm:61.7,vorhandene_duese_mm:0,kauf_geplant:true},
+      usable:133, fits:null, offers:['06008B7000'], entry,
+      step:'genaues_originalpaket_und_platzbedarf_pruefen',
+    },
+    {
+      inputs:{lichte_breite_mm:256.39999,spiel_pro_seite_mm:61.7,vorhandene_duese_mm:0,kauf_geplant:true},
+      usable:132.99999, fits:null, offers:[],
+      step:'vorhandenen_einwascher_oder_abzieher_pruefen',
+    },
+  ];
+  const compact = compactReplies(cases.map(({inputs}) => toolCall(compactRun,{name,eingaben:inputs})));
+  const jobs = cases.map(({inputs}, index) => ({jsonrpc:'2.0',id:index+1,...toolCall(name,inputs)}));
+  const standard = new Map(readStdio(jobs).map(reply => [reply.id,reply.result]));
+  for (const [index, {usable,fits,offers,entry:destination,step}] of cases.entries()) {
+    const result = standard.get(index+1);
+    assert.deepEqual(result,compact[index].result);
+    assert.equal(result.isError,false);
+    const output = result.structuredContent;
+    assert.ok(Math.abs(output.nutzbreite_mm - usable) < 1e-9);
+    assert.equal(output.vorhandene_duese_nominell_passend,fits);
+    assert.deepEqual(output.nominell_passende_originalpakete.map(item => item.artikel),offers);
+    assert.equal(output.folgeschritt,step);
+    assert.equal(output.entry_url,destination);
+    assert.equal(Object.hasOwn(output,'entry_url'),Boolean(destination));
+    assert.doesNotMatch(result.content[0].text,/https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('both offline stdio profiles resolve the German condensation question and expose the same share link', () => {
   const name = 'fenster_oberflaeche_taucheck';
   const citation = 'https://getecoback.com/guide/fenster-beschlagen-innen.html';
