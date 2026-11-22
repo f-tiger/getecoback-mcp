@@ -16,6 +16,18 @@ const { version } = JSON.parse(readFileSync(new URL('../package.json', import.me
 const server = fileURLToPath(new URL('../src/server.mjs', import.meta.url));
 const finder = fileURLToPath(new URL('../src/find-tools.mjs', import.meta.url));
 const cellarUri = 'ecoback://evidence/de/kellerentfeuchter';
+const bracketTool = 'midea_portasplit_fensterhalterung_pruefen';
+const bracketCitation = 'https://getecoback.com/guide/midea-portasplit-ausverkauft-alternativen.html';
+const bracketGuide = bracketCitation + '#kaufpruefung';
+const bracketEntry = bracketCitation + '?mcp_entry=portasplit-fensterhalterung#kaufpruefung';
+const laundryTool = 'waesche_trocknungswechsel_kaufschwelle';
+const laundryCitation = 'https://getecoback.com/waeschetrockner-oder-luftentfeuchter.html';
+const roofWithoutBracket = {
+  angebot_ean:4048164116478,
+  fenster:'dachfenster',
+  standardhalterung:'im_angebot',
+  universalhalterung:'fehlt',
+};
 
 test('offline lookup preserves every exact name and input schema', () => {
   for (const {name, inputSchema} of TOOLS) {
@@ -44,6 +56,13 @@ test('German questions find tools beyond the first page and keep reviewed exampl
   const filter = findTools('Auf dem Tisch liegt der iRobot-Filterpack 4785887. Mein Roomba j7+ hat keinen Combo-Zusatz. Nennt die deutsche Packliste mein Modell?');
   assert.equal(filter.tools[0].name, 'roboter_ersatzfilter_exakte_de_zuordnung');
   assert(TOOLS.findIndex(tool => tool.name === filter.tools[0].name) >= MCP_PAGE_SIZE);
+
+  const holder = findTools('Midea PortaSplit Dachfenster Halterung').tools[0];
+  assert.equal(holder.name, bracketTool);
+  assert.equal(holder.category, 'Quellen & Kaufprüfung');
+  assert.equal(holder.citation_url, bracketCitation);
+  assert.deepEqual(holder.example_arguments, roofWithoutBracket);
+  assert.deepEqual(holder.inputSchema.required, Object.keys(roofWithoutBracket));
 
   const toaster = 'Bosch TAT8613 Krümelschublade';
   assert.deepEqual(findTools(toaster.normalize('NFD')), findTools(toaster));
@@ -102,11 +121,10 @@ test('a named window vacuum model keeps a replacement blade and battery on their
 });
 
 test('offline finder emits JSON and handles an omitted query', () => {
-  const found = spawnSync(process.execPath, [finder, 'Wie lange darf ich mit 72 Litern duschen?'],
-    {encoding:'utf8', timeout:10000});
+  const found = runLocalCommand(finder, ['Midea PortaSplit Dachfenster Halterung']);
   assert.equal(found.status, 0, found.stderr);
-  assert.equal(JSON.parse(found.stdout).tools[0].name, 'dusche_zeit_bei_wasserbudget');
-  const missing = spawnSync(process.execPath, [finder], {encoding:'utf8', timeout:10000});
+  assert.equal(JSON.parse(found.stdout).tools[0].name, bracketTool);
+  const missing = runLocalCommand(finder, []);
   assert.equal(missing.status, 2);
   assert.match(missing.stderr, /Usage:/);
 });
@@ -160,7 +178,7 @@ test('German per-load cost comparisons find the existing measured laundry tool',
 });
 
 test('offline CLI examples run exact reviewed inputs and reject incomplete or live-only requests', () => {
-  const example = (...args) => spawnSync(process.execPath, [finder, '--example', ...args], {encoding:'utf8', timeout:10000});
+  const example = (...args) => runLocalCommand(finder, ['--example', ...args]);
   const drainage = example('entfeuchter_ablaufcheck');
   assert.equal(drainage.status, 0, drainage.stderr);
   const drain = JSON.parse(drainage.stdout);
@@ -182,35 +200,44 @@ test('offline CLI examples run exact reviewed inputs and reject incomplete or li
   }
 });
 
-function readStdio(jobs, serverArgs = []) {
+function runLocalCommand(entry, args, inputText = '') {
   // Regular descriptors exercise the real process without relying on libuv child sockets.
   const work = mkdtempSync(join(tmpdir(), 'ecoback-stdio-'));
-  let input, output;
+  let input, output, errors;
   try {
-    const inputPath = join(work, 'input.ndjson');
-    const outputPath = join(work, 'output.ndjson');
-    writeFileSync(inputPath, jobs.map(job => JSON.stringify(job)).join('\n') + '\n');
+    const inputPath = join(work, 'stdin');
+    const outputPath = join(work, 'stdout');
+    const errorPath = join(work, 'stderr');
+    writeFileSync(inputPath, inputText);
     input = openSync(inputPath, 'r');
     output = openSync(outputPath, 'w');
+    errors = openSync(errorPath, 'w');
     const preload = join(work, 'deny-network.cjs');
     writeFileSync(preload, `const deny = () => { process.stderr.write('Unexpected network call in stdio test\\n'); process.exit(89); };
 globalThis.fetch = deny;
 require('node:net').Socket.prototype.connect = deny;
 require('node:dgram').Socket.prototype.send = deny;
 `);
-    const child = spawnSync(process.execPath, ['--require', preload, server, ...serverArgs],
-      {stdio:[input, output, 'inherit'], timeout:10000});
+    const child = spawnSync(process.execPath, ['--require', preload, entry, ...args],
+      {stdio:[input, output, errors], timeout:10000});
     assert.equal(child.error, undefined);
-    assert.equal(child.status, 0);
-    return readFileSync(outputPath, 'utf8').trim().split('\n').map(line => JSON.parse(line));
+    return {status:child.status, stdout:readFileSync(outputPath, 'utf8'), stderr:readFileSync(errorPath, 'utf8')};
   } finally {
     if (input !== undefined) closeSync(input);
     if (output !== undefined) closeSync(output);
+    if (errors !== undefined) closeSync(errors);
     rmSync(work, {recursive:true, force:true});
   }
 }
 
-test('stdio handles initialize, the complete paginated catalogue, BTU and unknown tool frames', async () => {
+function readStdio(jobs, serverArgs = []) {
+  const input = jobs.map(job => JSON.stringify(job)).join('\n') + '\n';
+  const child = runLocalCommand(server, serverArgs, input);
+  assert.equal(child.status, 0, child.stderr);
+  return child.stdout.trim().split('\n').map(line => JSON.parse(line));
+}
+
+test('stdio handles initialize, the complete paginated catalogue, reviewed calls and unknown tool frames', async () => {
   const jobs = [];
   function send(method, params) {
     const id = jobs.length + 1;
@@ -228,6 +255,7 @@ test('stdio handles initialize, the complete paginated catalogue, BTU and unknow
     cursor = pageTools(TOOLS, cursor, version).nextCursor;
   }
   const btu = send('tools/call', {name:'btu_empfehlung', arguments:{qm:20}});
+  const holder = send('tools/call', {name:bracketTool, arguments:roofWithoutBracket});
   const unknown = send('tools/call', {name:'does_not_exist', arguments:{}});
   const messages = readStdio(jobs);
   assert.equal(messages.length, jobs.length);
@@ -250,6 +278,13 @@ test('stdio handles initialize, the complete paginated catalogue, BTU and unknow
   assert.deepEqual(catalogue, TOOLS);
   assert.equal(replies.get(btu).result.isError, false);
   assert.match(replies.get(btu).result.content[0].text, /7\.000 BTU/);
+  const decision = replies.get(holder).result;
+  assert.equal(decision.isError, false);
+  assert.equal(decision.structuredContent.status, 'passende_halterung_vor_kauf_klaeren');
+  assert.equal(decision.structuredContent.universalhalterung_ean, 4048164118687);
+  assert.equal(decision.structuredContent.citation_url, bracketCitation);
+  assert.equal(decision.structuredContent.guide_url, bracketGuide);
+  assert.equal(decision.structuredContent.entry_url, bracketEntry);
   assert.equal(replies.get(unknown).error.code, -32602);
 });
 
@@ -390,7 +425,7 @@ test('compact lookup exposes the offline tool schema, source and guide for real 
   assert.notDeepEqual(replies[3].result, replies[2].result);
 });
 
-test('compact finder embeds the matching cellar evidence and leaves unrelated results unchanged', () => {
+test('compact finder embeds matching cellar evidence and runs the documented test-point tool', async () => {
   const [read, listing, relevant, ...unmatched] = compactReplies([
     {method:'resources/read',params:{uri:cellarUri}},
     {method:'resources/list'},
@@ -404,6 +439,33 @@ test('compact finder embeds the matching cellar evidence and leaves unrelated re
   assert.deepEqual(relevant.result.structuredContent.resources, listing.result.resources);
   assert.deepEqual(relevant.result.content.filter(part => part.type === 'resource'),
     [{type:'resource',resource:read.result.contents[0]}]);
+  const found = relevant.result.structuredContent.tools[0];
+  assert.equal(found.name, 'kellerentfeuchter_pruefpunkt_abgleichen');
+  assert.deepEqual(found.inputSchema, TOOLS.find(tool => tool.name === found.name).inputSchema);
+  assert.equal(found.citation_url, 'https://getecoback.com/guide/luftentfeuchter-keller.html');
+  assert.equal(found.guide_url, found.citation_url + '#kalter-keller');
+
+  const cases = [
+    [{},'hersteller_pruefpunkt',3.4,180],
+    [{temperatur_c:20},'hersteller_pruefpunkt',8.5,216],
+    [{temperatur_c:15},'wertepaar_offen',null,null],
+    [{relative_feuchte_pct:59},'wertepaar_offen',null,null],
+    [{modell:'comfee-mddf20'},'wertepaar_offen',null,null],
+  ];
+  const inputs = cases.map(([change]) => ({...found.example_arguments,...change}));
+  const decisions = compactReplies(inputs.map(eingaben => toolCall(compactRun,{name:found.name,eingaben})));
+  for (const [index, [,status,litres,watts]] of cases.entries()) {
+    const {result} = decisions[index];
+    assert.deepEqual(result, await callTool(found.name,inputs[index]));
+    assert.equal(result.isError, false);
+    const data = result.structuredContent;
+    assert.deepEqual([data.status,data.liter_pro_tag,data.leistungsaufnahme_w], [status,litres,watts]);
+    assert.equal(data.quellenmarkt, 'DE');
+    assert.equal(data.quellenpruefung, '2026-11-20');
+    assert.equal(data.citation_url, found.citation_url);
+    assert.equal(data.guide_url, found.guide_url);
+    assert(read.result.contents[0].text.includes(data.quelle));
+  }
   for (const {result} of unmatched) {
     assert.equal(result.isError, false);
     assert.equal(Object.hasOwn(result.structuredContent,'resources'), false);
@@ -430,6 +492,65 @@ test('compact stdio excludes live tools and reports invalid inputs in-band', asy
   const nativeError = await callTool(name, {budget_l:72});
   assert.equal(nativeError.isError, true);
   assert.deepEqual(invalid.result, nativeError);
+});
+
+test('PortaSplit keeps one fixed first-party entry through each decision state', async () => {
+  const cases = [
+    [{}, 'passende_halterung_vor_kauf_klaeren'],
+    [{universalhalterung:'ean_separat_vorhanden'}, 'halterungsbeleg_vorhanden'],
+    [{universalhalterung:'offen'}, 'lieferumfang_klaeren'],
+    [{angebot_ean:0}, 'modellnummer_abgleichen'],
+    [{fenster:'anders_oder_offen'}, 'fenstertyp_mit_anleitung_abgleichen'],
+  ];
+  for (const [input,status] of cases) {
+    const result = await callTool(bracketTool, {...roofWithoutBracket, ...input});
+    assert.equal(result.isError, false, status);
+    assert.equal(result.structuredContent.status, status);
+    assert.equal(result.structuredContent.citation_url, bracketCitation);
+    assert.equal(result.structuredContent.guide_url, bracketGuide);
+    assert.equal(result.structuredContent.entry_url, bracketEntry);
+  }
+  const entryOverride = await callTool(bracketTool, {...roofWithoutBracket, entry_url:bracketCitation});
+  assert.equal(entryOverride.isError, true);
+  assert.equal(entryOverride.structuredContent, undefined);
+});
+
+test('the German mixed laundry decision is discoverable and runnable offline', async () => {
+  await withFetchFixtures(new Map(), async () => {
+    const question = 'Lohnt sich ein Luftentfeuchter zum Wäschetrocknen wenn ein Teil der Waschladungen im Winter weiter in den Trockner geht';
+    const found = findTools(question).tools[0];
+    assert.equal(found.name, laundryTool);
+    assert.equal(found.citation_url, laundryCitation);
+    assert.equal(found.guide_url, laundryCitation + '#laundry-check');
+    assert.deepEqual(found.inputSchema.required, Object.keys(found.example_arguments));
+
+    const example = runLocalCommand(finder, ['--example', laundryTool]);
+    assert.equal(example.status, 0, example.stderr);
+    const output = JSON.parse(example.stdout);
+    assert.deepEqual(output, runReviewedExample(laundryTool));
+    const {structuredContent: decision} = output.result;
+    assert.equal(decision.citation_url, found.citation_url);
+    assert.equal(decision.guide_url, found.guide_url);
+    assert.equal(decision.status, 'rechnerische_kostendeckung');
+    assert.equal(decision.trocknerladungen_weiter, 40);
+    assert.equal(decision.stromersparnis_saison_eur, 16.8);
+    assert.equal(decision.kostendeckung_saisons, 6);
+
+    const calculate = changes => callTool(laundryTool, {...found.example_arguments, ...changes});
+    const unknown = (await calculate({zusatzstrom_erfasst:false})).structuredContent;
+    assert.equal(unknown.status, 'erst_vergleichbar_messen');
+    assert.equal(unknown.stromersparnis_saison_eur, null);
+    assert.equal(unknown.kostendeckung_saisons, null);
+    const worse = (await calculate({entfeuchter_kwh:2})).structuredContent;
+    assert.equal(worse.status, 'kein_stromkostenvorteil');
+    assert.equal(worse.stromersparnis_saison_eur, -12.6);
+    assert.equal(worse.kostendeckung_saisons, null);
+    const available = (await calculate({anschaffung_eur:0})).structuredContent;
+    assert.equal(available.status, 'vorhandene_option_stromguenstiger');
+    assert.equal(available.kostendeckung_saisons, 0);
+    assert.equal((await calculate({ladungen_ersetzbar:100.5})).isError, true);
+    assert.equal((await calculate({ladungen_ersetzbar:101})).isError, true);
+  });
 });
 
 test('advertised tools have bilingual descriptions and valid required input names', () => {

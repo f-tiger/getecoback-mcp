@@ -6,7 +6,7 @@ Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
 [Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
-<!-- count -->2015<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2018<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -160,6 +160,7 @@ exact MCP tool name.
 node src/find-tools.mjs 'Kann ich den Abflussschlauch nach oben führen?'
 node src/find-tools.mjs 'Wie lange darf ich mit 72 Litern duschen?'
 node src/find-tools.mjs 'Wäschetrockner oder Luftentfeuchter – was kostet das Trocknen pro Ladung?'
+node src/find-tools.mjs 'Midea PortaSplit Dachfenster Halterung'
 ```
 
 The command searches the local catalogue without contacting the website. It
@@ -209,6 +210,7 @@ separately measured loads reach different levels of dryness.
 | `hygrometer_messbereiche` | Check whether two humidity readings overlap within stated measurement tolerances. |
 | `hygrometer_messort_pruefen` | Check whether hygrometer placement is suitable for tracking room-air humidity. |
 | `entfeuchter_kalt_messvergleich` | Normalize two dehumidifier collection measurements to a day at the same humidity. |
+| `kellerentfeuchter_pruefpunkt_abgleichen` | Match a measured cellar condition to a documented German dehumidifier test point. |
 | `entfeuchter_kalt_modellbeleg` | Retrieve verified cold-room evidence and limitations for an exact model. |
 | `entfeuchter_tank_leerintervall` | Estimate tank-emptying interval from collected water and time. |
 | `entfeuchter_leerer_tank_check` | Troubleshoot an empty dehumidifier tank using the actual setting, temperature and drain mode. |
@@ -365,6 +367,7 @@ separately measured loads reach different levels of dryness.
 | `angebot_lagerstatus_zitieren` | Qualify an availability quote by exact offer and observation date. |
 | `angebote_gesamtpreis_vergleichen` | Compare delivered purchase totals for matched quotes. |
 | `portasplit_gebraucht_belegliste` | Review the evidence needed before considering a used PortaSplit. |
+| `midea_portasplit_fensterhalterung_pruefen` | Check the original German Midea PortaSplit bracket and seller bundle before purchase. |
 | `pac_n90_ean_abgleichen` | Check the advertised model and GTIN for the documented German PAC N90 ECO Silent. |
 | `auslands_datenblatt_de_angebot` | Check how an overseas datasheet applies to a German offer. |
 | `thermostat_funkzentrale_abgleichen` | Match an existing hub to a documented smart radiator thermostat ecosystem. |
@@ -528,6 +531,7 @@ separately measured loads reach different levels of dryness.
 | `heizdecke_saison_vorlauf_abschaltcheck` | Verify whether a documented blanket preheat timer ends before the chosen use time. |
 | `ventilator_nacht_geraeuschprofil_kompromiss` | Find which measured fan settings meet independently chosen air speed and sound criteria. |
 | `raumklimageraet_modus_nach_strompause` | Check which previously scheduled room-climate settings actually returned after an observed outage. |
+| `waesche_trocknungswechsel_kaufschwelle` | Check the payback when replacing only some dryer loads. |
 | `geraetekauf_raten_gegen_barpreis` | Compare the stated installment total with the full cash price. |
 | `geraeteaufpreis_strompreisband` | Test the purchase premium across a range of energy prices. |
 | `geraete_gebraucht_restnutzungs_schwelle` | Find the used appliance usage threshold relative to a new one. |
@@ -2216,7 +2220,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->2015<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2018<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.

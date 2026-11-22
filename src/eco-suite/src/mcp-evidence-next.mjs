@@ -1,4 +1,5 @@
 import {createRequire} from 'node:module';
+import {PORTASPLIT_ENTRY_PAGE, PORTASPLIT_ENTRY_URL, PORTASPLIT_GUIDE_URL} from './portasplit-entry.mjs';
 const require=createRequire(import.meta.url);
 const dehumidifiers = require('../data/dehum-catalog.json');
 const thermostats = require('../data/thermostat-catalog.json');
@@ -106,6 +107,45 @@ export const evidenceNext = [
         grenze:'Eine Checkliste oder ein Sichtbefund ersetzt keine Prüfung von Gerät, Kältemittelkreislauf oder Montage.'};
     },
     example:{args:{typenschild:true,leitung_geprueft:false,lieferumfang:true,funktion:true},expect:{ergebnis:'vor_kauf_klaeren'}},
+  },
+  {
+    name:'midea_portasplit_fensterhalterung_pruefen',
+    description:'Halterung, Universalhalterung und Lieferumfang der originalen Midea PortaSplit für Dreh-Kippfenster, Dachfenster und französische Balkonfenster prüfen — Check the original German Midea PortaSplit bracket and seller bundle before purchase.',
+    page:PORTASPLIT_ENTRY_PAGE,
+    guide_url:PORTASPLIT_GUIDE_URL,
+    properties:{
+      angebot_ean:number('EAN aus dem konkreten deutschen Angebot oder vom Typenschild, als 13-stellige Zahl. 0 wenn unbekannt.',0,9999999999999),
+      fenster:choice('Fenstertyp am vorgesehenen Aufstellort.', 'dreh_kippfenster','dachfenster','franzoesischer_balkon','anders_oder_offen'),
+      standardhalterung:choice('Ist die Original-Standardhalterung im konkreten Angebot bestätigt?', 'im_angebot','fehlt','offen'),
+      universalhalterung:choice('Ist die Universalhalterung mit EAN 4048164118687 im Angebot oder separat vorhanden?', 'ean_im_angebot','ean_separat_vorhanden','fehlt','offen'),
+    },
+    calculate({angebot_ean,fenster,standardhalterung,universalhalterung}) {
+      if (!Number.isSafeInteger(angebot_ean) || (angebot_ean !== 0 && angebot_ean < 1000000000000)) throw new RangeError('EAN');
+      const referenz_ean = 4048164116478;
+      const original = angebot_ean === referenz_ean;
+      const halterung = original ? {
+        dreh_kippfenster:'standardhalterung', dachfenster:'universalhalterung', franzoesischer_balkon:'universalhalterung',
+      }[fenster] ?? null : null;
+      const beleg = halterung === 'standardhalterung' ? standardhalterung : halterung === 'universalhalterung' ? universalhalterung : null;
+      let status = 'halterungsbeleg_vorhanden';
+      if (!original) status = 'modellnummer_abgleichen';
+      else if (!halterung) status = 'fenstertyp_mit_anleitung_abgleichen';
+      else if (beleg === 'offen') status = 'lieferumfang_klaeren';
+      else if (beleg === 'fehlt') status = 'passende_halterung_vor_kauf_klaeren';
+      return {
+        status, referenz_ean, angebot_ean_passt:angebot_ean === 0 ? null : original,
+        halterung_im_herstellerbeispiel:halterung, beleg_fuer_diese_halterung:beleg,
+        universalhalterung_ean:halterung === 'universalhalterung' ? 4048164118687 : null,
+        quelle_modell:'https://www.midea.com/de/klimatisieren-heizen/portasplit',
+        quelle_aufstellung:'https://www.midea.com/de/klimatisieren-heizen/portasplit/installation',
+        quelle_universalhalterung:'https://www.midea.com/content/dam/midea-aem/de/klimatisieren-heizen/portasplit/universalhalterung/PortaSplit-UM-universal-bracket.pdf',
+        quellen_geprueft_am:'2026-11-20',
+        entry_url:PORTASPLIT_ENTRY_URL,
+        grenze:'Ein bestätigter Lieferumfang ersetzt weder die Prüfung der konkreten Fenstermaße und Befestigung nach Anleitung noch eine gegebenenfalls erforderliche Erlaubnis. Bei offenem Modell, fehlender Halterung oder ungeklärter Aufstellung mit dem Kauf warten.',
+      };
+    },
+    example:{args:{angebot_ean:4048164116478,fenster:'dachfenster',standardhalterung:'im_angebot',universalhalterung:'fehlt'},
+      expect:{status:'passende_halterung_vor_kauf_klaeren',halterung_im_herstellerbeispiel:'universalhalterung',universalhalterung_ean:4048164118687,entry_url:PORTASPLIT_ENTRY_URL}},
   },
   {
     name:'pac_n90_ean_abgleichen',

@@ -5,6 +5,29 @@ const words = value => normalize(value)
   .replace(/\b(\d{3})\.(\d{3})\.(\d{2})\b/g, '$1$2$3')
   .match(/[a-z0-9]+/g) || [];
 
+function ownedGuide(value) {
+  if (typeof value !== 'string') return null;
+  try {
+    const origin = 'https://getecoback.com';
+    const url = new URL(value, origin);
+    const canonical = /^\/(?:[a-z0-9-]+\/)*[a-z0-9-]+\.html$/.test(url.pathname);
+    return url.origin === origin && canonical && !url.search && !url.username && !url.password ? url : null;
+  } catch {
+    return null;
+  }
+}
+
+// Keep catalogue navigation on the canonical guide, optionally at its supplied section.
+export function toolGuidePath({citation_url, guide_url}) {
+  const citation = ownedGuide(citation_url);
+  if (!citation || citation.hash) return null;
+  const guide = ownedGuide(guide_url);
+  if (guide?.pathname === citation.pathname && /^#[a-z0-9-]{1,100}$/.test(guide.hash)) {
+    return guide.pathname + guide.hash;
+  }
+  return citation.pathname;
+}
+
 const questionWords = new Set((
   'wie was wann wo welche welcher welches welchen welchem wer weswegen wieso weshalb wieviel ' +
   'kann kannst koennen soll sollte ich du er sie es wir ihr uns mir mein meine meinen meiner meinem unseren unserem unsere unser euren ' +
@@ -102,6 +125,7 @@ const taskWords = new Map([
   ["brita_maxtra_kanne_eingangswasser_quellenrahmen", "kannenanleitung kaltes wasser oeffentliches versorgungsnetz brunnenwasser eigene quelle oeffentlichen netz vorgewaermt eingangswasser"],
   ['dusche_zeit_bei_wasserbudget', 'duschen litern liter wasserbudget duschdauer lange'],
   ['saugroboter_kabelroute_vorbereiten', 'roboter kabel faehrt ueberfaehrt kabelsalat'],
+  ['kellerentfeuchter_pruefpunkt_abgleichen', 'prueftemperatur entfeuchtungsleistung entzieht liter watt grad luftfeuchtigkeit prozent pruefbedingungen'],
   ['entfeuchter_ablaufcheck', 'abflussschlauch ablaufschlauch abfluss auslass keller oben hoeher fuehren ableiten kondensat'],
   ['luftreiniger_ersatzfilter_zuordnung', 'passt ersatzfilter luftreinigermodell luftreiniger filternummer'],
   ['waesche_trockenweg_sortierplan', 'liegeplaetze leine liegend liegen haengend'],
