@@ -6,7 +6,7 @@ Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
 [Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
-<!-- count -->2023<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2025<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -240,6 +240,7 @@ separately measured loads reach different levels of dryness.
 | `mobile_klima_einlagern_check` | Check portable AC storage readiness against its own manual. |
 | `klima_fenster_nachtbetrieb_check` | Review night-time window constraints before running a hose AC. |
 | `arbeitszimmer_abwaerme_vergleich` | Estimate the indoor heat reduction between two measured office-device configurations. |
+| `heizdecke_stromkosten_nennleistung` | Estimate an electric blanket’s running cost at a supplied constant wattage. |
 | `thermostat_amortisation` | Estimate thermostat payback using your own savings assumption. |
 | `thermostat_paketkosten` | Budget radiator thermostat hardware and shared hub. |
 | `thermostat_ventilabgleich` | Check a known radiator valve against the selected model’s documentation. |
@@ -287,6 +288,7 @@ separately measured loads reach different levels of dryness.
 | `luftreiniger_filter_faelligkeit` | Assess a particulate filter change using condition and manufacturer instructions. |
 | `luftreiniger_cadr_raumcheck` | Estimate equivalent particulate clean-air delivery in a measured room. |
 | `luftbefeuchter_modellpflege` | Retrieve model-specific humidifier care and consumables. |
+| `philips_verdunsterfilter_zuordnung` | Resolve exact German Philips humidifier filter parts. |
 | `poolroboter_beckencheck` | Assess debris, obstacles and basket care for a pool robot. |
 | `maehroboter_gartencheck` | Check narrow routes, measured slopes and navigation conditions. |
 | `ersatzteil_druck_eignung` | Triage a small missing part or organizer for 3D printing. |
@@ -2225,7 +2227,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->2023<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2025<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.

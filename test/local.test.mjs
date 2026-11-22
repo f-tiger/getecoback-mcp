@@ -450,6 +450,74 @@ function compactReplies(requests) {
   });
 }
 
+test('offline stdio estimates electric blanket costs from explicit user inputs only', () => {
+  const name = 'heizdecke_stromkosten_nennleistung';
+  const citation = 'https://getecoback.com/guide/heizdecke-stromverbrauch.html';
+  const guide = citation+'#waerme-rechner';
+  const source = 'https://verbraucherzentrale-energieberatung.de/energie-sparen/allgemeines/stromverbrauch-messen/';
+  const queries = [
+    'Was kostet eine Heizdecke mit 110 Watt für 2 Stunden bei 35 Cent pro kWh?',
+    'Wie hoch ist der Stromverbrauch meiner Heizdecke mit 110 Watt?',
+    'Stromkosten für meine Wärmezudecke pro Abend berechnen',
+  ];
+  const unrelated = [
+    'Wie viel kostet die Anschaffung einer Heizdecke?',
+    'Ist es sicher, eine Heizdecke im Schlaf unbeaufsichtigt zu nutzen?',
+    'Was kostet der Betrieb eines Heizlüfters mit 1100 Watt?',
+    'Was kostet Meine Heizdecke oder die Raumerwärmung per Gasheizung im Vergleich?',
+    'Was kostet meine Heizdecke laut gemessenen 0,12 kWh je Abend?',
+  ];
+  const base = {nennleistung_w:110,laufzeit_h:2,arbeitspreis_kwh:0.35};
+  const cases = [
+    [{...base,nutzungstage:30},[0.22,0.077,6.6,2.31,'EUR',30]],
+    [base,[0.22,0.077,0.22,0.077,'EUR',1]],
+    [{...base,nutzungstage:30,waehrung:'CHF'},[0.22,0.077,6.6,2.31,'CHF',30]],
+    [{...base,arbeitspreis_kwh:0},[0.22,0,0.22,0,'EUR',1]],
+  ];
+  const invalid = [
+    {}, {nennleistung_w:110,laufzeit_h:2}, {...base,nennleistung_w:'110 W'},
+    {...base,arbeitspreis_kwh:35}, {...base,nutzungstage:4.5}, {...base,waehrung:'GBP'},
+    {...base,laufzeit_h:25}, {...base,nennleistung_w:501}, {...base,modell:'unknown'},
+  ];
+  const inputs = [...cases.map(([args])=>args),...invalid];
+  const searches = [...queries,...unrelated];
+  const compact = compactReplies([
+    ...searches.map(frage=>toolCall(compactFind,{frage})),
+    ...inputs.map(eingaben=>toolCall(compactRun,{name,eingaben})),
+  ]);
+  for (const [index,frage] of queries.entries()) {
+    const first = compact[index].result.structuredContent.tools[0];
+    assert.equal(first?.name,name,frage);
+    assert.deepEqual(first,findTools(frage).tools[0]);
+    assert.deepEqual([first.citation_url,first.guide_url],[citation,guide]);
+    assert.deepEqual(first.inputSchema.required,['nennleistung_w','laufzeit_h','arbeitspreis_kwh']);
+  }
+  for (const [index,frage] of unrelated.entries()) {
+    const hits = compact[queries.length+index].result.structuredContent.tools;
+    assert.ok(!hits.some(tool=>tool.name===name),frage);
+  }
+  const jobs = inputs.map((args,index)=>({jsonrpc:'2.0',id:index+1,...toolCall(name,args)}));
+  const standard = new Map(readStdio(jobs).map(reply=>[reply.id,reply.result]));
+  for (const [index] of inputs.entries()) {
+    const result = standard.get(index+1);
+    assert.deepEqual(result,compact[searches.length+index].result);
+    if (index >= cases.length) {
+      assert.equal(result.isError,true);
+      assert.equal(result.structuredContent,undefined);
+      continue;
+    }
+    assert.equal(result.isError,false);
+    const data = result.structuredContent;
+    assert.equal(data.berechnungsart,'nennleistung_schaetzung');
+    assert.deepEqual([data.energie_kwh_pro_nutzung,data.kosten_pro_nutzung,data.energie_kwh_gesamt,
+      data.kosten_gesamt,data.waehrung,data.nutzungstage],cases[index][1]);
+    assert.deepEqual([data.citation_url,data.guide_url,data.guidance_source],[citation,guide,source]);
+    assert.match(data.hinweis,/Geräteanleitung/);
+    assert.match(data.hinweis,/messen/);
+    assert.doesNotMatch(result.content[0].text,/https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('offline stdio distinguishes exact Philips humidifier filters, variants and unknown models', () => {
   const name = 'philips_verdunsterfilter_zuordnung';
   const citation = 'https://getecoback.com/guide/luftbefeuchter-ratgeber.html';

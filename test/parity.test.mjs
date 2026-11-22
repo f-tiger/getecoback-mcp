@@ -26,6 +26,9 @@ const CASES = [
   ["heizleistung_watt", { qm: 30, daemmung: "schlecht", strompreis_euro_kwh: 0.35 }],
   ["heizleistung_watt", { qm: 20, strompreis_euro_kwh: 0 }],
   ["taupunkt_lueften", { aussen_temp_c: 18, aussen_luftfeuchte_prozent: 60, innen_temp_c: 16 }],
+  ["heizdecke_stromkosten_nennleistung", { nennleistung_w: 110, laufzeit_h: 2, arbeitspreis_kwh: 0.35, nutzungstage: 30 }],
+  ["heizdecke_stromkosten_nennleistung", { nennleistung_w: 110, laufzeit_h: 2 }],
+  ["heizdecke_stromkosten_nennleistung", { nennleistung_w: 110, laufzeit_h: 2, arbeitspreis_kwh: 0.35, nutzungstage: 4.5 }],
   ["luftreiniger_ersatzfilter_zuordnung", { model: "beurer-lr401" }],
   ["luftreiniger_ersatzfilter_zuordnung", { model: "levoit-core-300s" }],
   ["luftreiniger_ersatzfilter_zuordnung", { model: "levoit-core-300s-p" }],
@@ -133,9 +136,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 2014 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 2015 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,2014);
+  assert.equal(expandedDefinitions.length,2015);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);
