@@ -1,3 +1,5 @@
+import {WINDOW_CONDENSATION_PAGE, WINDOW_CONDENSATION_URL} from '../site/assets/fenster-taucheck.mjs';
+
 const productGuide = '/produkte.html';
 const laundryGuide = '/guide/waesche-trocknen-wohnung.html';
 const sections = new Map([
@@ -21,6 +23,7 @@ const toolSections = new Map([
 ]);
 
 export function evidenceGuideUrl(category, page, name) {
+  if (name === 'fenster_oberflaeche_taucheck' && page === WINDOW_CONDENSATION_PAGE) return WINDOW_CONDENSATION_URL;
   const section = toolSections.get(name) ?? sections.get(category);
   if (section && section[0] === page) return 'https://getecoback.com' + page + '#' + section[1];
   return undefined;

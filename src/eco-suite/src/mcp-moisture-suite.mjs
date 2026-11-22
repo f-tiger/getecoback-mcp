@@ -1,6 +1,7 @@
-import {createRequire} from 'node:module';
-const require=createRequire(import.meta.url);
-const catalog = require('../data/dehum-catalog.json');
+import catalog from '../data/dehum-catalog.json' with {type:'json'};
+import {
+  checkWindowCondensation, dewPoint, WINDOW_CONDENSATION_PAGE, WINDOW_CONDENSATION_URL,
+} from '../site/assets/fenster-taucheck.mjs';
 
 const number = (description, minimum, maximum) => ({type:'number', description, minimum, maximum});
 const bool = description => ({type:'boolean', description});
@@ -13,10 +14,6 @@ const roomHumidity = number('Relative Feuchte der Raumluft in Prozent.', 1, 100)
 const saturation = celsius => 6.112 * Math.exp(17.62 * celsius / (243.12 + celsius));
 const vapourPressure = (celsius, relativeHumidity) => saturation(celsius) * relativeHumidity / 100;
 const vapourDensity = (celsius, relativeHumidity) => 216.7 * vapourPressure(celsius, relativeHumidity) / (273.15 + celsius);
-function dewPoint(celsius, relativeHumidity) {
-  const gamma = Math.log(relativeHumidity / 100) + 17.62 * celsius / (243.12 + celsius);
-  return 243.12 * gamma / (17.62 - gamma);
-}
 
 const coldModels = catalog.products.filter(model => model.status === 'verified' &&
   ['meaco-one-20', 'meaco-two-12', 'stadler-lukas'].includes(model.id));
@@ -38,21 +35,19 @@ const cellarTestSources = {
 export const moistureSuite = [
   {
     name:'fenster_oberflaeche_taucheck',
-    description:'Gemessene Innenscheibe auf Kondensation prüfen — Check an actual indoor glass or wall surface temperature against the indoor dew point.',
-    page:'/guide/fenster-beschlagen-innen.html',
+    description:'Kondenswasser am Fenster einordnen: gemessene Innenscheibe oder Wand mit dem Taupunkt vergleichen — Check a measured indoor glass or wall surface against the dew point.',
+    page:WINDOW_CONDENSATION_PAGE,
     properties:{
       room_c:roomTemperature,
       room_rh_pct:roomHumidity,
       surface_c:number('Gemessene Temperatur der Oberfläche in °C.',-20,55),
     },
-    calculate({room_c, room_rh_pct, surface_c}) {
-      const dew = dewPoint(room_c, room_rh_pct);
-      const margin = surface_c - dew;
+    calculate(values) {
       return {
-        dew_point_c:round(dew,1),
-        surface_margin_c:round(margin,1),
-        condensation_possible:margin <= 1e-9,
-        assumption:'Gleichgewicht für die gemessene Raumluft. Messfehler und kalte Ecken beachten. Kein Nachweis für Bauzustand oder Schimmelfreiheit.',
+        ...checkWindowCondensation(values),
+        assumption:'Taupunkt-Näherung für zeitgleich gemessene Raumluft und Oberfläche. Bei höchstens 1 °C Abstand erneut messen. Das ist eine Orientierung und keine Angabe zur Messgenauigkeit. Kein Nachweis für Bauzustand oder Schimmelfreiheit.',
+        buying_note:'Tuch oder geeigneter Fenstersauger nehmen sichtbare Tropfen auf. Bei wiederkehrender Nässe die Ursache prüfen, bevor du ein Gerät kaufst.',
+        share_url:WINDOW_CONDENSATION_URL,
       };
     },
     example:{args:{room_c:20, room_rh_pct:60, surface_c:10}, expect:{condensation_possible:true, dew_point_c:12}},
