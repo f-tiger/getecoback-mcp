@@ -16,6 +16,10 @@ const n90Model = 'PAC N90 ECO Silent';
 const n90Support = 'https://www.delonghi.com/de-de/s/PACN90ECOSILENT';
 const n90Datasheet = 'https://shop.sonepar.at/asset_external/downloads/pim/400901/datasheet_delonghi_PAC%20N90ECO.pdf';
 const n90Label = 'https://library.delonghigroup.com/assetbank-delonghi/action/directLinkImage?assetId=209150&download=true';
+const portaSplitManual = 'https://www.midea.com/content/dam/midea-aem/de/klimatisieren-heizen/portasplit/PortaSplit-Gebrauchsanweisung-DE.pdf';
+const portaSplitOriginalEan = 4048164116478;
+const portaSplitLipMaxWidth = 45;
+const portaSplitLipMinHeight = 20;
 
 const bool = description => ({type:'boolean', description});
 const choice = (description, ...values) => ({type:'string', enum: values, description});
@@ -166,7 +170,7 @@ export const evidenceNext = [
     },
     calculate({angebot_ean,fenster,standardhalterung,universalhalterung}) {
       if (!Number.isSafeInteger(angebot_ean) || (angebot_ean !== 0 && angebot_ean < 1000000000000)) throw new RangeError('EAN');
-      const referenz_ean = 4048164116478;
+      const referenz_ean = portaSplitOriginalEan;
       const original = angebot_ean === referenz_ean;
       const halterung = original ? {
         dreh_kippfenster:'standardhalterung', dachfenster:'universalhalterung', franzoesischer_balkon:'universalhalterung',
@@ -191,6 +195,58 @@ export const evidenceNext = [
     },
     example:{args:{angebot_ean:4048164116478,fenster:'dachfenster',standardhalterung:'im_angebot',universalhalterung:'fehlt'},
       expect:{status:'passende_halterung_vor_kauf_klaeren',halterung_im_herstellerbeispiel:'universalhalterung',universalhalterung_ean:4048164118687,entry_url:PORTASPLIT_ENTRY_URL}},
+  },
+  {
+    name:'midea_portasplit_fensterfalz_pruefen',
+    description:'Breite und Höhe des Fensterfalzes für die Original-Standardhalterung der Midea PortaSplit nach der deutschen Zeichnung prüfen — Check the documented window-lip dimensions for the original Midea PortaSplit standard bracket.',
+    page:PORTASPLIT_ENTRY_PAGE,
+    guide_url:'https://getecoback.com'+PORTASPLIT_ENTRY_PAGE+'#fensterfalz',
+    properties:{
+      angebot_ean:number('EAN der angebotenen oder vorhandenen PortaSplit. Bei unbekannter EAN 0.',0,9999999999999),
+      halterung:choice('Genaue Halterung anhand des Angebots oder der Anleitung bestätigt?', 'original_standard','anders_oder_offen'),
+      fenster:choice('Öffnet sich das vorgesehene Fenster nach innen?', 'nach_innen_oeffnend','anders_oder_offen'),
+      messbezug:choice('Vorhandene Maße beziehen sich auf den Falzquerschnitt in der Midea-Zeichnung. Bei unklarer Dichtung oder anderem Messpunkt die zweite Option wählen.', 'falz_nach_zeichnung','dichtung_oder_unklar'),
+      falzbreite_mm:number('Breite des Fensterfalzes in Millimetern gemäß Zeichnung. Bei fehlendem Wert 0.',0,1000),
+      falzhoehe_mm:number('Höhe des Fensterfalzes in Millimetern gemäß Zeichnung. Bei fehlendem Wert 0.',0,1000),
+    },
+    calculate({angebot_ean,halterung,fenster,messbezug,falzbreite_mm,falzhoehe_mm}) {
+      if (!Number.isSafeInteger(angebot_ean) || (angebot_ean !== 0 && angebot_ean < 1000000000000)) throw new RangeError('EAN');
+      const isOriginal = angebot_ean === portaSplitOriginalEan;
+      const applies = isOriginal && halterung === 'original_standard' && fenster === 'nach_innen_oeffnend';
+      const measuresApply = applies && messbezug === 'falz_nach_zeichnung';
+      const widthKnown = measuresApply && falzbreite_mm > 0;
+      const heightKnown = measuresApply && falzhoehe_mm > 0;
+      const outside = (widthKnown && falzbreite_mm > portaSplitLipMaxWidth) ||
+        (heightKnown && falzhoehe_mm < portaSplitLipMinHeight);
+      let status, naechster_schritt;
+      if (!isOriginal) {
+        status = 'modell_klaeren';
+        naechster_schritt = 'Vollständige Variante und EAN vor der Auswahl mit dem Händler oder der Modellanleitung klären.';
+      } else if (!applies) {
+        status = 'halterung_oder_fenster_klaeren';
+        naechster_schritt = 'Exakte Halterung und Fenstertyp anhand der Modellanleitung prüfen. Diese Maße gelten für die Standardhalterung am nach innen öffnenden Fenster.';
+      } else if (outside) {
+        status = 'ausserhalb_dokumentierter_masse';
+        naechster_schritt = 'Die Standardhalterung für diese Maße nicht einplanen. Eine für den Standort dokumentierte Lösung mit Midea klären oder den Kauf aufschieben.';
+      } else if (!widthKnown || !heightKnown) {
+        status = 'messpunkt_oder_masse_klaeren';
+        naechster_schritt = 'Beide Maße am Falzquerschnitt aus der Zeichnung feststellen. Unklaren Dichtungseinfluss vor dem Kauf mit Midea klären.';
+      } else {
+        status = 'masse_im_dokumentierten_rahmen';
+        naechster_schritt = 'Als Nächstes Befestigung, Sicherung, Aufstellort und gegebenenfalls Erlaubnis zu diesem Fenster separat nach Anleitung prüfen.';
+      }
+      return {
+        status, referenz_ean:portaSplitOriginalEan, naechster_schritt,
+        breite_max_mm:applies ? portaSplitLipMaxWidth : null,
+        hoehe_min_mm:applies ? portaSplitLipMinHeight : null,
+        breite_unter_max_mm:widthKnown ? rounded(portaSplitLipMaxWidth-falzbreite_mm) : null,
+        hoehe_ueber_min_mm:heightKnown ? rounded(falzhoehe_mm-portaSplitLipMinHeight) : null,
+        hersteller_anleitung_url:portaSplitManual, druckseite:15,
+        grenze:'Reine Maßprüfung an einem dokumentierten Falz. Eine passende Breite und Höhe erlauben noch keine Aufstellung oder Befestigung des Außengeräts.',
+      };
+    },
+    example:{args:{angebot_ean:portaSplitOriginalEan,halterung:'original_standard',fenster:'nach_innen_oeffnend',messbezug:'falz_nach_zeichnung',falzbreite_mm:60,falzhoehe_mm:0},
+      expect:{status:'ausserhalb_dokumentierter_masse',breite_unter_max_mm:-15}},
   },
   {
     name:'pac_n90_ean_abgleichen',

@@ -26,6 +26,17 @@ const CASES = [
   ["heizleistung_watt", { qm: 30, daemmung: "schlecht", strompreis_euro_kwh: 0.35 }],
   ["heizleistung_watt", { qm: 20, strompreis_euro_kwh: 0 }],
   ["taupunkt_lueften", { aussen_temp_c: 18, aussen_luftfeuchte_prozent: 60, innen_temp_c: 16 }],
+  ...[
+    { falzbreite_mm: 60, falzhoehe_mm: 0 },
+    { falzbreite_mm: 45, falzhoehe_mm: 20 },
+    { messbezug: "dichtung_oder_unklar" },
+    { angebot_ean: 0 },
+    { fenster: "anders_oder_offen" },
+    { angebot_ean: 123456789012 },
+  ].map(changes => ["midea_portasplit_fensterfalz_pruefen", {
+    angebot_ean: 4048164116478, halterung: "original_standard", fenster: "nach_innen_oeffnend",
+    messbezug: "falz_nach_zeichnung", falzbreite_mm: 35, falzhoehe_mm: 25, ...changes,
+  }]),
   ["pac_n90_ean_abgleichen", { ean: 8004399512351, modell: "PAC N90 ECO Silent" }],
   ["pac_n90_ean_abgleichen", { ean: 8004399512351, modell: "abweichend" }],
   ["pac_n90_ean_abgleichen", { ean: 8004399512351, modell: "unbekannt" }],
@@ -146,9 +157,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 2015 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 2016 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,2015);
+  assert.equal(expandedDefinitions.length,2016);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);
