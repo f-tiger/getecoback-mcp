@@ -182,8 +182,9 @@ export const coolingSuite = [
   },
   {
     name:'klimaanlage_geraeusch_vergleich',
-    description:'Zwei Geräuschwerte nur bei gleicher Messgröße und vergleichbaren Bedingungen einordnen — Compare AC noise figures on a like-for-like basis.',
+    description:'Schalldruck und Schallleistung von Klimageräten unterscheiden. Zwei Geräuschwerte nur bei gleicher Messgröße und vergleichbaren Bedingungen einordnen — Compare AC noise figures on a like-for-like basis.',
     page:guide('delonghi-pac-n90-test'),
+    guide_url:'https://getecoback.com/guide/delonghi-pac-n90-test.html#lautstaerke',
     properties:{
       pegel_a_dba:number('Angegebener Pegel A in dB(A).',0,130), pegel_b_dba:number('Angegebener Pegel B in dB(A).',0,130),
       groesse_a:choice('Messgröße der Angabe A.','schalldruck','schallleistung','unbekannt'),
@@ -197,7 +198,7 @@ export const coolingSuite = [
         hinweis:'Schallleistung beschreibt die Quelle, Schalldruck gilt am Messort. Kein Datenblattwert allein sagt, wie laut das Gerät am Bett wird.'
       };
     },
-    example:{args:{pegel_a_dba:52,pegel_b_dba:64,groesse_a:'schalldruck',groesse_b:'schallleistung',gleiche_bedingungen:true},expect:{vergleichbar:false,differenz_b_minus_a_db:null}}
+    example:{args:{pegel_a_dba:39,pegel_b_dba:64,groesse_a:'schalldruck',groesse_b:'schallleistung',gleiche_bedingungen:true},expect:{vergleichbar:false,differenz_b_minus_a_db:null}}
   },
   {
     name:'klima_effizienzlabel_vergleichen',

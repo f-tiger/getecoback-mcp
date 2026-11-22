@@ -27,6 +27,14 @@ const CASES = [
   ["heizleistung_watt", { qm: 20, strompreis_euro_kwh: 0 }],
   ["taupunkt_lueften", { aussen_temp_c: 18, aussen_luftfeuchte_prozent: 60, innen_temp_c: 16 }],
   ...[
+    { groesse_a: "schalldruck", groesse_b: "schallleistung" },
+    { groesse_a: "schallleistung", groesse_b: "schallleistung" },
+    { groesse_a: "schalldruck", groesse_b: "schalldruck", gleiche_bedingungen: false },
+    { groesse_a: "unbekannt", groesse_b: "unbekannt" },
+  ].map(changes => ["klimaanlage_geraeusch_vergleich", {
+    pegel_a_dba: 52, pegel_b_dba: 64, gleiche_bedingungen: true, ...changes,
+  }]),
+  ...[
     { spalt_min_mm: 4, spalt_max_mm: 4 },
     { spalt_min_mm: 3, spalt_max_mm: 3.5 },
     { dichtungsart: "nutdichtung", spalt_min_mm: 4, spalt_max_mm: 4 },
