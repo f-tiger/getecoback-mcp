@@ -9,6 +9,7 @@ const choice = (description, values) => ({type:'string', description, enum:value
 const round = (value, digits = 2) => Number(value.toFixed(digits));
 const roomTemperature = number('Lufttemperatur innen in °C.', 0, 40);
 const roomHumidity = number('Relative Feuchte der Raumluft in Prozent.', 1, 100);
+const hygrometerGuide = '/guide/luftfeuchtigkeit-richtig-messen.html';
 
 // The guide's Magnus approximation over water, with vapour pressure in hPa.
 const saturation = celsius => 6.112 * Math.exp(17.62 * celsius / (243.12 + celsius));
@@ -133,20 +134,34 @@ export const moistureSuite = [
   },
   {
     name:'hygrometer_messbereiche',
-    description:'Zwei Hygrometer mit ihren angegebenen Genauigkeiten vergleichen — Check whether two humidity readings overlap within stated measurement tolerances.',
-    page:'/guide/luftfeuchtigkeit-richtig-messen.html',
+    description:'Zwei Hygrometer am selben Messort mit ihren angegebenen Toleranzen in Prozentpunkten vergleichen — Check whether two humidity readings overlap within stated measurement tolerances.',
+    page:hygrometerGuide,
+    guide_url:'https://getecoback.com'+hygrometerGuide+'#hygrometer-vergleichen',
     properties:{
       reading_a_pct:roomHumidity,
-      accuracy_a_pp:number('Angegebene absolute Toleranz des ersten Geräts in Prozentpunkten.',0,25),
+      accuracy_a_pp:number('Belegte absolute Toleranz des ersten Geräts in Prozentpunkten, passend zu Messbereich und Bedingungen.',0,25),
       reading_b_pct:roomHumidity,
-      accuracy_b_pp:number('Angegebene absolute Toleranz des zweiten Geräts in Prozentpunkten.',0,25),
+      accuracy_b_pp:number('Belegte absolute Toleranz des zweiten Geräts in Prozentpunkten, passend zu Messbereich und Bedingungen.',0,25),
     },
     calculate({reading_a_pct,accuracy_a_pp,reading_b_pct,accuracy_b_pp}) {
       const gap = Math.abs(reading_a_pct-reading_b_pct);
+      const aLow = Math.max(0,reading_a_pct-accuracy_a_pp);
+      const aHigh = Math.min(100,reading_a_pct+accuracy_a_pp);
+      const bLow = Math.max(0,reading_b_pct-accuracy_b_pp);
+      const bHigh = Math.min(100,reading_b_pct+accuracy_b_pp);
+      const low = Math.max(aLow,bLow);
+      const high = Math.min(aHigh,bHigh);
+      // Decimal values that just touch can differ by a binary floating point ulp.
+      const overlap = low-high <= Number.EPSILON*100;
+      const shown = value => round(value,10);
       return {
         difference_pp:round(gap),
-        stated_ranges_overlap:gap <= accuracy_a_pp+accuracy_b_pp,
-        assumption:'Gleicher Messort, gleiche Temperatur, ausreichende Angleichzeit und Gültigkeit der Herstellerangaben. Eine Überlappung ist keine Kalibrierung.',
+        stated_ranges_overlap:overlap,
+        range_a_pct:[shown(aLow),shown(aHigh)],
+        range_b_pct:[shown(bLow),shown(bHigh)],
+        overlap_range_pct:overlap ? [shown(low),shown(Math.max(low,high))] : null,
+        assumption:'Gleicher Messort und gleiche Höhe, gleiche Temperatur, ausreichende Angleichzeit und Gültigkeit der Herstellerangaben. Die rechnerischen Bereiche beantworten keine Kalibrierungsfrage und bestimmen weder den wahren Wert noch einen Defekt.',
+        guidance_source:'https://www.tfa-dostmann.de/service/faq/',
       };
     },
     example:{args:{reading_a_pct:60,accuracy_a_pp:2,reading_b_pct:65,accuracy_b_pp:2}, expect:{difference_pp:5,stated_ranges_overlap:false}},

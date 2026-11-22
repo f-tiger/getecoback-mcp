@@ -450,6 +450,71 @@ function compactReplies(requests) {
   });
 }
 
+test('offline stdio checks exact, touching and clipped hygrometer measurement ranges', () => {
+  const name = 'hygrometer_messbereiche';
+  const citation = 'https://getecoback.com/guide/luftfeuchtigkeit-richtig-messen.html';
+  const guide = citation + '#hygrometer-vergleichen';
+  const authority = 'https://www.tfa-dostmann.de/service/faq/';
+  const args = (a, da, b, db) => ({
+    reading_a_pct: a, accuracy_a_pp: da, reading_b_pct: b, accuracy_b_pp: db,
+  });
+  const cases = [
+    [args(55, 3, 60, 3), [5, true, [52, 58], [57, 63], [57, 58]]],
+    [args(55.1, 2.5, 60.2, 2.6), [5.1, true, [52.6, 57.6], [57.6, 62.8], [57.6, 57.6]]],
+    [args(60.2, 2.6, 55.1, 2.5), [5.1, true, [57.6, 62.8], [52.6, 57.6], [57.6, 57.6]]],
+    [args(55.1, 2.5, 60.200001, 2.6), [5.1, false, [52.6, 57.6], [57.600001, 62.800001], null]],
+    [args(1, 3, 99, 3), [98, false, [0, 4], [96, 100], null]],
+  ];
+  const invalid = [args(55, 3, 60), args(55, -0.1, 60, 3), args(55, 25.01, 60, 3),
+    args(55, 3, 100.01, 3), args('55', 3, 60, 3), {...args(55, 3, 60, 3), calibrate: true}];
+  const related = [
+    'Zwei Hygrometer nebeneinander zeigen 55 und 60 Prozent, beide ±3 Prozentpunkte.',
+    'Hygrometer A und Hygrometer B am selben Messort zeigen Unterschiede, wie viel Toleranz ist normal?',
+    'Zwei Hygrometer unterscheiden sich am selben Ort um 5 Prozentpunkte.',
+    'Zwei Hygrometer haben am gleichen Standort eine Differenz von 5 Prozentpunkten.',
+  ];
+  const separate = [
+    'Muss ich beide Hygrometer mit einem Salztest kalibrieren?',
+    'Wie prüfe ich mit einer Referenz die Abweichung von zwei Hygrometern?',
+    'Wie hoch soll ein Hygrometer an der Fensterbank stehen?',
+  ];
+  const queries = [...related, ...separate];
+  const inputs = [...cases.map(([input]) => input), ...invalid];
+  const compact = compactReplies([
+    ...queries.map(frage => toolCall(compactFind, {frage})),
+    ...inputs.map(eingaben => toolCall(compactRun, {name, eingaben})),
+  ]);
+  for (const [index, query] of queries.entries()) {
+    const first = compact[index].result.structuredContent.tools[0];
+    assert.deepEqual(first, findTools(query).tools[0]);
+    if (index >= related.length) {
+      assert.notEqual(first?.name, name, query);
+      continue;
+    }
+    assert.equal(first?.name, name, query);
+    assert.deepEqual([first.citation_url, first.guide_url], [citation, guide]);
+    assert.deepEqual(first.inputSchema.required, Object.keys(args(0, 0, 0, 0)));
+  }
+  const jobs = inputs.map((input, index) => ({jsonrpc: '2.0', id: index + 1, ...toolCall(name, input)}));
+  const full = new Map(readStdio(jobs).map(reply => [reply.id, reply.result]));
+  for (const [index] of inputs.entries()) {
+    const result = full.get(index + 1);
+    assert.deepEqual(result, compact[queries.length + index].result);
+    if (index >= cases.length) {
+      assert.equal(result.isError, true);
+      assert.equal(result.structuredContent, undefined);
+      continue;
+    }
+    assert.equal(result.isError, false);
+    const data = result.structuredContent;
+    assert.deepEqual([data.difference_pp, data.stated_ranges_overlap, data.range_a_pct,
+      data.range_b_pct, data.overlap_range_pct], cases[index][1]);
+    assert.deepEqual([data.citation_url, data.guide_url, data.guidance_source], [citation, guide, authority]);
+    assert.match(data.assumption, /keine Kalibrierungsfrage/);
+    assert.doesNotMatch(result.content[0].text, /https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('offline stdio estimates electric blanket costs from explicit user inputs only', () => {
   const name = 'heizdecke_stromkosten_nennleistung';
   const citation = 'https://getecoback.com/guide/heizdecke-stromverbrauch.html';
