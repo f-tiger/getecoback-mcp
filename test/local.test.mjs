@@ -450,6 +450,84 @@ function compactReplies(requests) {
   });
 }
 
+test('offline stdio uses only the documented PortaSplit window-lip limits', () => {
+  const name = 'midea_portasplit_fensterfalz_pruefen';
+  const guide = bracketCitation + '#fensterfalz';
+  const ean = 4048164116478;
+  const manual = 'https://www.midea.com/content/dam/midea-aem/de/klimatisieren-heizen/portasplit/PortaSplit-Gebrauchsanweisung-DE.pdf';
+  const input = {
+    angebot_ean: ean, halterung: 'original_standard', fenster: 'nach_innen_oeffnend',
+    messbezug: 'falz_nach_zeichnung', falzbreite_mm: 45, falzhoehe_mm: 20,
+  };
+  const scopePending = ['halterung_oder_fenster_klaeren', null, null, null, null];
+  const modelPending = ['modell_klaeren', null, null, null, null];
+  const cases = [
+    [{falzbreite_mm: 60, falzhoehe_mm: 0}, ['ausserhalb_dokumentierter_masse', 45, 20, -15, null]],
+    [{}, ['masse_im_dokumentierten_rahmen', 45, 20, 0, 0]],
+    [{messbezug: 'dichtung_oder_unklar', falzbreite_mm: 60}, ['messpunkt_oder_masse_klaeren', 45, 20, null, null]],
+    [{falzbreite_mm: 0, falzhoehe_mm: 19.9}, ['ausserhalb_dokumentierter_masse', 45, 20, null, -0.1]],
+    [{falzbreite_mm: 0, falzhoehe_mm: 20}, ['messpunkt_oder_masse_klaeren', 45, 20, null, 0]],
+    [{angebot_ean: 0}, modelPending],
+    [{angebot_ean: 4048164118687}, modelPending],
+    [{halterung: 'anders_oder_offen'}, scopePending],
+    [{fenster: 'anders_oder_offen'}, scopePending],
+  ];
+  const invalid = [{...input, angebot_ean: ean + 0.5}, {...input, angebot_ean: '4048164116478'},
+    {...input, angebot_ean: 123456789012}, {...input, falzbreite_mm: -1},
+    {...input, falzhoehe_mm: undefined}, {...input, zusaetzliches_mass: 5}];
+  const queries = [
+    ['Midea PortaSplit Fensterfalz 60 mm breit, reicht die Standardhalterung?', name],
+    ['Muss ich bei der Midea PortaSplit die Gummidichtung beim Fensterrahmen mitmessen?', name],
+    ['Die PortaSplit passt nicht ans Fenster, wo muss ich die Rahmendicke messen?', name],
+    ['Midea PortaSplit Dachfenster Halterung', bracketTool],
+    ['Passt die Midea PortaSplit Universalhalterung fürs Dachfenster?', bracketTool],
+  ];
+  const otherVariants = [
+    'Midea PortaSplit Pro: Passt die Standardhalterung an meinen 60 mm Fensterfalz?',
+    'Midea PortaSplit Lite Dachfenster Universalhalterung',
+  ];
+  const args = [...cases.map(([change]) => ({...input, ...change})), ...invalid];
+  const searches = [...queries.map(([query]) => query), ...otherVariants];
+  const compact = compactReplies([
+    ...searches.map(frage => toolCall(compactFind, {frage})),
+    ...args.map(eingaben => toolCall(compactRun, {name, eingaben})),
+  ]);
+  for (const [index, query] of searches.entries()) {
+    const hits = compact[index].result.structuredContent.tools;
+    const first = hits[0];
+    assert.deepEqual(first, findTools(query).tools[0]);
+    if (index >= queries.length) {
+      assert.ok(!hits.some(tool => [name, bracketTool].includes(tool.name)), query);
+      continue;
+    }
+    const expected = queries[index][1];
+    assert.equal(first?.name, expected, query);
+    assert.equal(first.citation_url, bracketCitation);
+    assert.equal(first.guide_url, expected === name ? guide : bracketGuide);
+    if (expected === name) assert.deepEqual(first.inputSchema.required, Object.keys(input));
+    else assert.ok(!hits.some(tool => tool.name === name), query);
+  }
+  const jobs = args.map((arguments_, index) => ({jsonrpc: '2.0', id: index + 1, ...toolCall(name, arguments_)}));
+  const full = new Map(readStdio(jobs).map(reply => [reply.id, reply.result]));
+  for (const [index] of args.entries()) {
+    const result = full.get(index + 1);
+    assert.deepEqual(result, compact[searches.length + index].result);
+    if (index >= cases.length) {
+      assert.equal(result.isError, true);
+      assert.equal(result.structuredContent, undefined);
+      continue;
+    }
+    assert.equal(result.isError, false);
+    const data = result.structuredContent;
+    assert.deepEqual([data.status, data.breite_max_mm, data.hoehe_min_mm,
+      data.breite_unter_max_mm, data.hoehe_ueber_min_mm], cases[index][1]);
+    assert.deepEqual([data.referenz_ean, data.citation_url, data.guide_url, data.hersteller_anleitung_url, data.druckseite],
+      [ean, bracketCitation, guide, manual, 15]);
+    assert.match(data.grenze, /noch keine Aufstellung oder Befestigung/);
+    assert.doesNotMatch(result.content[0].text, /https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('offline stdio checks German N90 identity and separates it from energy-cost intent', () => {
   const name = 'pac_n90_ean_abgleichen';
   const costs = 'pac_n90_energielabel_zu_stromkosten';
