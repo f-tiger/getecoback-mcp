@@ -27,6 +27,16 @@ const CASES = [
   ["heizleistung_watt", { qm: 20, strompreis_euro_kwh: 0 }],
   ["taupunkt_lueften", { aussen_temp_c: 18, aussen_luftfeuchte_prozent: 60, innen_temp_c: 16 }],
   ...[
+    { spalt_min_mm: 4, spalt_max_mm: 4 },
+    { spalt_min_mm: 3, spalt_max_mm: 3.5 },
+    { dichtungsart: "nutdichtung", spalt_min_mm: 4, spalt_max_mm: 4 },
+    { dichtungsart: "zusatzdichtung", spalt_min_mm: 4, spalt_max_mm: 4 },
+    { spalt_min_mm: 0, spalt_max_mm: 4 },
+    { spalt_min_mm: 5, spalt_max_mm: 2 },
+  ].map(changes => ["tesamoll_fensterdichtung_profil_pruefen", {
+    dichtungsart: "tesamoll_klebeprofil", ...changes,
+  }]),
+  ...[
     { falzbreite_mm: 60, falzhoehe_mm: 0 },
     { falzbreite_mm: 45, falzhoehe_mm: 20 },
     { messbezug: "dichtung_oder_unklar" },
@@ -157,9 +167,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 2016 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 2017 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,2016);
+  assert.equal(expandedDefinitions.length,2017);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);

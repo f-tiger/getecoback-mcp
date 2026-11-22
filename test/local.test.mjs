@@ -450,6 +450,85 @@ function compactReplies(requests) {
   });
 }
 
+test('offline stdio compares the full stated gap with the documented German tesamoll profile bands', () => {
+  const name = 'tesamoll_fensterdichtung_profil_pruefen';
+  const groove = 'fensterdichtung_falz_profilabgleich';
+  const citation = 'https://getecoback.com/guide/fenster-zugluft-mietwohnung.html';
+  const guide = citation + '#dichtungsprofil';
+  const catalog = 'https://www.tesa.com/de-de/files/download/11555752%2C4%2Ctesa-consumerkatalog-2024-online.pdf';
+  const instructions = 'https://www.tesa.com/de-de/buero-und-zuhause/do-it-yourself-magazin/fensterdichtung-erneuern.html';
+  const base = {dichtungsart: 'tesamoll_klebeprofil', spalt_min_mm: 4, spalt_max_mm: 4};
+  const allowed = 'abmessungen_passender_profile';
+  const measure = 'messwerte_klaeren';
+  const defer = 'fenstersystem_klaeren';
+  const none = 'kein_dokumentiertes_profil';
+  const cases = [
+    [{}, allowed, ['P','D']],
+    [{spalt_min_mm: 1, spalt_max_mm: 1}, allowed, ['E']],
+    [{spalt_min_mm: 3, spalt_max_mm: 3.5}, allowed, ['E','P','D']],
+    [{spalt_min_mm: 1, spalt_max_mm: 7}, none, []],
+    [{spalt_min_mm: 0}, measure, []],
+    [{spalt_max_mm: 0}, measure, []],
+    [{spalt_min_mm: 5, spalt_max_mm: 2}, measure, []],
+    [{dichtungsart: 'nutdichtung'}, defer, []],
+    [{dichtungsart: 'zusatzdichtung'}, defer, []],
+    [{dichtungsart: 'unbekannt'}, defer, []],
+  ];
+  const invalid = [{...base, dichtungsart: 'silikon'}, {...base, spalt_min_mm: -0.01},
+    {...base, spalt_min_mm: '4'}, {...base, spalt_max_mm: undefined},
+    {...base, profil_erzwungen: 'D'}];
+  const related = [
+    'Welches tesamoll E-, P- oder D-Profil passt bei 4 mm Spalt?',
+    'tesamoll Fensterdichtung für 3 bis 3,5 mm Spalt: E, P oder D?',
+  ];
+  const legacy = 'Meine Fensterdichtung ist aus der Nut gezogen. Wie gleiche ich Nut und Falzprofil beim Ersatz ab?';
+  const unrelated = [
+    'tesamoll Silikonprofil für 4 mm Fensterdichtung',
+    'Wie repariere ich undichte Dachfenster nach einem Sturm?',
+  ];
+  const searches = [...related, legacy, ...unrelated];
+  const args = [...cases.map(([change]) => ({...base, ...change})), ...invalid];
+  const compact = compactReplies([
+    ...searches.map(frage => toolCall(compactFind, {frage})),
+    ...args.map(eingaben => toolCall(compactRun, {name, eingaben})),
+  ]);
+  for (const [index, query] of searches.entries()) {
+    const hits = compact[index].result.structuredContent.tools;
+    const first = hits[0];
+    assert.deepEqual(first, findTools(query).tools[0]);
+    if (index >= related.length) {
+      assert.ok(!hits.some(tool => tool.name === name), query);
+      if (query === legacy) assert.equal(first?.name, groove, query);
+      continue;
+    }
+    assert.equal(first?.name, name, query);
+    assert.deepEqual([first.citation_url, first.guide_url], [citation, guide]);
+    assert.deepEqual(first.inputSchema.required, Object.keys(base));
+  }
+  const jobs = args.map((input, index) => ({jsonrpc: '2.0', id: index + 1, ...toolCall(name, input)}));
+  const full = new Map(readStdio(jobs).map(reply => [reply.id, reply.result]));
+  for (const [index] of args.entries()) {
+    const result = full.get(index + 1);
+    assert.deepEqual(result, compact[searches.length + index].result);
+    if (index >= cases.length) {
+      assert.equal(result.isError, true);
+      assert.equal(result.structuredContent, undefined);
+      continue;
+    }
+    assert.equal(result.isError, false);
+    const data = result.structuredContent;
+    const [, status, profiles] = cases[index];
+    assert.deepEqual([data.status, data.passende_profile], [status, profiles]);
+    assert.deepEqual([data.citation_url, data.guide_url, data.hersteller_katalog_url, data.hersteller_anleitung_url],
+      [citation, guide, catalog, instructions]);
+    assert.equal(data.katalog_druckseite, 28);
+    assert.equal(data.quellen_geprueft_am, '2026-11-22');
+    assert.deepEqual(data.dokumentierte_spaltbereiche_mm, {E:[1,3.5],P:[2,5],D:[3,7]});
+    assert.match(data.grenze, /Entwässerungsöffnungen und vorgesehene Lüftung frei lassen/);
+    assert.doesNotMatch(result.content[0].text, /https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('offline stdio uses only the documented PortaSplit window-lip limits', () => {
   const name = 'midea_portasplit_fensterfalz_pruefen';
   const guide = bracketCitation + '#fensterfalz';

@@ -20,6 +20,11 @@ const portaSplitManual = 'https://www.midea.com/content/dam/midea-aem/de/klimati
 const portaSplitOriginalEan = 4048164116478;
 const portaSplitLipMaxWidth = 45;
 const portaSplitLipMinHeight = 20;
+const windowSealPage = '/guide/fenster-zugluft-mietwohnung.html';
+const tesaWindowGuide = 'https://www.tesa.com/de-de/buero-und-zuhause/do-it-yourself-magazin/fensterdichtung-erneuern.html';
+const tesaConsumerCatalogue = 'https://www.tesa.com/de-de/files/download/11555752%2C4%2Ctesa-consumerkatalog-2024-online.pdf';
+const tesamollWindowGaps = {E:[1,3.5], P:[2,5], D:[3,7]};
+
 
 const bool = description => ({type:'boolean', description});
 const choice = (description, ...values) => ({type:'string', enum: values, description});
@@ -195,6 +200,46 @@ export const evidenceNext = [
     },
     example:{args:{angebot_ean:4048164116478,fenster:'dachfenster',standardhalterung:'im_angebot',universalhalterung:'fehlt'},
       expect:{status:'passende_halterung_vor_kauf_klaeren',halterung_im_herstellerbeispiel:'universalhalterung',universalhalterung_ean:4048164118687,entry_url:PORTASPLIT_ENTRY_URL}},
+  },
+  {
+    name:'tesamoll_fensterdichtung_profil_pruefen',
+    description:'tesamoll E-, P- und D-Fensterdichtungen: den kleinsten und größten gemessenen Spalt mit den dokumentierten Klebeprofilen vergleichen und Nut oder zweite Dichtung abgrenzen — Compare documented gap ranges for named adhesive window seals.',
+    page:windowSealPage,
+    guide_url:'https://getecoback.com'+windowSealPage+'#dichtungsprofil',
+    properties:{
+      dichtungsart:choice('Ist das geplante tesamoll-Klebeprofil am Fenster bereits als Dichtungsart geklärt, eine Nutdichtung vorhanden, eine zusätzliche Dichtung geplant oder die Bauart offen?', 'tesamoll_klebeprofil','nutdichtung','zusatzdichtung','unbekannt'),
+      spalt_min_mm:number('Kleinster Spalt an den gemessenen Stellen der vorgesehenen Dichtungsebene in mm. Falls unbekannt, 0.',0,100),
+      spalt_max_mm:number('Größter Spalt an den gemessenen Stellen derselben Dichtungsebene in mm. Falls unbekannt, 0.',0,100),
+    },
+    calculate({dichtungsart,spalt_min_mm,spalt_max_mm}) {
+      const passenderTyp = dichtungsart === 'tesamoll_klebeprofil';
+      const messungVollstaendig = spalt_min_mm > 0 && spalt_max_mm >= spalt_min_mm;
+      const passende_profile = passenderTyp && messungVollstaendig ? Object.entries(tesamollWindowGaps)
+        .filter(([, [min,max]]) => min <= spalt_min_mm && spalt_max_mm <= max)
+        .map(([profil]) => profil) : [];
+      let status, naechster_schritt;
+      if (!passenderTyp) {
+        status = 'fenstersystem_klaeren';
+        naechster_schritt = 'Vor dem Kauf vorhandene Nut, Originalprofil oder zusätzliche Dichtungsebene mit der Hausverwaltung oder einem Fensterfachbetrieb klären.';
+      } else if (!messungVollstaendig) {
+        status = 'messwerte_klaeren';
+        naechster_schritt = 'An mehreren Stellen derselben Dichtungsebene messen. Kleinsten und größten Messwert in dieser Reihenfolge eintragen.';
+      } else if (!passende_profile.length) {
+        status = 'kein_dokumentiertes_profil';
+        naechster_schritt = 'Keines der drei Profile deckt alle gemessenen Stellen ab. Messpunkte, Fensterzustand und vorgesehenes Profil vor einem Kauf klären.';
+      } else {
+        status = 'abmessungen_passender_profile';
+        naechster_schritt = 'Die aufgeführten Profile decken nur die Spaltmaße ab. Vor dem Kauf die genaue Packung, die Oberfläche und das Schließen des Fensters prüfen.';
+      }
+      return {
+        status, passende_profile, dokumentierte_spaltbereiche_mm:tesamollWindowGaps, naechster_schritt,
+        hersteller_anleitung_url:tesaWindowGuide, hersteller_katalog_url:tesaConsumerCatalogue, katalog_druckseite:28,
+        quellen_geprueft_am:'2026-11-22',
+        grenze:'Die Maße gelten für die genannten tesamoll-Klebeprofile. Sie bestätigen weder eine Montage noch die Eignung für eine Nut oder zweite Dichtung. Entwässerungsöffnungen und vorgesehene Lüftung frei lassen.',
+      };
+    },
+    example:{args:{dichtungsart:'tesamoll_klebeprofil',spalt_min_mm:4,spalt_max_mm:4},
+      expect:{status:'abmessungen_passender_profile',passende_profile:['P','D']}},
   },
   {
     name:'midea_portasplit_fensterfalz_pruefen',
