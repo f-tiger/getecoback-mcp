@@ -332,8 +332,8 @@ export const modellunterlagen = [
   },
   {
     name: 'befeuchter_nennwatt_abgabeleistung_bezug',
-    description: 'Erkenne, ob Feuchteabgabe und elektrische Leistung aus unterschiedlichen Betriebsstufen stammen — Check whether moisture output and rated watts share a setting',
-    page: guide('luftbefeuchter-ratgeber'),
+    description: 'Prüfe, ob Wasserabgabe und Watt eines Luftbefeuchters aus derselben Betriebsstufe stammen und zur Effizienzrechnung taugen — Check whether humidifier output and power are comparable',
+    page: guide('luftbefeuchter-stromverbrauch'),
     properties: {
       gemessene_wasserabgabe_ml_h: number('Dokumentierte abgegebene Wassermenge in ml/h', 1, 20000),
       elektrische_leistung_w: number('Dokumentierte Leistungsaufnahme in W', 1, 5000),

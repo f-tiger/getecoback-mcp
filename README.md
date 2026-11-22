@@ -771,7 +771,7 @@ separately measured loads reach different levels of dryness.
 | `thermovorhang_pflegeetikett_verfahren` | Match curtain cleaning needs to the care label |
 | `lb200_ziellicht_betriebshinweis` | Interpret the Beurer LB 200 with no target light |
 | `lb55_dampfstufe_mengenbezug` | Convert the documented LB 55 steam setting to a runtime quantity |
-| `befeuchter_nennwatt_abgabeleistung_bezug` | Check whether moisture output and rated watts share a setting |
+| `befeuchter_nennwatt_abgabeleistung_bezug` | Check whether humidifier output and power are comparable |
 | `saugwischer_vortrieb_arbeitsrichtung_beleg` | Check whether floor washer assistance covers the required direction |
 | `saugwischer_selbstreinigung_restpflicht_lesen` | Find manual steps still documented for a self-cleaning floor washer |
 | `trockner_programmdauer_lastvergleich_lesen` | Compare dryer label cycle duration only for matching loads |

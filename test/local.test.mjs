@@ -446,6 +446,41 @@ function compactReplies(requests) {
   });
 }
 
+test('offline humidifier efficiency questions require output and watts from matching settings', async () => {
+  const name = 'befeuchter_nennwatt_abgabeleistung_bezug';
+  const citation = 'https://getecoback.com/guide/luftbefeuchter-stromverbrauch.html';
+  const questions = [
+    'Welcher befeuchtet effizienter: der Beurer LB 55 mit 365 Watt oder Oskar mit 6 bis 18 Watt?',
+    'Gibt der LB 55 mit 365 W mehr Wasser an die Raumluft ab als ein Oskar mit 18 W?',
+  ];
+  for (const question of questions) assert.equal(findTools(question).tools[0]?.name, name);
+  for (const question of [
+    'Welcher Tank fasst mehr Wasser, der Oskar mit 18 Watt oder der LB 55 mit 365 Watt?',
+    'Braucht der LB 55 mit 365 W mehr Wasser zum Nachfüllen als der Oskar mit 18 W?',
+  ]) assert.notEqual(findTools(question).tools[0]?.name, name);
+  const filter = 'Wann muss ich den Filter von meinem Oskar wechseln?';
+  assert.equal(findTools(filter).tools[0]?.name, 'oskar_filtermatten_gemeinsamer_vorrat');
+
+  const readings = {gemessene_wasserabgabe_ml_h:400, elektrische_leistung_w:365};
+  const different = {...readings, gleiche_stufe_bedingung:false};
+  const same = {...readings, gleiche_stufe_bedingung:true};
+  const [found, unmatched, matched] = compactReplies([
+    toolCall(compactFind, {frage:questions[0]}),
+    toolCall(compactRun, {name, eingaben:different}),
+    toolCall(compactRun, {name, eingaben:same}),
+  ]);
+  assert.equal(found.result.structuredContent.tools[0].name, name);
+  assert.equal(found.result.structuredContent.tools[0].citation_url, citation);
+  assert.equal(found.result.structuredContent.tools[0].guide_url, citation + '#effizienz-vergleichen');
+  for (const [reply, args, expected] of [[unmatched, different, null], [matched, same, 1.1]]) {
+    assert.equal(reply.result.isError, false);
+    assert.deepEqual(reply.result, await callTool(name, args));
+    assert.equal(reply.result.structuredContent.ml_pro_wh, expected);
+    assert.equal(reply.result.structuredContent.citation_url, citation);
+    assert.equal(reply.result.structuredContent.guide_url, citation + '#effizienz-vergleichen');
+  }
+});
+
 test('compact stdio advertises only the finder and executor without pagination', () => {
   const [list, invalidCursor, direct] = compactReplies([
     {method:'tools/list', params:{}},
