@@ -110,6 +110,8 @@ test('local advertised tool names match the hosted contract', async()=>{
 test("drainage choices preserve exact model evidence and structured results", async () => {
   const cases = [
     {drain: "level_or_uphill", model: "meaco-one-20"},
+    {drain: "level_or_uphill", model: "meaco-two-12", moisture: "normal"},
+    {drain: "level_or_uphill", model: "stadler-lukas"},
     {drain: "downhill", model: "stadler-lukas", moisture: "persistently_high"},
     {drain: "no_drain", model: "meaco-two-12"},
     {drain: "unknown", moisture: "damage"},

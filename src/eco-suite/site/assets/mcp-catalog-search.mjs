@@ -1,3 +1,5 @@
+import {asksForDehumidifierDrainRoute} from './dehumidifier-drain-intent.mjs';
+
 const german = {ä:'ae', ö:'oe', ü:'ue', ß:'ss'};
 const normalize = value => String(value).toLowerCase()
   .replace(/[äöüß]/g, letter => german[letter]).normalize('NFD').replace(/\p{Diacritic}/gu, '');
@@ -356,7 +358,8 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   }
   const results = ranked.sort((a, b) => b.score - a.score).map(result => result.tool);
   let preferredName;
-  if (fritzValve) preferredName = fritzValveTool;
+  if (asksForDehumidifierDrainRoute(focus.query)) preferredName = 'entfeuchter_ablaufcheck';
+  else if (fritzValve) preferredName = fritzValveTool;
   else if (singleLaundry) preferredName = singleLaundryTool;
   else if (asksForLaundryCostComparison(tokens)) preferredName = 'waesche_trocknungskosten';
   else if (asksForHumidifierEfficiency(focus.query)) preferredName = 'befeuchter_nennwatt_abgabeleistung_bezug';

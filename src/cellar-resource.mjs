@@ -47,7 +47,7 @@ Beim **Comfee MDDF-20DEN7 ohne WF** bleiben die entsprechenden Paare aus Wassere
 
 ## Gefälle, Pumpe oder Tank?
 
-Vergleiche Geräteauslass und Zielablauf entlang des ganzen Schlauchwegs. Für Schwerkraftablauf muss der Schlauch durchgehend abwärts und ohne Knick verlaufen. Bei einem Anstieg oder waagerechten Abschnitt prüfe die für das genaue Modell freigegebene Pumpe und ihre Förderhöhe. Bei unklarem Verlauf oder fehlendem Abfluss prüfe Tankzugang und Entleerung am vorgesehenen Platz. Lass den Tankalarm aktiv.
+Vergleiche Geräteauslass und Zielablauf entlang des ganzen Schlauchwegs. Für Schwerkraftablauf muss der Schlauch durchgehend abwärts und ohne Knick verlaufen. Eine kurze Schwelle unterbricht das Gefälle auch bei tiefer liegendem Zielablauf. Prüfe bei einem Anstieg oder waagerechten Abschnitt die freigegebene Pumpe, Förderhöhe und Schlauchstrecke für das genaue Modell. Bei unklarem Verlauf oder fehlendem Abfluss prüfe Tankzugang und Entleerung am vorgesehenen Platz. Lass den Tankalarm aktiv.
 
 ${modelNotes.join('\n')}
 
