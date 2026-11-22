@@ -223,6 +223,16 @@ function asksForLaundryCostComparison(terms) {
     !terms.some(term => /^(?:kaufpreis|anschaffung|amortis|rentier|rechnet|gleichzeitig$|ausgeschaltet$|abgeschaltet$)/.test(term));
 }
 
+function asksForHumidifierEfficiency(query) {
+  const comparesModels = /\blb[\s-]*55\b/.test(query) && /\boskar\b/.test(query);
+  const namesHumidifier = /\b(?:luft)?befeuchter(?:s|n)?\b/.test(query);
+  const hasPower = /\b(?:nennwatt|watt|nennleistung|leistungsaufnahme)\b|\b\d+\s*w\b/.test(query);
+  const asksForOutput = /\b(?:(?:energie)?effizien[a-z]*|wasserabgabe|feuchteabgabe|befeuchtungsleistung|abgabeleistung)\b/.test(query);
+  const asksForWaterInAir = /\b(?:mehr|weniger)\s+wasser\s+(?:an|in)\s+die\s+(?:raum)?luft\b/.test(query);
+  return (comparesModels || namesHumidifier) && hasPower &&
+    (asksForOutput || (comparesModels && asksForWaterInAir));
+}
+
 export function findCatalogueTools(index, {query='', category='', name=null}={}) {
   const eligible = entry => (!category || category === entry.tool.category) && (name === null || name === entry.tool.name);
   const bounded = query.slice(0, 512);
@@ -273,10 +283,12 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
     ranked.push({tool, score});
   }
   const results = ranked.sort((a, b) => b.score - a.score).map(result => result.tool);
-  if (!asksForLaundryCostComparison(tokens)) return results;
+  let preferredName;
+  if (asksForLaundryCostComparison(tokens)) preferredName = 'waesche_trocknungskosten';
+  else if (asksForHumidifierEfficiency(exact)) preferredName = 'befeuchter_nennwatt_abgabeleistung_bezug';
+  else return results;
 
-  // Keep the measured cost comparison available even when long buyer questions
-  // match too few of its published terms to pass the ordinary ranking threshold.
-  const comparison = index.find(entry => entry.tool.name === 'waesche_trocknungskosten' && eligible(entry));
-  return comparison ? [comparison.tool, ...results.filter(tool => tool.name !== comparison.tool.name)] : results;
+  // These questions can match too few published terms for the ordinary threshold.
+  const preferred = index.find(entry => entry.tool.name === preferredName && eligible(entry));
+  return preferred ? [preferred.tool, ...results.filter(tool => tool.name !== preferredName)] : results;
 }

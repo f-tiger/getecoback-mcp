@@ -12,6 +12,7 @@ const sections = new Map([
   ['Wasserkocherbelege', [productGuide, 'wasserkocher-bosch-twk8613p']],
   ['Toasterbelege', [productGuide, 'bosch-tat8613-toaster-belege']],
   ['Fenstersauger', [productGuide, 'fenstersauger-belege']],
+  ['Modellunterlagen', ['/guide/luftbefeuchter-stromverbrauch.html', 'effizienz-vergleichen']],
 ]);
 
 export function evidenceGuideUrl(category, page) {
