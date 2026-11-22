@@ -27,6 +27,12 @@ const CASES = [
   ["heizleistung_watt", { qm: 20, strompreis_euro_kwh: 0 }],
   ["taupunkt_lueften", { aussen_temp_c: 18, aussen_luftfeuchte_prozent: 60, innen_temp_c: 16 }],
   ...[
+    ["EP2220/10", "AquaClean"], ["EP2231/40", "TCZ7003"],
+    ["TIE20301", "TCZ7033"], ["ECAM22.110.B", "DLSC002"],
+    ["anderes_modell", "AquaClean"], ["EP2220", "AquaClean"],
+    ["EP2220/10", "CA6903/10"], ["EP2231/40", "CA6903/10"], ["TIE20301", "CA6903/10"],
+  ].map(([modell, filter]) => ["kaffeevollautomat_intenza_aquaclean_filterfamilie_modellpruefung", { modell, filter }]),
+  ...[
     {},
     { temperatur_c: 20, luftfeuchte_prozent: 60 },
     { temperatur_c: 10, luftfeuchte_prozent: 60 },
