@@ -450,6 +450,85 @@ function compactReplies(requests) {
   });
 }
 
+test('offline stdio distinguishes exact Trotec TTK 75 ECO evidence and unsupported conditions', () => {
+  const name = 'trotec_ttk75_eco_pruefpunkt';
+  const citation = 'https://getecoback.com/guide/trotec-luftentfeuchter-test.html';
+  const guide = citation + '#ttk75-pruefpunkt';
+  const manual = 'https://de.trotec.com/fileadmin/downloads/Entfeuchtung/TTK75ECO/TRT-BA-TTK75ECO-TC-010-DE.pdf';
+  const supplier = 'https://www.baushop-express.com/trotec-kondensationsentfeuchter-ttk-eco.html';
+  const base = {modell: 'ttk_75_eco', temperatur_c: 30, luftfeuchte_prozent: 80};
+  const outside = ['ausserhalb_betriebsbereich', null, null];
+  const unknown = ['kein_pruefpunkt', null, null];
+  const cases = [
+    [{}, ['hersteller_pruefpunkt', 20, null]],
+    [{temperatur_c: 20, luftfeuchte_prozent: 60}, ['lieferantenwert_abgleichen', null, 6.4]],
+    [{temperatur_c: 10, luftfeuchte_prozent: 60}, unknown],
+    [{temperatur_c: 29.999}, unknown],
+    [{luftfeuchte_prozent: 79.999}, unknown],
+    [{temperatur_c: 5, luftfeuchte_prozent: 30}, unknown],
+    [{temperatur_c: 32, luftfeuchte_prozent: 90}, unknown],
+    [{temperatur_c: 4.999}, outside],
+    [{temperatur_c: 32.001}, outside],
+    [{luftfeuchte_prozent: 29.999}, outside],
+    [{luftfeuchte_prozent: 90.001}, outside],
+    [{modell: 'abweichend_oder_offen'}, ['modell_klaeren', null, null]],
+  ];
+  const invalid = [{...base, modell: 'ttk_75_e'}, {...base, temperatur_c: '30'}, {...base, temperatur_c: undefined},
+    {...base, luftfeuchte_prozent: 101}, {...base, luftfeuchte_prozent: -1}, {...base, angebots_watt: 440}];
+  const related = [
+    'Wie viele Liter entzieht der Trotec TTK 75 ECO bei 30 °C und 80 Prozent relativer Luftfeuchte?',
+    'Bringt der Trotec TTK 75 ECO bei 10 Grad und 60 Prozent Luftfeuchte im Keller auch 21 Liter am Tag?',
+    'Kann ich beim Trotec TTK-75-ECO mit 20l/24h rechnen?',
+  ];
+  const separate = [
+    'Wie viele Liter entzieht der Trotec TTK 75 E bei 30 Grad und 80 Prozent Luftfeuchte?',
+    'Trotec TTK 72 E Entfeuchtungsleistung bei 20 Grad und 60 Prozent Luftfeuchte',
+    'Verbraucht mein Trotec TTK 75 ECO 440 Watt, was kostet der Strom?',
+    'Nicht TTK 75 ECO, sondern Trotec TTK 75 E: wie viel Wasser zieht der bei 30 °C und 80 %?',
+    'Trotec TTK 75 ECO Pro Entfeuchtungsleistung bei 30 Grad und 80 Prozent Luftfeuchte',
+  ];
+  const searches = [...related, ...separate];
+  const inputs = [...cases.map(([change]) => ({...base, ...change})), ...invalid];
+  const compact = compactReplies([
+    ...searches.map(frage => toolCall(compactFind, {frage})),
+    ...inputs.map(eingaben => toolCall(compactRun, {name, eingaben})),
+  ]);
+  for (const [index, query] of searches.entries()) {
+    const hits = compact[index].result.structuredContent.tools;
+    const first = hits[0];
+    assert.deepEqual(first, findTools(query).tools[0]);
+    if (index >= related.length) {
+      assert.ok(!hits.some(tool => tool.name === name), query);
+      continue;
+    }
+    assert.equal(first?.name, name, query);
+    assert.deepEqual([first.citation_url, first.guide_url], [citation, guide]);
+    assert.deepEqual(first.inputSchema.required, Object.keys(base));
+  }
+  const jobs = inputs.map((input, index) => ({jsonrpc: '2.0', id: index + 1, ...toolCall(name, input)}));
+  const full = new Map(readStdio(jobs).map(reply => [reply.id, reply.result]));
+  for (const [index] of inputs.entries()) {
+    const result = full.get(index + 1);
+    assert.deepEqual(result, compact[searches.length + index].result);
+    if (index >= cases.length) {
+      assert.equal(result.isError, true);
+      assert.equal(result.structuredContent, undefined);
+      continue;
+    }
+    assert.equal(result.isError, false);
+    const data = result.structuredContent;
+    assert.deepEqual([data.status, data.dokumentierter_entzug_l_24h, data.lieferantenwert_l_24h], cases[index][1]);
+    assert.deepEqual([data.citation_url, data.guide_url], [citation, guide]);
+    assert.deepEqual([data.hersteller_anleitung_url, data.druckseite, data.lieferantenquelle_url, data.quellen_geprueft_am],
+      [manual, 14, supplier, '2026-11-22']);
+    assert.deepEqual(data.betriebsbereich, data.status === 'modell_klaeren' ? null :
+      {temperatur_c:[5,32],luftfeuchte_prozent:[30,90]});
+    assert.match(data.grenze, /21 l\/24 h.*separat als Maximalwert/);
+    assert.ok(!Object.keys(data).some(key => /watt|leistungsaufnahme|_w$|stromkosten|kwh/i.test(key)));
+    assert.doesNotMatch(result.content[0].text, /https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('offline stdio separates air-conditioner noise quantities, conditions and finder routes', () => {
   const name = 'klimaanlage_geraeusch_vergleich';
   const energy = 'pac_n90_energielabel_zu_stromkosten';

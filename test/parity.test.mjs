@@ -27,6 +27,16 @@ const CASES = [
   ["heizleistung_watt", { qm: 20, strompreis_euro_kwh: 0 }],
   ["taupunkt_lueften", { aussen_temp_c: 18, aussen_luftfeuchte_prozent: 60, innen_temp_c: 16 }],
   ...[
+    {},
+    { temperatur_c: 20, luftfeuchte_prozent: 60 },
+    { temperatur_c: 10, luftfeuchte_prozent: 60 },
+    { temperatur_c: 4.99 },
+    { modell: "abweichend_oder_offen" },
+    { luftfeuchte_prozent: 101 },
+  ].map(changes => ["trotec_ttk75_eco_pruefpunkt", {
+    modell: "ttk_75_eco", temperatur_c: 30, luftfeuchte_prozent: 80, ...changes,
+  }]),
+  ...[
     { groesse_a: "schalldruck", groesse_b: "schallleistung" },
     { groesse_a: "schallleistung", groesse_b: "schallleistung" },
     { groesse_a: "schalldruck", groesse_b: "schalldruck", gleiche_bedingungen: false },
@@ -175,9 +185,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 2017 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 2018 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,2017);
+  assert.equal(expandedDefinitions.length,2018);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);

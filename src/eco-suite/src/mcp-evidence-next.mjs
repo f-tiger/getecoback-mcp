@@ -24,6 +24,11 @@ const windowSealPage = '/guide/fenster-zugluft-mietwohnung.html';
 const tesaWindowGuide = 'https://www.tesa.com/de-de/buero-und-zuhause/do-it-yourself-magazin/fensterdichtung-erneuern.html';
 const tesaConsumerCatalogue = 'https://www.tesa.com/de-de/files/download/11555752%2C4%2Ctesa-consumerkatalog-2024-online.pdf';
 const tesamollWindowGaps = {E:[1,3.5], P:[2,5], D:[3,7]};
+const trotec75EcoPage = '/guide/trotec-luftentfeuchter-test.html';
+const trotec75EcoManual = 'https://de.trotec.com/fileadmin/downloads/Entfeuchtung/TTK75ECO/TRT-BA-TTK75ECO-TC-010-DE.pdf';
+const trotec75EcoSupplier = 'https://www.baushop-express.com/trotec-kondensationsentfeuchter-ttk-eco.html';
+const trotec75EcoOperatingRange = {temperatur_c:[5,32],luftfeuchte_prozent:[30,90]};
+
 
 
 const bool = description => ({type:'boolean', description});
@@ -200,6 +205,53 @@ export const evidenceNext = [
     },
     example:{args:{angebot_ean:4048164116478,fenster:'dachfenster',standardhalterung:'im_angebot',universalhalterung:'fehlt'},
       expect:{status:'passende_halterung_vor_kauf_klaeren',halterung_im_herstellerbeispiel:'universalhalterung',universalhalterung_ean:4048164118687,entry_url:PORTASPLIT_ENTRY_URL}},
+  },
+  {
+    name:'trotec_ttk75_eco_pruefpunkt',
+    description:'Trotec TTK 75 ECO: Betriebsbereich, dokumentierten Entzug bei 30 °C/80 % und separat ausgewiesenen Lieferantenwert für 20 °C/60 % prüfen — Check documented TTK 75 ECO conditions without extrapolating to a cold cellar.',
+    page:trotec75EcoPage,
+    guide_url:'https://getecoback.com'+trotec75EcoPage+'#ttk75-pruefpunkt',
+    properties:{
+      modell:choice('Steht der vollständige Modellname TTK 75 ECO auf Typenschild oder Angebot?', 'ttk_75_eco','abweichend_oder_offen'),
+      temperatur_c:number('Vor Ort gemessene Raumlufttemperatur in °C.',-30,60),
+      luftfeuchte_prozent:number('Zeitgleich gemessene relative Raumluftfeuchte in Prozent.',0,100),
+    },
+    calculate({modell,temperatur_c,luftfeuchte_prozent}) {
+      const exact = modell === 'ttk_75_eco';
+      const [minTemp,maxTemp] = trotec75EcoOperatingRange.temperatur_c;
+      const [minHumidity,maxHumidity] = trotec75EcoOperatingRange.luftfeuchte_prozent;
+      const applicable = exact && temperatur_c >= minTemp && temperatur_c <= maxTemp &&
+        luftfeuchte_prozent >= minHumidity && luftfeuchte_prozent <= maxHumidity;
+      const manufacturerPoint = applicable && temperatur_c === 30 && luftfeuchte_prozent === 80;
+      const supplierPoint = applicable && temperatur_c === 20 && luftfeuchte_prozent === 60;
+      let status, naechster_schritt;
+      if (!exact) {
+        status = 'modell_klaeren';
+        naechster_schritt = 'Vollständigen Modellnamen und die zum Gerät gehörende Anleitung prüfen. TTK 75 E ist eine andere Bezeichnung.';
+      } else if (!applicable) {
+        status = 'ausserhalb_betriebsbereich';
+        naechster_schritt = 'Für diese Messwerte liegt der Einsatz außerhalb des dokumentierten Betriebsbereichs. Ursache und geeignete Lösung vor dem Kauf klären.';
+      } else if (manufacturerPoint) {
+        status = 'hersteller_pruefpunkt';
+        naechster_schritt = 'Die 20 Liter gelten beim dokumentierten Prüfpunkt. Für den konkreten Raum zusätzlich Feuchtelast, Wasserweg und reale Laufzeit prüfen.';
+      } else if (supplierPoint) {
+        status = 'lieferantenwert_abgleichen';
+        naechster_schritt = 'Der Lieferant nennt 6,4 Liter unter diesen Bedingungen. Vor dem Kauf den Wert für die konkrete Geräteausführung bestätigen lassen.';
+      } else {
+        status = 'kein_pruefpunkt';
+        naechster_schritt = 'Temperatur und Feuchte protokollieren, die Feuchteursache klären und einen bestätigten Prüfwert für diese Bedingungen anfragen. Bis dahin den Gerätekauf offen lassen.';
+      }
+      return {
+        status, dokumentierter_entzug_l_24h:manufacturerPoint ? 20 : null,
+        lieferantenwert_l_24h:supplierPoint ? 6.4 : null,
+        betriebsbereich:exact ? trotec75EcoOperatingRange : null, naechster_schritt,
+        hersteller_anleitung_url:trotec75EcoManual, druckseite:14, lieferantenquelle_url:trotec75EcoSupplier,
+        quellen_geprueft_am:'2026-11-22',
+        grenze:'21 l/24 h ist separat als Maximalwert angegeben. Der Betriebsbereich liefert keine Liter- oder Verbrauchsprognose für andere Bedingungen. Der Lieferantenwert ist kein eigener oder in der Anleitung bestätigter Messwert.',
+      };
+    },
+    example:{args:{modell:'ttk_75_eco',temperatur_c:10,luftfeuchte_prozent:60},
+      expect:{status:'kein_pruefpunkt',dokumentierter_entzug_l_24h:null,lieferantenwert_l_24h:null}},
   },
   {
     name:'tesamoll_fensterdichtung_profil_pruefen',
