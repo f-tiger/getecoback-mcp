@@ -28,7 +28,12 @@ const checks=description=>choose(description,'ja','nein','offen');
 const hs22=flag('Deutsche Guard L1 Ausführung mit Typ HS22 und zugeordneter Anleitung M.-Nr. 13 114 040 bestätigt');
 const cx1=flag('Deutsche Boost CX1 Cat & Dog PowerLine-Ausführung 11602420 und zugeordnete Anleitung bestätigt');
 const roles=['beutel','motorschutz','abluftfilter'];
-const bagSources={GN:gn,FJM:fjm,TU:tu,CO:co};
+const bagPacks={
+  GN:{url:gn,artikelnummer:'12421170',beutel:4,motorschutzfilter:1,abluftfilter:1},
+  FJM:{url:fjm,artikelnummer:'12421180',beutel:4,motorschutzfilter:1,abluftfilter:1},
+  TU:{url:tu,artikelnummer:'12557060',beutel:4,motorschutzfilter:0,abluftfilter:1,abluftfilter_art:'AirClean'},
+  CO:{url:co,artikelnummer:'12557080',beutel:4,motorschutzfilter:0,abluftfilter:1,abluftfilter_art:'AirClean'},
+};
 const vacuumFamily={
   classic_c1:{bag:'GN',hepa:'SF-HA 30-1'},
   complete_c1:{bag:'FJM',hepa:'SF-HA 30-1'},
@@ -60,12 +65,14 @@ export const bodenstaubsaugerBelege=[
     }, a=>{
       const row=vacuumFamily[a.modellfamilie];
       const product=a.beutel_am_angebot==='unbekannt'?null:a.beutel_am_angebot;
+      const {url, ...lieferumfang}=bagPacks[row?.bag]??{};
       return {dokumentierter_beuteltyp:row?.bag??null,
         status:!row?'vollstaendigen_modellnamen_pruefen':!product?'beuteltyp_am_angebot_pruefen':
           row.bag===product?'gleich_mit_de_herstellerliste':'typ_weicht_von_de_herstellerliste_ab',
         ...proof(matrix,'Modellauswahl der deutschen Beutel- und Filterliste',
           'Classic C1 und Complete C1 sowie Compact C2 und Complete C2 stehen getrennt. Ein Kürzel wie C1 oder C2 reicht allein nicht.'),
-        beleg_zum_passenden_originalpack:row?bagSources[row.bag]:null};
+        beleg_zum_passenden_originalpack:url??null,
+        dokumentierter_de_originalpack:url?{...lieferumfang,geprueft_am:'2026-11-22'}:null};
     },{modellfamilie:'compact_c2',beutel_am_angebot:'GN'},
     {dokumentierter_beuteltyp:'FJM',status:'typ_weicht_von_de_herstellerliste_ab'}),
 
@@ -104,7 +111,8 @@ export const bodenstaubsaugerBelege=[
       const present=[a.beutel_vorhanden,a.motorschutz_vorhanden,a.abluftfilter_vorhanden];
       whole(...desired,...present);
       const missing=desired.map((n,i)=>Math.max(0,n-present[i]));
-      const references={gn_4_12421170:{n:[4,1,1],url:gn},gn_16_12498270:{n:[16,4,4],url:gnXxl}};
+      const {beutel,motorschutzfilter,abluftfilter}=bagPacks.GN;
+      const references={gn_4_12421170:{n:[beutel,motorschutzfilter,abluftfilter],url:gn},gn_16_12498270:{n:[16,4,4],url:gnXxl}};
       const pack=references[a.gewaehltes_pack]??null;
       const contents=a.modell_gn_belegt&&pack?pack.n:null;
       const short=contents?missing.map((n,i)=>Math.max(0,n-contents[i])):null;

@@ -20,6 +20,8 @@ const sections = new Map([
 const toolSections = new Map([
   ['kaffeevollautomat_intenza_aquaclean_filterfamilie_modellpruefung', [productGuide, 'kaffee-wasserfilter']],
   ['glassvac_kalt_lagern_einschalten_laden_getrennt', [productGuide, 'bosch-glassvac-einsatz-und-pflege']],
+  ['miele_hyclean_beutel_vollstaendige_modellzeile', [productGuide, 'miele-staubsaugerbeutel']],
+  ['miele_zwei_sauger_vorrat_beutel_abluftfilter_getrennt', [productGuide, 'miele-staubsaugerbeutel']],
   ['fenstersauger_170mm_saugduese_geraetezuordnung', [productGuide, 'kaercher-170mm-saugduese']],
   ['fenstersauger_wv3_wv8_led_muster_einordnen', [productGuide, 'kaercher-fenstersauger-einsatz-und-hinweise']],
 ]);

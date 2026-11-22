@@ -450,6 +450,90 @@ function compactReplies(requests) {
   });
 }
 
+test('offline stdio finds Miele bag types and keeps two-device filter evidence separate', () => {
+  const bag = 'miele_hyclean_beutel_vollstaendige_modellzeile';
+  const shared = 'miele_zwei_sauger_vorrat_beutel_abluftfilter_getrennt';
+  const citation = 'https://getecoback.com/produkte.html';
+  const guide = citation + '#miele-staubsaugerbeutel';
+  const source = 'https://www.miele.de/c/staubsaugerbeutel-und-filter-10520.htm';
+  const tu = 'https://www.miele.de/product/12557060/4-staubsaugerbeutel-tu-hyclean-pure';
+  const co = 'https://www.miele.de/product/12557080/4-staubsaugerbeutel-co-hyclean-pure';
+  const fjm = 'https://www.miele.de/product/12421180/4-staubsaugerbeutel-fjm-hyclean-pure';
+  const gn = 'https://www.miele.de/product/12421170/4-staubsaugerbeutel-gn-hyclean-pure';
+  const pack = (artikelnummer, motorschutzfilter) => ({artikelnummer,beutel:4,motorschutzfilter,abluftfilter:1,
+    ...(motorschutzfilter ? {} : {abluftfilter_art:'AirClean'}),geprueft_am:'2026-11-22'});
+  const match = 'gleich_mit_de_herstellerliste', different = 'typ_weicht_von_de_herstellerliste_ab';
+  const direct = [
+    ['guard_s1','TU', ['TU',match,tu,pack('12557060',0)]],
+    ['guard_l1','TU', ['TU',match,tu,pack('12557060',0)]],
+    ['guard_m1','GN', ['CO',different,co,pack('12557080',0)]],
+    ['compact_c2','GN', ['FJM',different,fjm,pack('12421180',1)]],
+    ['complete_c2','GN', ['GN',match,gn,pack('12421170',1)]],
+    ['nur_c2','FJM', [null,'vollstaendigen_modellnamen_pruefen',null,null]],
+    ['guard_l1','unbekannt', ['TU','beuteltyp_am_angebot_pruefen',tu,pack('12557060',0)]],
+  ].map(([modellfamilie, beutel_am_angebot, expected]) => ({
+    name:bag,input:{modellfamilie,beutel_am_angebot},
+    fields:['dokumentierter_beuteltyp','status','beleg_zum_passenden_originalpack','dokumentierter_de_originalpack'],expected,
+  }));
+  const pairs = [
+    ['guard_s1','guard_l1',true,['TU',true,'SF-HA 50-1',true]],
+    ['guard_s1','guard_l1',false,['TU',true,null,null]],
+    ['classic_c1','complete_c3',true,['GN',true,null,false]],
+    ['guard_l1','guard_m1',true,[null,false,'SF-HA 50-1',true]],
+    ['nur_c2','guard_l1',true,[null,null,null,null]],
+  ].map(([erstes_modell, zweites_modell, vorrat_soll_hepa_serie_abdecken, expected]) => ({
+    name:shared,input:{erstes_modell,zweites_modell,vorrat_soll_hepa_serie_abdecken},
+    fields:['gemeinsamer_beuteltyp','beleg_geteilter_beuteltyp','gemeinsamer_gelisteter_hepa_filter','beleg_geteilter_hepa_filter'],
+    expected,
+  }));
+  const invalid = [
+    {name:bag,input:{modellfamilie:'miele_guard_s1',beutel_am_angebot:'TU'}},
+    {name:bag,input:{modellfamilie:'guard_s1',beutel_am_angebot:'CO/TU'}},
+    {name:shared,input:{erstes_modell:'guard_s1',zweites_modell:'guard_l1',vorrat_soll_hepa_serie_abdecken:'true'}},
+  ];
+  const searches = [
+    ['Welcher Staubsaugerbeutel passt in meinen Miele Guard S1: TU oder GN?',bag],
+    ['Miele Guard M1: Darf ich meine alten GN-Beutel weiterverwenden oder brauche ich CO?',bag],
+    ['Ist 12557080 das richtige Originalpaket für den Miele Guard M1, und was ist drin?',bag],
+    ['Ist bei der Originalpackung TU 12557060 für Miele Guard L1 auch der AirClean Abluftfilter drin?',bag],
+    ['Mein Miele sagt nur C2. Passen die GN-Beutel oder FJM?',bag],
+    ['Kann ich für meine Miele Guard S1 und Guard L1 dieselben TU Beutel gemeinsam auf Vorrat kaufen?',shared],
+    ['Miele Guard L1 und Complete C3 haben beide SF-HA 50-1, passen auch die Beutel?',shared],
+    ['Gemeinsamer Vorrat für Miele Guard M1 und Complete C3: CO oder GN und Abluftfilter?',shared],
+    ['Miele Staubsaugerbeutel Anzeige sagt voll obwohl der Beutel leer ist','miele_beutelsignal_feinstaub_fusseln_abgleichen'],
+    ['Miele Guard L1 Filter wechseln und rote Anzeige zurücksetzen','miele_guard_l1_abluftanzeige_reset_vor_wechsel'],
+  ];
+  const cases = [...direct,...pairs,...invalid];
+  const compact = compactReplies([
+    ...searches.map(([frage]) => toolCall(compactFind,{frage})),
+    ...cases.map(({name,input:eingaben}) => toolCall(compactRun,{name,eingaben})),
+  ]);
+  for (const [index, [query, expected]] of searches.entries()) {
+    const first = compact[index].result.structuredContent.tools[0];
+    assert.deepEqual(first, findTools(query).tools[0]);
+    assert.equal(first?.name, expected, query);
+    if ([bag,shared].includes(expected)) assert.deepEqual([first.citation_url,first.guide_url],[citation,guide]);
+  }
+  const jobs = cases.map(({name,input}, index) => ({jsonrpc:'2.0',id:index+1,...toolCall(name,input)}));
+  const full = new Map(readStdio(jobs).map(reply => [reply.id,reply.result]));
+  for (const [index, {fields,expected}] of cases.entries()) {
+    const result = full.get(index + 1);
+    assert.deepEqual(result, compact[searches.length + index].result);
+    if (!fields) {
+      assert.equal(result.isError,true);
+      assert.equal(result.structuredContent,undefined);
+      continue;
+    }
+    assert.equal(result.isError,false);
+    const data = result.structuredContent;
+    assert.deepEqual(fields.map(field => data[field]),expected);
+    assert.deepEqual([data.citation_url,data.guide_url,data.herstellerquelle,data.quellen_geprueft],
+      [citation,guide,source,'2026-11-20']);
+    assert.match(data.grenze,index < direct.length ? /Kürzel wie C1 oder C2 reicht allein nicht/ : /keinen gemeinsamen Abluftfilter/);
+    assert.doesNotMatch(result.content[0].text,/https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('offline stdio preserves the Trotec TTK 70 HEPA production boundary and filter evidence', () => {
   const name = 'trotec_ttk70_hepa_filter_generation';
   const citation = 'https://getecoback.com/guide/trotec-luftentfeuchter-test.html';

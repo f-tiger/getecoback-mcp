@@ -27,6 +27,15 @@ const CASES = [
   ["heizleistung_watt", { qm: 20, strompreis_euro_kwh: 0 }],
   ["taupunkt_lueften", { aussen_temp_c: 18, aussen_luftfeuchte_prozent: 60, innen_temp_c: 16 }],
   ...[
+    ["guard_s1", "TU"], ["guard_l1", "TU"], ["guard_m1", "GN"],
+    ["compact_c2", "GN"], ["complete_c2", "GN"], ["nur_c2", "GN"],
+  ].map(([modellfamilie, beutel_am_angebot]) => ["miele_hyclean_beutel_vollstaendige_modellzeile", { modellfamilie, beutel_am_angebot }]),
+  ...[
+    ["guard_s1", "guard_l1", true], ["classic_c1", "complete_c3", true],
+    ["guard_l1", "guard_m1", true], ["nur_c2", "guard_l1", true],
+  ].map(([erstes_modell, zweites_modell, vorrat_soll_hepa_serie_abdecken]) =>
+    ["miele_zwei_sauger_vorrat_beutel_abluftfilter_getrennt", { erstes_modell, zweites_modell, vorrat_soll_hepa_serie_abdecken }]),
+  ...[
     ["TTK 70 HEPA","vor_dezember_2023","7710000024"],
     ["TTK 70 HEPA","dezember_2023","7710000024"],
     ["TTK 70 HEPA Plus","nach_dezember_2023","7710000077"],
