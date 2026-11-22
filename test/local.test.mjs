@@ -450,6 +450,84 @@ function compactReplies(requests) {
   });
 }
 
+test('offline stdio separates air-conditioner noise quantities, conditions and finder routes', () => {
+  const name = 'klimaanlage_geraeusch_vergleich';
+  const energy = 'pac_n90_energielabel_zu_stromkosten';
+  const identity = 'pac_n90_ean_abgleichen';
+  const citation = 'https://getecoback.com/guide/delonghi-pac-n90-test.html';
+  const guide = citation + '#lautstaerke';
+  const base = {
+    pegel_a_dba: 52, pegel_b_dba: 64, groesse_a: 'schalldruck',
+    groesse_b: 'schallleistung', gleiche_bedingungen: true,
+  };
+  const cases = [
+    [{}, false, null],
+    [{groesse_a: 'schallleistung'}, true, 12],
+    [{groesse_b: 'schalldruck', gleiche_bedingungen: false}, false, null],
+    [{groesse_b: 'schalldruck', pegel_a_dba: 51.2, pegel_b_dba: 47.1}, true, -4.1],
+    [{groesse_a: 'unbekannt', groesse_b: 'unbekannt'}, false, null],
+    [{groesse_b: 'schalldruck', pegel_b_dba: 52}, true, 0],
+  ];
+  const invalid = [{...base, pegel_a_dba: -0.1}, {...base, pegel_b_dba: 131},
+    {...base, gleiche_bedingungen: 'true'}, {...base, groesse_a: 'lautstaerke'},
+    {...base, pegel_b_dba: undefined}, {...base, pegel_a_dba: '52'}];
+  const lookups = [
+    ['Kann ich 52 dB(A) Schalldruck und 64 dB(A) Schallleistung bei zwei Klimaanlagen vergleichen?', name, guide],
+    ['Midea PortaSplit 39 dB(A) oder PAC N90 64 dB(A): Welche ist leiser im Schlafzimmer?', name, guide],
+    ['Midea PortaSplit 39 dB Schalldruck innen oder 62 dB Schallleistung außen vergleichen', name, guide],
+    ['PAC N90 50–52 dB Schalldruck gegen 64 dB Schallleistung vergleichen?', name, guide],
+    ['Midea PortaSplit 39 dB und De’Longhi Pinguino N90 64 dB im Schlafzimmer vergleichen', name, guide],
+    ['Sind 39 und 64 Dezibel bei Midea PortaSplit und PAC N90 vergleichbar?', name, guide],
+    ['DeLonghi PAC N90 ECO Silent Energielabel Stromkosten 8004399512351', energy, citation + '#n90-energielabel'],
+    ['8004399512351', identity, citation + '#testlage'],
+  ];
+  const other = [
+    'Kann man den Schalldruck zweier Luftreiniger im Schlafzimmer vergleichen?',
+    'Lautstärke Klimaanlage klappert plötzlich, was tun?',
+    'Wie laut ist die Midea PortaSplit nachts?',
+    'Ist die PortaSplit Lite mit 39 dB oder der N90 mit 64 dB leiser?',
+  ];
+  const searches = [...lookups.map(([query]) => query), ...other];
+  const inputs = [...cases.map(([change]) => ({...base, ...change})), ...invalid];
+  const compact = compactReplies([
+    ...searches.map(frage => toolCall(compactFind, {frage})),
+    ...inputs.map(eingaben => toolCall(compactRun, {name, eingaben})),
+  ]);
+  for (const [index, query] of searches.entries()) {
+    const hits = compact[index].result.structuredContent.tools;
+    const first = hits[0];
+    assert.deepEqual(first, findTools(query).tools[0]);
+    if (index >= lookups.length) {
+      assert.notEqual(first?.name, name, query);
+      continue;
+    }
+    const [, expected, target] = lookups[index];
+    assert.equal(first?.name, expected, query);
+    assert.deepEqual([first.citation_url, first.guide_url], [citation, target]);
+    if (expected === name) {
+      assert.deepEqual(first.inputSchema.required, Object.keys(base));
+      assert.ok(!hits.some(tool => tool.name === energy), query);
+    }
+  }
+  const jobs = inputs.map((input, index) => ({jsonrpc: '2.0', id: index + 1, ...toolCall(name, input)}));
+  const full = new Map(readStdio(jobs).map(reply => [reply.id, reply.result]));
+  for (const [index] of inputs.entries()) {
+    const result = full.get(index + 1);
+    assert.deepEqual(result, compact[searches.length + index].result);
+    if (index >= cases.length) {
+      assert.equal(result.isError, true);
+      assert.equal(result.structuredContent, undefined);
+      continue;
+    }
+    assert.equal(result.isError, false);
+    const data = result.structuredContent;
+    const [, comparable, difference] = cases[index];
+    assert.deepEqual([data.vergleichbar, data.differenz_b_minus_a_db], [comparable, difference]);
+    assert.deepEqual([data.citation_url, data.guide_url], [citation, guide]);
+    assert.doesNotMatch(result.content[0].text, /https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('offline stdio compares the full stated gap with the documented German tesamoll profile bands', () => {
   const name = 'tesamoll_fensterdichtung_profil_pruefen';
   const groove = 'fensterdichtung_falz_profilabgleich';
