@@ -1,3 +1,4 @@
+import {mieleBagTask} from './miele-beutel-intent.mjs';
 import {asksForTrotecTtk70Filter} from './trotec-ttk70-hepa-filter-intent.mjs';
 import {asksForNarrowKaercherNozzle, asksForWindowVacClearance, focusWindowVacQuestion, glassvacModel, windowVacCharging} from './kaercher-saugduese-intent.mjs';
 import {asksAboutCoffeeFilterMaintenance, asksForCoffeeWaterFilterMatch} from './kaffee-wasserfilter-intent.mjs';
@@ -323,6 +324,7 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const hygrometerComparisonTool = 'hygrometer_messbereiche';
   const narrowNozzle = asksForNarrowKaercherNozzle(focus.query);
   const narrowNozzleTool = 'fenstersauger_170mm_saugduese_geraetezuordnung';
+  const mieleBags = mieleBagTask(focus.query);
   const coffeeFilterMatch = asksForCoffeeWaterFilterMatch(focus.query);
   const coffeeMaintenance = asksAboutCoffeeFilterMaintenance(focus.query);
   const coffeeFilterTool = 'kaffeevollautomat_intenza_aquaclean_filterfamilie_modellpruefung';
@@ -399,6 +401,8 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   else if (philipsFilter) preferredName = philipsFilterTool;
   else if (asksForWindowVacClearance(focus.query)) preferredName = 'fenstersauger_sprossenfenster_duesenbreite';
   else if (narrowNozzle) preferredName = narrowNozzleTool;
+  else if (mieleBags === 'single') preferredName = 'miele_hyclean_beutel_vollstaendige_modellzeile';
+  else if (mieleBags === 'pair') preferredName = 'miele_zwei_sauger_vorrat_beutel_abluftfilter_getrennt';
   else if (coffeeFilterMatch) preferredName = coffeeFilterTool;
   else if (blanketCost) preferredName = blanketCostTool;
   else if (hygrometerComparison) preferredName = hygrometerComparisonTool;
