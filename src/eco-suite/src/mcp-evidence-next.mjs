@@ -10,6 +10,10 @@ const method = '/wie-wir-empfehlen.html';
 const cold = '/guide/luftentfeuchter-keller.html';
 const thermo = '/guide/smarte-heizkoerperthermostate-lohnen-sich.html';
 const air = '/guide/luftreiniger-ratgeber.html';
+const n90Page = '/guide/delonghi-pac-n90-test.html';
+const n90Ean = 8004399512351;
+const n90Model = 'PAC N90 ECO Silent';
+const n90Label = 'https://library.delonghigroup.com/assetbank-delonghi/action/directLinkImage?assetId=209150&download=true';
 
 const bool = description => ({type:'boolean', description});
 const choice = (description, ...values) => ({type:'string', enum: values, description});
@@ -17,6 +21,11 @@ const number = (description, minimum, maximum) => ({type:'number', minimum, maxi
 const money = description => number(description, 0, 50000);
 const missing = entries => Object.entries(entries).filter(([,ok]) => !ok).map(([key]) => key);
 const rounded = value => Math.round(value * 100) / 100;
+
+function n90ModelStatus(ean, modell) {
+  if (ean !== n90Ean) return 'ean_abweicht';
+  return modell === n90Model ? 'modellangaben_passen' : 'modellbezeichnung_klaeren';
+}
 
 const tadoXValveTable = 'https://cdn.bfldr.com/607DGEMS/at/hqb8tzxsq4cmchcjxsxtwhh/DE_SRTx_compatibility_Links.pdf';
 const tadoXAdapterHelp = 'https://help.tado.com/de/articles/8949346-brauche-ich-einen-adapter-um-meinen-smarten-heizkorper-thermostat-x-zu-montieren';
@@ -159,18 +168,61 @@ export const evidenceNext = [
   {
     name:'pac_n90_ean_abgleichen',
     description:'EAN und Modellangabe des PAC N90 ECO Silent gegen deutsche Unterlagen prüfen — Check the advertised model and GTIN for the documented German PAC N90 ECO Silent.',
-    page:'/guide/delonghi-pac-n90-test.html',
+    page:n90Page,
     properties:{
       ean:number('Als Zahl geschriebene EAN vom Angebot oder Typenschild.',1000000000000,9999999999999),
-      modell:choice('Zusätzliche Modellbezeichnung.', 'PAC N90 ECO Silent','abweichend','unbekannt'),
+      modell:choice('Zusätzliche Modellbezeichnung.', n90Model,'abweichend','unbekannt'),
     },
     calculate({ean,modell}) {
       if (!Number.isSafeInteger(ean)) throw new RangeError('EAN');
-      return {referenz_ean:8004399512351,status:ean!==8004399512351?'ean_abweicht'
-        : modell==='PAC N90 ECO Silent'?'modellangaben_passen':'modellbezeichnung_klaeren',
+      return {referenz_ean:n90Ean,status:n90ModelStatus(ean,modell),
         grenze:'Zwei passende Angaben identifizieren den dokumentierten Typ. Händler und Lieferumfang separat prüfen.'};
     },
     example:{args:{ean:8004399512351,modell:'PAC N90 ECO Silent'},expect:{status:'modellangaben_passen'}},
+  },
+  {
+    name:'pac_n90_energielabel_zu_stromkosten',
+    description:'PAC N90 ECO Silent: Stromkosten pro EU-Labelstunde aus 0,9 kWh und eigenem Tarif berechnen, Kühlleistung von 2,5 kW abgrenzen und den gemessenen Verbrauch eines tatsächlichen Laufs separat auswerten — Compare energy-label and metered electricity cost for the verified German PAC N90.',
+    page:n90Page,
+    guide_url:'https://getecoback.com' + n90Page + '#n90-energielabel',
+    properties:{
+      ean:number('EAN in 13 Ziffern aus Angebot oder Typenschild. Bei unbekannter EAN 0.',0,9999999999999),
+      modell:choice('Vollständige Modellbezeichnung vom Etikett oder Angebot.', n90Model,'abweichend','unbekannt'),
+      arbeitspreis_eur_kwh:number('Eigener Arbeitspreis in EUR pro kWh (35 Cent = 0,35 EUR). Bei unbekanntem Tarif -1 angeben.',-1,20),
+      messung_vollstaendig:bool('Wurden die kWh für denselben vollständigen Zeitraum am eigenen Gerät abgelesen?'),
+      messenergie_kwh:number('Gemessene elektrische Energie in kWh für den vollständigen Zeitraum. Bei fehlender Messung 0.',0,100000),
+      messdauer_min:number('Messzeitraum in ganzen Minuten, einschließlich Pausen. Bei fehlender Dauer 0.',0,525600),
+    },
+    calculate({ean,modell,arbeitspreis_eur_kwh,messung_vollstaendig,messenergie_kwh,messdauer_min}) {
+      if (!Number.isSafeInteger(ean) || (ean !== 0 && ean < 1000000000000)) throw new RangeError('EAN');
+      if (arbeitspreis_eur_kwh < 0 && arbeitspreis_eur_kwh !== -1) throw new RangeError('Arbeitspreis');
+      if (!Number.isInteger(messdauer_min)) throw new RangeError('Messdauer');
+
+      const status = ean === 0 ? 'ean_fehlt' : n90ModelStatus(ean,modell);
+      const exactModel = status === 'modellangaben_passen';
+      const tariffKnown = arbeitspreis_eur_kwh >= 0;
+      const measurementReady = exactModel && messung_vollstaendig && messdauer_min > 0;
+      const labelKwh = 0.9;
+      return {
+        status, referenz_ean:n90Ean, tarif_bekannt:tariffKnown,
+        label_eu_kwh_je_60_min:exactModel ? labelKwh : null,
+        label_kuehlleistung_kw:exactModel ? 2.5 : null,
+        label_referenz_eur_je_60_min:exactModel && tariffKnown ? rounded(labelKwh * arbeitspreis_eur_kwh) : null,
+        messung_auswertbar:measurementReady,
+        messzeitraum_kwh:measurementReady ? messenergie_kwh : null,
+        messzeitraum_min:measurementReady ? messdauer_min : null,
+        messzeitraum_eur:measurementReady && tariffKnown ? rounded(messenergie_kwh * arbeitspreis_eur_kwh) : null,
+        messwert_eur_je_stunde:measurementReady && tariffKnown ? rounded(messenergie_kwh * arbeitspreis_eur_kwh * 60 / messdauer_min) : null,
+        quellenmarkt:'DE', quellen_geprueft_am:'2026-11-20',
+        energielabel_url:n90Label, hersteller_url:'https://www.delonghi.com/de-de/s/PACN90ECOSILENT',
+        naechster_schritt:exactModel
+          ? 'Eigenen Tarif und vollständige kWh-Messung des eigenen Laufs heranziehen. Reichen Verschattung und Lüften, zunächst ohne Kauf auskommen.'
+          : 'Vor dem Kauf EAN und vollständige Variante am Typenschild oder beim Händler prüfen. Bei anderer Variante das zugehörige eigene Energieetikett suchen.',
+        grenze:'Die Kühlleistung ist keine elektrische Aufnahme. Eine nach EU-Label berechnete Normstunde und die Messung eines einzelnen Laufs liefern keine Prognose für den Alltag. Fixe Tarifbestandteile sind nicht enthalten.',
+      };
+    },
+    example:{args:{ean:n90Ean,modell:n90Model,arbeitspreis_eur_kwh:0.30,messung_vollstaendig:false,messenergie_kwh:0,messdauer_min:0},
+      expect:{status:'modellangaben_passen',label_eu_kwh_je_60_min:0.9,label_kuehlleistung_kw:2.5,label_referenz_eur_je_60_min:0.27,messzeitraum_eur:null}},
   },
   {
     name:'auslands_datenblatt_de_angebot',

@@ -127,6 +127,7 @@ const taskWords = new Map([
   ['saugroboter_kabelroute_vorbereiten', 'roboter kabel faehrt ueberfaehrt kabelsalat'],
   ['kellerentfeuchter_pruefpunkt_abgleichen', 'prueftemperatur entfeuchtungsleistung entzieht liter watt grad luftfeuchtigkeit prozent pruefbedingungen'],
   ['tado_x_oventrop_ventiladapter_pruefen', 'oventrop ventil heizungsventil heizkoerperventil unidh unil vindo th gewinde gewindesteigung 30mm m30 adapterring 1011445 4026755228717'],
+  ['pac_n90_energielabel_zu_stromkosten', 'delonghi pinguino n90 eco silent 8004399512351 labelstunde energielabel energieetikett stromverbrauch arbeitspreis strompreis cent zwischenzaehler gemessen verbrauch lauf stand stunden kw kwh kosten kostet'],
   ['entfeuchter_ablaufcheck', 'abflussschlauch ablaufschlauch abfluss auslass keller oben hoeher fuehren ableiten kondensat'],
   ['luftreiniger_ersatzfilter_zuordnung', 'passt ersatzfilter luftreinigermodell luftreiniger filternummer'],
   ['waesche_trockenweg_sortierplan', 'liegeplaetze leine liegend liegen haengend'],
