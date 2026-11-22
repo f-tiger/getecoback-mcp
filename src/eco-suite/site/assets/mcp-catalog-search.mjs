@@ -1,3 +1,4 @@
+import {asksForTrotecTtk70Filter} from './trotec-ttk70-hepa-filter-intent.mjs';
 import {asksForNarrowKaercherNozzle, asksForWindowVacClearance, focusWindowVacQuestion, glassvacModel, windowVacCharging} from './kaercher-saugduese-intent.mjs';
 import {asksAboutCoffeeFilterMaintenance, asksForCoffeeWaterFilterMatch} from './kaffee-wasserfilter-intent.mjs';
 import {asksForTrotecTtk75EcoConditions, namesTrotecTtk75Eco} from './trotec-ttk75-eco-intent.mjs';
@@ -325,6 +326,8 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const coffeeFilterMatch = asksForCoffeeWaterFilterMatch(focus.query);
   const coffeeMaintenance = asksAboutCoffeeFilterMaintenance(focus.query);
   const coffeeFilterTool = 'kaffeevollautomat_intenza_aquaclean_filterfamilie_modellpruefung';
+  const trotecFilter = asksForTrotecTtk70Filter(focus.query);
+  const trotecFilterTool = 'trotec_ttk70_hepa_filter_generation';
   const trotecConditions = asksForTrotecTtk75EcoConditions(focus.query);
   const trotecTool = 'trotec_ttk75_eco_pruefpunkt';
   const trotecOnly = namesTrotecTtk75Eco(focus.query) && !/\b(?:meaco|arete|comfee|pac[ -]*n[ -]*90|8004399512351)\b/.test(focus.query);
@@ -352,6 +355,7 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
     if (entry.tool.name === n90IdentityTool && coolingNoise) continue;
     if (entry.tool.name === coffeeFilterTool && coffeeMaintenance) continue;
     if (entry.tool.name === 'delonghi_magnifica_filter_stillstand_drei_wochen' && coffeeFilterMatch) continue;
+    if (entry.tool.name === trotecFilterTool && !trotecFilter) continue;
     if (entry.tool.name === trotecTool && !trotecConditions) continue;
     if (entry.tool.name === 'kellerentfeuchter_pruefpunkt_abgleichen' && trotecOnly) continue;
     if (entry.tool.name === tesamollTool && !tesamollProfile) continue;
@@ -402,6 +406,7 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   else if (n90Identity) preferredName = n90IdentityTool;
   else if (tesamollProfile) preferredName = tesamollTool;
   else if (portaSplitLip) preferredName = portaSplitLipTool;
+  else if (trotecFilter) preferredName = trotecFilterTool;
   else if (trotecConditions) preferredName = trotecTool;
   else if (asksForDehumidifierDrainRoute(focus.query)) preferredName = 'entfeuchter_ablaufcheck';
   else if (cellarVentilation) preferredName = cellarVentilationTool;

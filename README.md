@@ -6,7 +6,7 @@ Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
 [Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
-<!-- count -->2029<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2030<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -373,6 +373,7 @@ separately measured loads reach different levels of dryness.
 | `portasplit_gebraucht_belegliste` | Review the evidence needed before considering a used PortaSplit. |
 | `midea_portasplit_fensterhalterung_pruefen` | Check the original German Midea PortaSplit bracket and seller bundle before purchase. |
 | `trotec_ttk75_eco_pruefpunkt` | Check documented TTK 75 ECO conditions without extrapolating to a cold cellar. |
+| `trotec_ttk70_hepa_filter_generation` | Check exact German replacement filter evidence. |
 | `tesamoll_fensterdichtung_profil_pruefen` | Compare documented gap ranges for named adhesive window seals. |
 | `midea_portasplit_fensterfalz_pruefen` | Check the documented window-lip dimensions for the original Midea PortaSplit standard bracket. |
 | `pac_n90_ean_abgleichen` | Check the advertised model and GTIN for the documented German PAC N90 ECO Silent. |
@@ -2231,7 +2232,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->2029<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2030<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
