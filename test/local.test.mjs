@@ -1512,7 +1512,23 @@ test('both offline stdio profiles make cellar ventilation decisions from five me
     [{...initial,aussen_c:20,aussen_rh_prozent:70,wand_c:16},['keine_trocknung',14.4,10.4,1.6,-4,false]],
     [{...initial,aussen_rh_prozent:100,innen_c:20,wand_c:11},['grenzbereich_nachmessen',10,13.2,1,3.2,true]],
   ];
-  const invalid = [{...outside,innen_c:17,wand_c:15},{...initial,innen_rh_prozent:0},{...initial,wand_c:'15'}];
+  const shareMeasurements = [
+    'Außen 28 °C / 60 % r. F. → Taupunkt ca. 19,5 °C. Innen 17 °C / 65 % r. F. → ca. 10,4 °C. Kälteste geprüfte Wand: 15 °C.',
+    'Außen 10 °C / 80 % r. F. → Taupunkt ca. 6,7 °C. Innen 17 °C / 65 % r. F. → ca. 10,4 °C. Kälteste geprüfte Wand: 15 °C.',
+    'Außen 10 °C / 80 % r. F. → Taupunkt ca. 6,7 °C. Innen 17 °C / 65 % r. F. → ca. 10,4 °C. Kälteste geprüfte Wand: 7 °C.',
+    'Außen 20 °C / 70 % r. F. → Taupunkt ca. 14,4 °C. Innen 17 °C / 65 % r. F. → ca. 10,4 °C. Kälteste geprüfte Wand: 16 °C.',
+    'Außen 10 °C / 100 % r. F. → Taupunkt ca. 10 °C. Innen 20 °C / 65 % r. F. → ca. 13,2 °C. Kälteste geprüfte Wand: 11 °C.',
+  ];
+  const shareDecisions = {
+    kondensationsrisiko: 'Kondensationsrisiko an der gemessenen Wand. Für die Trocknung auf andere Außenbedingungen warten.',
+    probeweise_lueften: 'Diese Außenluft kann Feuchte abführen. Kurz probeweise lüften und anschließend erneut messen.',
+    grenzbereich_nachmessen: 'Messwerte liegen nah beieinander. Miss noch einmal. Innen, außen und an der kältesten Wand zeitgleich nachmessen. Auch vorhandene Kellerluft kann an dieser Wand kondensieren.',
+    keine_trocknung: 'Keine Trocknung durch diese Außenluft zu erwarten. Für die Trocknung auf einen niedrigeren Außentaupunkt warten.',
+  };
+  const invalid = [
+    {...outside,innen_c:17,wand_c:15}, {...initial,innen_rh_prozent:0},
+    {...initial,wand_c:'15'}, {...initial,messort:'Private Adresse'},
+  ];
   const queries = [
     'Soll ich meinen Keller jetzt lüften? Draußen 28 °C und 60 %, drinnen 17 °C und 65 %, Wand 15 °C.',
     'Kann ich das Kellerfenster jetzt öffnen, draußen 10 °C und 80 %, innen 17 °C und 65 %, die Wand 15 °C?',
@@ -1564,6 +1580,14 @@ test('both offline stdio profiles make cellar ventilation decisions from five me
       data.abstand_innen_aussentaupunkt_c,data.kondensation_innen_moeglich,
     ],cases[index][1]);
     assert.deepEqual([data.citation_url,data.guide_url,data.quellen_geprueft_am],[citation,guide,'2026-11-22']);
+    assert.equal(data.share_url,guide);
+    assert.equal(data.share_text_de,[
+      'Keller lüften · Eingegebene Werte, nicht unabhängig geprüft',
+      shareMeasurements[index],
+      shareDecisions[data.status],
+      'Bei sichtbarer Nässe zuerst die Ursache klären. Notwendige Lüftung für die Luftqualität bleibt separat.',
+      `Rechenweg und Quellen im EcoBack-Ratgeber (enthält Affiliate-Links): ${guide}`,
+    ].join('\n'));
     assert.equal(new URL(data.quellen_url).hostname,'www.umweltbundesamt.de');
     assert.equal(new URL(data.verbraucherzentrale_url).hostname,'www.verbraucherzentrale.de');
     assert.doesNotMatch(result.content[0].text,/https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
