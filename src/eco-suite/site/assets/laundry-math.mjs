@@ -13,6 +13,32 @@ export function laundry(x){
 }
 
 export const LAUNDRY_SHARE_URL='https://getecoback.com/waeschetrockner-oder-luftentfeuchter.html#laundry-check';
+export const LAUNDRY_SINGLE_SHARE_URL='https://getecoback.com/waeschetrockner-oder-luftentfeuchter.html#luftentfeuchter-waesche-kosten';
+
+export function laundrySingle(input) {
+ const {method,dehum,watts,hours,price}=input;
+ const fields=method==='measured'?['method','dehum','price']:['method','watts','hours','price'];
+ if (!['measured','estimate'].includes(method)||Object.keys(input).some(key=>!fields.includes(key))) {
+   throw new RangeError('Messung oder Schätzung eindeutig angeben.');
+ }
+ const kwh=method==='measured'?bound(dehum,0,100,'dehum'):
+   bound(watts,0,5000,'watts')*bound(hours,0,72,'hours')/1000;
+ return {kwh,cost:kwh*bound(price,0,5,'price')};
+}
+
+export function laundrySingleShareText(input) {
+ const {kwh,cost}=laundrySingle(input);
+ const energy=new Intl.NumberFormat('de-DE',{maximumFractionDigits:10}).format(kwh);
+ const amount=Number(cost.toFixed(10)).toLocaleString('de-DE',{style:'currency',currency:'EUR'});
+ const provenance=input.method==='measured'?'Eingegebener Messwert für den ganzen Trocknungsgang':
+   'Schätzung aus mittlerer Leistung und Laufzeit';
+ return [
+   'Direkte Stromkosten für einen Wäschedurchgang mit Luftentfeuchter',
+   `${provenance}: ${energy} kWh × ${laundryTariff(input.price,'EUR')}/kWh = ${amount}.`,
+   'Erfasst ist der Strom des Luftentfeuchters. Raumheizung und weitere Geräte sind getrennt zu berücksichtigen.',
+   `Rechenweg bei EcoBack: ${LAUNDRY_SINGLE_SHARE_URL}`,
+ ].join('\n');
+}
 
 export function laundryTariff(price,currency,locale='de-DE'){
  return new Intl.NumberFormat(locale,{style:'currency',currency,maximumFractionDigits:20}).format(price);

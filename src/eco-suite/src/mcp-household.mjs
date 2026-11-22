@@ -1,5 +1,5 @@
 import {measured, replacement} from '../site/assets/household-math.mjs';
-import {laundry, laundryShareText, LAUNDRY_SHARE_URL} from '../site/assets/laundry-math.mjs';
+import {laundry, laundryShareText, laundrySingle, laundrySingleShareText, LAUNDRY_SHARE_URL, LAUNDRY_SINGLE_SHARE_URL} from '../site/assets/laundry-math.mjs';
 
 const number = (description, minimum, maximum) => ({type:'number', description, minimum, maximum});
 const price = number('Eigener Strompreis in EUR/kWh.', 0, 5);
@@ -34,6 +34,29 @@ export const householdSuite = [
         share_text_de:laundryShareText(input, 'entered'),
         share_url:LAUNDRY_SHARE_URL,
       };
+    }
+  },
+  {
+    name:'luftentfeuchter_waesche_einzelkosten',
+    description:'Berechne nur die Stromkosten des Entfeuchters pro Wäscheladung aus gemessenen kWh oder gemessener mittlerer Leistung und Laufzeit. Keine Vergleichskosten erforderlich — Calculate a single dehumidifier drying run without assuming a dryer reading.',
+    page:'/waeschetrockner-oder-luftentfeuchter.html',
+    guide_url:LAUNDRY_SINGLE_SHARE_URL,
+    properties:{
+      method:{type:'string',enum:['measured','estimate'],description:'measured: vollständige kWh-Messung. estimate: gemessene mittlere Leistungsaufnahme × Laufzeit.'},
+      dehum:number('Gemessene kWh des vollständigen Entfeuchter-Durchgangs.',0,100),
+      watts:number('Gemessene mittlere Leistungsaufnahme in Watt über den Durchgang; keine Nennleistung vom Typenschild.',0,5000),
+      hours:number('Zugehörige Laufzeit in Stunden.',0,72),
+      price,
+    },
+    required:['method','price'],
+    oneOf:[
+      {properties:{method:{const:'measured'},watts:false,hours:false},required:['dehum']},
+      {properties:{method:{const:'estimate'},dehum:false},required:['watts','hours']},
+    ],
+    example:{args:{method:'measured',dehum:1.8,price:0.35},expect:{kwh:1.8,cost:0.63,basis:'measured'}},
+    calculate(input) {
+      const {kwh,cost}=laundrySingle(input);
+      return {kwh,cost,basis:input.method,share_text_de:laundrySingleShareText(input),share_url:LAUNDRY_SINGLE_SHARE_URL};
     }
   }
 ];

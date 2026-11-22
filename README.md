@@ -6,7 +6,7 @@ Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
 [Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
-<!-- count -->2020<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2021<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -202,6 +202,7 @@ separately measured loads reach different levels of dryness.
 | `strommessung_hochrechnen` | Project meter readings across representative days. |
 | `geraetewechsel_rechnen` | Compare the cost of keeping an appliance with replacing it. |
 | `waesche_trocknungskosten` | Compare measured energy costs for equally dry laundry. |
+| `luftentfeuchter_waesche_einzelkosten` | Calculate a single dehumidifier drying run without assuming a dryer reading. |
 | `fenster_oberflaeche_taucheck` | Check an actual indoor glass or wall surface temperature against the indoor dew point. |
 | `fenster_beschlag_einordnen` | Interpret the side on which window condensation is observed. |
 | `raumluft_wassermenge` | Estimate the grams of water in room air above a chosen relative humidity. |
@@ -2222,7 +2223,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->2020<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2021<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
