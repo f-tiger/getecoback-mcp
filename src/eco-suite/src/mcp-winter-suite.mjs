@@ -1,5 +1,6 @@
 import { calculate as winter } from '../site/assets/winter-math.mjs';
 import { decision as valveDecision } from '../site/assets/thermostat-fit.mjs';
+import { calculateWarmth } from '../site/assets/personal-warmth.mjs';
 import valveData from '../site/assets/thermostat-fit-data.json' with {type: 'json'};
 
 const number = (description, minimum, maximum) => ({type: 'number', description, minimum, maximum});
@@ -13,12 +14,44 @@ const shower = guide('duschen-kosten-rechner');
 const radiator = guide('heizkoerper-wird-nicht-warm');
 const draft = guide('fenster-zugluft-mietwohnung');
 const heatCompare = guide('heizkosten-vergleich-rechner');
+const blanket = guide('heizdecke-stromverbrauch');
 const energyPrice = number('Arbeitspreis in EUR/kWh.', 0, 5);
 const documentedValves = ['unknown', ...new Set(
   [...valveData.cases, ...(valveData.bosch?.cases ?? []), ...(valveData.fritz?.cases ?? [])].map(({id}) => id))];
 const reviewDates = {'bosch-ii-m': valveData.bosch?.reviewed, 'fritz-302': valveData.fritz?.reviewed};
 
 export const winterSuite = [
+  {
+    name: 'heizdecke_stromkosten_nennleistung',
+    description: 'Stromverbrauch und Stromkosten einer Heizdecke oder Wärmezudecke für eine Nutzung und mehrere Tage aus eigenen Annahmen berechnen — Estimate an electric blanket’s running cost at a supplied constant wattage.',
+    page: blanket,
+    guide_url: 'https://getecoback.com' + blanket + '#waerme-rechner',
+    properties: {
+      nennleistung_w: number('Eigene bestätigte Nennleistung vom Typenschild in Watt; bei fehlender Angabe nachfragen.', 0, 500),
+      laufzeit_h: number('Eigene Annahme zur effektiven Laufzeit je Nutzungstag in Stunden, innerhalb der Geräteanleitung.', 0, 24),
+      arbeitspreis_kwh: number('Eigener Strom-Arbeitspreis je kWh in der gewählten Währung. Centbeträge vorab durch 100 teilen.', 0, 5),
+      nutzungstage: number('Ganze Tage mit jeweils dieser Nutzung; ohne Angabe ein Tag.', 1, 366),
+      waehrung: choice('Währung des eingegebenen Arbeitspreises; ohne Angabe EUR. Keine Umrechnung.', ['EUR', 'CHF']),
+    },
+    required: ['nennleistung_w', 'laufzeit_h', 'arbeitspreis_kwh'],
+    calculate({nennleistung_w, laufzeit_h, arbeitspreis_kwh, nutzungstage = 1, waehrung = 'EUR'}) {
+      const result = calculateWarmth({watts:nennleistung_w, hours:laufzeit_h, days:nutzungstage, tariff:arbeitspreis_kwh});
+      if (!result) throw new RangeError('Eigene Nutzungswerte prüfen.');
+      return {
+        berechnungsart: 'nennleistung_schaetzung',
+        energie_kwh_pro_nutzung: round(result.kwh),
+        kosten_pro_nutzung: round(result.cost),
+        energie_kwh_gesamt: round(result.totalKwh),
+        kosten_gesamt: round(result.totalCost),
+        waehrung,
+        nutzungstage,
+        guidance_source: 'https://verbraucherzentrale-energieberatung.de/energie-sparen/allgemeines/stromverbrauch-messen/',
+        hinweis: 'Rechnung mit durchgehender angegebener Leistung. Heizstufe, Regelung und Abschaltung können die Messung verändern. Die Geräteanleitung entscheidet über erlaubte Nutzung und Laufzeit. Für tatsächliche Kosten die kWh über die ganze zulässige Nutzung messen und mit dem eigenen Arbeitspreis multiplizieren.',
+      };
+    },
+    example: {args: {nennleistung_w: 110, laufzeit_h: 2, arbeitspreis_kwh: 0.35},
+      expect: {energie_kwh_pro_nutzung: 0.22, kosten_pro_nutzung: 0.077, waehrung: 'EUR'}},
+  },
   {
     name: 'thermostat_amortisation',
     description: 'Sparannahme und Amortisation eines Thermostats prüfen — Estimate thermostat payback using your own savings assumption.',
