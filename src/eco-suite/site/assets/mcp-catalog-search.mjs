@@ -235,11 +235,12 @@ function asksForHumidifierEfficiency(query) {
 
 const glassvacTemperatureTool = 'glassvac_kalt_lagern_einschalten_laden_getrennt';
 const glassvacModel = /\b(?:glass[ -]?vac|06008b7000)\b/;
+const kaercherWindowVac = /\b(?:wv[ -]*[238]|kaercher[ -]+fenstersauger)\b/;
+const windowVacCharging = /\b(?:laden|aufladen|aufzuladen|aufladung|einstecken|ladenetzteil|ans\s+ladegeraet|(?:in|an)\s+die\s+steckdose)\b/;
 
 function asksForGlassvacTemperature(query) {
   const cold = /\b(?:frost[a-z]*|bodenfrost|gefroren[a-z]*|gefrier[a-z]*|minus[a-z]*|kaelte|unter\s+null)\b|[−-]\s*\d+(?:[,.]\d+)?\s*(?:°\s*c|grad)\b/.test(query);
-  const charging = /\b(?:laden|aufladen|aufzuladen|aufladung|einstecken|ladenetzteil|ans\s+ladegeraet|(?:in|an)\s+die\s+steckdose)\b/.test(query);
-  return glassvacModel.test(query) && cold && charging;
+  return glassvacModel.test(query) && cold && windowVacCharging.test(query);
 }
 
 function asksForGlassvacConnectorPhoto(query) {
@@ -252,17 +253,40 @@ function asksAboutGlassvacFault(query) {
     /\b(?:kaputt|defekt[a-z]*|fehler|fehlersuche)\b/.test(query);
 }
 
+function focusWindowVacQuestion(query) {
+  if (!glassvacModel.test(query) || !kaercherWindowVac.test(query)) return {query};
+  const pivots = [...query.matchAll(/\b(?:stattdessen|korrektur|ich\s+(?:meine|meinte)|gemeint\s+ist|sondern|jetzt(?:\s+(?:habe\s+ich|nutze\s+ich|geht\s+es\s+um|zum))?)\b/g)];
+  for (const pivot of pivots.reverse()) {
+    const previous = query.slice(0,pivot.index);
+    if (pivot[0] === 'jetzt' && !/\b(?:alt[a-z]*|frueher|zuvor|vorher|wollte|bislang)\b/.test(previous)) continue;
+    const current = query.slice(pivot.index+pivot[0].length).trim();
+    const bosch = current.match(glassvacModel);
+    const kaercher = current.match(kaercherWindowVac);
+    if (Boolean(bosch) === Boolean(kaercher)) continue;
+    const model = bosch ?? kaercher;
+    if (/\b(?:nicht|kein[a-z]*)\b/.test(current.slice(0,model.index))) continue;
+    if (kaercher && glassvacModel.test(previous)) return {query:current, omitPrefix:'glassvac_'};
+    if (bosch && kaercherWindowVac.test(previous)) return {query:current, omitPrefix:'fenstersauger_wv'};
+  }
+  // A charging question with two possible subjects has no single model limit.
+  return windowVacCharging.test(query) ? null : {query};
+}
+
 export function findCatalogueTools(index, {query='', category='', name=null}={}) {
-  const eligible = entry => (!category || category === entry.tool.category) && (name === null || name === entry.tool.name);
   const bounded = query.slice(0, 512);
   const exact = normalize(bounded.trim());
+  const focus = focusWindowVacQuestion(exact);
+  if (focus === null) return [];
+  const eligible = entry => (!category || category === entry.tool.category) &&
+    (name === null || name === entry.tool.name) &&
+    (!focus.omitPrefix || !entry.tool.name.startsWith(focus.omitPrefix));
   if (!exact) return query.length === bounded.length ? index.filter(eligible).map(entry => entry.tool) : [];
   if (query.length === bounded.length) {
     const exactEntry = index.find(entry => entry.name === exact);
     if (exactEntry) return eligible(exactEntry) ? [exactEntry.tool] : [];
   }
 
-  const tokens = words(bounded).filter(token =>
+  const tokens = words(focus.query).filter(token =>
     (token.length >= 3 || /^[a-z][0-9]$/.test(token)) && !questionWords.has(token));
   const observed = new Map();
   for (const term of tokens) {
@@ -304,10 +328,10 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const results = ranked.sort((a, b) => b.score - a.score).map(result => result.tool);
   let preferredName;
   if (asksForLaundryCostComparison(tokens)) preferredName = 'waesche_trocknungskosten';
-  else if (asksForHumidifierEfficiency(exact)) preferredName = 'befeuchter_nennwatt_abgabeleistung_bezug';
-  else if (asksAboutGlassvacFault(exact)) return results.filter(tool => tool.name !== glassvacTemperatureTool);
-  else if (asksForGlassvacTemperature(exact)) preferredName = glassvacTemperatureTool;
-  else if (asksForGlassvacConnectorPhoto(exact)) return results.filter(tool => tool.name !== glassvacTemperatureTool);
+  else if (asksForHumidifierEfficiency(focus.query)) preferredName = 'befeuchter_nennwatt_abgabeleistung_bezug';
+  else if (asksAboutGlassvacFault(focus.query)) return results.filter(tool => tool.name !== glassvacTemperatureTool);
+  else if (asksForGlassvacTemperature(focus.query)) preferredName = glassvacTemperatureTool;
+  else if (asksForGlassvacConnectorPhoto(focus.query)) return results.filter(tool => tool.name !== glassvacTemperatureTool);
   else return results;
 
   // These questions can match too few published terms for the ordinary threshold.

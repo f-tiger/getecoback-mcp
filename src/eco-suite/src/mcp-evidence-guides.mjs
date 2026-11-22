@@ -17,6 +17,7 @@ const sections = new Map([
 
 const toolSections = new Map([
   ['glassvac_kalt_lagern_einschalten_laden_getrennt', [productGuide, 'bosch-glassvac-einsatz-und-pflege']],
+  ['fenstersauger_wv3_wv8_led_muster_einordnen', [productGuide, 'kaercher-fenstersauger-einsatz-und-hinweise']],
 ]);
 
 export function evidenceGuideUrl(category, page, name) {

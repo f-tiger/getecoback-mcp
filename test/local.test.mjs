@@ -164,7 +164,9 @@ test('German window vacuum questions find the same five reviewed tasks in local 
   for (const [i, [query, expected]] of queries.entries()) {
     const first = findTools(query).tools[0];
     assert.equal(first?.name, expected, query);
-    assert.equal(first.guide_url, 'https://getecoback.com/produkte.html#fenstersauger-belege');
+    const section = expected === 'fenstersauger_wv3_wv8_led_muster_einordnen' ?
+      'kaercher-fenstersauger-einsatz-und-hinweise' : 'fenstersauger-belege';
+    assert.equal(first.guide_url, 'https://getecoback.com/produkte.html#' + section);
     assert.deepEqual(replies[i].result.structuredContent.tools[0], first, query);
   }
 });
@@ -445,6 +447,45 @@ function compactReplies(requests) {
     return byId.get(job.id);
   });
 }
+
+test('German model corrections keep charging temperatures and LED observations on their own window vacuum', async () => {
+  const bosch = 'glassvac_kalt_lagern_einschalten_laden_getrennt';
+  const kaercher = 'fenstersauger_wv3_wv8_led_muster_einordnen';
+  const guide = 'https://getecoback.com/produkte.html#kaercher-fenstersauger-einsatz-und-hinweise';
+  const changedToKaercher = 'Den Bosch GlassVAC wollte ich nach Frost laden. Jetzt geht es um meinen Kärcher WV 8: Alle LEDs blinken zweimal kurz und machen dann eine lange Pause, der Motor ist schon aus. Was bedeutet das?';
+  const changedToBosch = 'Zuvor hatte ich den Kärcher WV 8. Jetzt nutze ich den Bosch GlassVAC 06008B7000. Darf ich ihn nach Frost bei minus 3 Grad aufladen?';
+  const unanswered = [
+    'Mein alter Bosch GlassVAC war im Schuppen. Jetzt habe ich einen Kärcher WV 8. Darf ich dessen Akku nach Frost bei minus 3 Grad aufladen?',
+    'Beim Bosch GlassVAC habe ich im Schuppen minus 3 Grad gemessen. Den Kärcher WV 8 lade ich drinnen, dort habe ich nicht gemessen. Darf ich ihn jetzt laden?',
+    'Ich vergleiche Bosch GlassVAC und Kärcher WV 8. Darf ich beide Fenstersauger bei minus 3 Grad aufladen?',
+    'Ich vergleiche beide Geräte: Darf ich beim Bosch GlassVAC und Kärcher WV 8 jeweils im unbeheizten Schuppen laden?',
+  ];
+  for (const [query, expected] of [[changedToKaercher, kaercher], [changedToBosch, bosch], [kaercher, kaercher], [bosch, bosch]]) {
+    assert.equal(findTools(query).tools[0]?.name, expected);
+  }
+  for (const query of unanswered) assert.equal(findTools(query).totalMatches, 0, query);
+  const pattern = {
+    artikel:'1.633-785.0', sicherheitsblatt_bestaetigt:true,
+    muster:'alle_leds_zweimal_kurz_dann_lange_pause', zustand:'motor_aus',
+  };
+  const [found, empty, executed] = compactReplies([
+    toolCall(compactFind, {frage:changedToKaercher}),
+    toolCall(compactFind, {frage:unanswered[1]}),
+    toolCall(compactRun, {name:kaercher, eingaben:pattern}),
+  ]);
+  const entry = found.result.structuredContent.tools[0];
+  assert.equal(entry.name, kaercher);
+  assert.equal(entry.guide_url, guide);
+  assert.equal(empty.result.structuredContent.totalMatches, 0);
+  assert.deepEqual(executed.result, await callTool(kaercher, pattern));
+  const observation = executed.result.structuredContent;
+  assert.equal(observation.tabellenbedeutung, 'akkutemperatur_zu_hoch_oder_zu_tief');
+  assert.equal(observation.guide_url, guide);
+  assert.equal(observation.citation_url, 'https://getecoback.com/produkte.html');
+  assert.equal(Object.hasOwn(observation, 'im_empfohlenen_ladebereich'), false);
+  const unmeasured = await callTool(bosch, {paketkennung:'06008B7000', handbuch_zugeordnet:true});
+  assert.equal(unmeasured.isError, true);
+});
 
 test('GlassVAC frost questions distinguish charging, startup and storage using the measured temperature', () => {
   const name = 'glassvac_kalt_lagern_einschalten_laden_getrennt';
