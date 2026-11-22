@@ -11,3 +11,30 @@ export function laundry(x){
  breakEvenHours:x.method==='estimate'&&x.watts>0?dryer*1000/x.watts:null,
  payback:x.comparable&&annualDifference>0?purchase/annualDifference:null};
 }
+
+export const LAUNDRY_SHARE_URL='https://getecoback.com/waeschetrockner-oder-luftentfeuchter.html#laundry-check';
+
+export function laundryTariff(price,currency,locale='de-DE'){
+ return new Intl.NumberFormat(locale,{style:'currency',currency,maximumFractionDigits:20}).format(price);
+}
+
+export function laundryShareText(input,provenance='entered'){
+ const result=laundry(input),{currency}=input;
+ const energy=new Intl.NumberFormat('de-DE',{maximumFractionDigits:10});
+ const cost=new Intl.NumberFormat('de-DE',{style:'currency',currency});
+ const price=laundryTariff(input.price,currency);
+ const dryerBasis=input.dryerBasis==='hundred'?'Labelwert je 100 Zyklen ÷ 100':'eingegebene kWh je Ladung';
+ const dehumBasis=input.method==='estimate'?'aus mittlerer Leistung × Laufzeit geschätzt':'eingegebene kWh je Durchgang';
+ const basis={example:'Rechenbeispiel',shared:'Werte aus einem geteilten Szenario',entered:'Eingegebene Werte'}[provenance]??'Eingegebene Werte';
+ const comparison=result.winner==='unconfirmed'?'Wäschemenge oder Endtrockenheit nicht als gleich bestätigt. Keine Aussage, welches Verfahren bei gleicher Trocknung günstiger ist.':
+  'Gleiche Wäschemenge und Endtrockenheit sind für den Vergleich vorausgesetzt.';
+ return [
+  'Direkte Stromkosten je vollständigem Trocknungsdurchgang',
+  `${basis}. Trockner: ${dryerBasis}. Entfeuchter: ${dehumBasis}.`,
+  `Trockner: ${energy.format(result.dryer)} kWh × ${price}/kWh = ${cost.format(result.dryerCost)}`,
+  `Entfeuchter: ${energy.format(result.dehum)} kWh × ${price}/kWh = ${cost.format(result.dehumCost)}`,
+  comparison,
+  'Raumheizung, Lüftungswärme, Kaufpreis und Zeit sind nicht enthalten.',
+  `Rechenweg bei EcoBack: ${LAUNDRY_SHARE_URL}`,
+ ].join('\n');
+}
