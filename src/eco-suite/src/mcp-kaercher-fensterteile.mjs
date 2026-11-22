@@ -48,3 +48,77 @@ export const kaercherFensterlippe = {
     expect: {status:'kombination_nicht_aufgelistet', vor_kauf:'kauf_zurueckstellen_und_zuordnung_klaeren'},
   },
 };
+
+const checkedNozzles = new Map([
+  ['2.633-112.0', {
+    models: ['WV 2 Plus Multi Edition'],
+    url: 'https://www.karcher.com/de/de/home-and-garden/produkte/absaugduese-schmal-fuer-wv-2-wv-5-p26331120',
+  }],
+  ['2.633-605.0', {
+    models: ['WV 3 Comfort Precision+ Black'],
+    url: 'https://www.karcher.com/de/de/home-and-garden/produkte/schmale-absaugduese-170-mm-wv-1-go-wv-1-compact-wv-2-universal-wv-3-comfort-p26336050',
+  }],
+  ['2.633-512.0', {
+    models: ['WV 4-4 Plus', 'WV 6 + KV 4', 'WV 6 Plus'],
+    url: 'https://www.karcher.com/de/de/home-and-garden/produkte/absaugduese-schmal-170-mm-gelb-fuer-wv-6-p26335120',
+  }],
+  ['2.633-532.0', {
+    models: ['WV 5 Ultra Care', 'WV 6 + KV 4 Premium', 'WV 6 Plus', 'WV 8 Signature Line'],
+    url: 'https://www.karcher.com/de/de/home-and-garden/produkte/absaugduese-schmal-170-mm-weiss-fuer-wv-4-4-wv-5-ultra-wv-6-wv-7-wv-8-p26335320',
+  }],
+]);
+const unclear = 'unbekannt';
+const knownDevices = [...new Set([...checkedNozzles.values()].flatMap(({models}) => models))];
+
+export const kaercherFensterduese = {
+  name: 'fenstersauger_170mm_saugduese_geraetezuordnung',
+  description: 'Gleiche eine komplette schmale Kärcher 170-mm-Absaugdüse anhand der Teilenummer 2.633-112.0, 2.633-605.0, 2.633-512.0 oder 2.633-532.0 und des exakten WV-Geräts ab. Unterscheide Saugkopf und Gummilippe — Check an exact German model and complete narrow suction nozzle.',
+  page: '/produkte.html',
+  properties: {
+    geraet: {
+      type: 'string',
+      enum: [...knownDevices, unclear],
+      description: 'Vollständig bestätigte Kärcher-Gerätevariante. Wähle bei einem Kürzel wie WV 6 oder bei nicht eindeutig zugeordneten Bundles unbekannt.',
+    },
+    teilenummer: {
+      type: 'string',
+      enum: [...checkedNozzles.keys(), unclear],
+      description: 'Bestätigte Kärcher-Artikelnummer des Angebots in Originalschreibweise. Wähle bei anderer oder fehlender Nummer unbekannt.',
+    },
+    angebotsart: {
+      type: 'string',
+      enum: ['komplette_saugduese', 'nur_abziehlippe', unclear],
+      description: 'Tatsächlich bestätigter Angebotsumfang. Eine Abziehlippe allein ist der Gummistreifen. Bei Widerspruch zwischen Artikelnummer und Beschreibung wähle unbekannt.',
+    },
+  },
+  calculate({geraet, teilenummer, angebotsart}) {
+    const offered = checkedNozzles.get(teilenummer);
+    const matches = [...checkedNozzles].filter(([, {models}]) => models.includes(geraet));
+    let status = 'zuordnung_offen';
+    if (angebotsart === 'nur_abziehlippe') {
+      status = 'nur_abziehlippe';
+    } else if (angebotsart === 'komplette_saugduese' && offered && geraet !== unclear) {
+      status = offered.models.includes(geraet) ? 'herstellerliste_bestaetigt' : 'kombination_nicht_belegt';
+    }
+    const evidence = offered ? new Map([[teilenummer, offered], ...matches]) : new Map(matches);
+    return {
+      status,
+      markt: 'Deutschland',
+      dokumentierte_duesen: matches.map(([number]) => number),
+      vor_kauf: status === 'herstellerliste_bestaetigt'
+        ? 'passende_vorhandene_duese_weiterverwenden_sonst_angebotsumfang_abgleichen'
+        : 'kauf_zurueckstellen_und_geraetevariante_teileart_oder_kennung_klaeren',
+      hinweis: '170 mm ist die Nennbreite. Prüfe die Gerätevariante, die vollständige Artikelnummer und den Angebotsumfang. Ein Treffer in der deutschen Zubehörliste belegt weder die Ausstattung eines Sets noch die Kompatibilität unbelegter Varianten.',
+      belege: [...evidence].map(([number, {url}]) => ({
+        teilenummer: number,
+        url,
+        fundstelle: 'Kärcher Deutschland, kompatible Geräte der Absaugdüse',
+        geprueft_am: '2026-11-22',
+      })),
+    };
+  },
+  example: {
+    args: {geraet:'WV 6 Plus', teilenummer:'2.633-532.0', angebotsart:'komplette_saugduese'},
+    expect: {status:'herstellerliste_bestaetigt', dokumentierte_duesen:['2.633-512.0', '2.633-532.0']},
+  },
+};
