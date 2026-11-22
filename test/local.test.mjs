@@ -450,6 +450,82 @@ function compactReplies(requests) {
   });
 }
 
+test('both offline stdio profiles find exact German replacement filters without using unsupported variants', () => {
+  const name = 'luftreiniger_ersatzfilter_zuordnung';
+  const citation = 'https://getecoback.com/ersatzfilter.html';
+  const guide = citation + '#finder';
+  const queries = [
+    'Welcher Ersatzfilter passt in meinen Beurer LR 401?',
+    'Ich brauche einen neuen Filter für den Levoit Core 300S ohne Pro. Welche Variante passt?',
+    'Passt der Ersatzfilter in mein Luftreinigermodell?',
+  ];
+  const unrelated = [
+    'Welcher Ersatzfilter passt in den Levoit Core 300S Pro?',
+    'Welcher Ersatzfilter passt in den Levoit Core 300S-P?',
+    'Welcher Ersatzfilter passt in den Philips AC2889?',
+    'Darf ich den Filter vom Levoit Core 300S waschen?',
+    'Kann ich einen Ersatzfilter für Beurer LR 401 und LR 405 tauschen?',
+    'Welcher Ersatzfilter passt in den Xiaomi LR 401?',
+    'Welcher Ersatzfilter passt in den Dyson Core 300S?',
+    'Welcher Ersatzfilter passt in den Levoit Core 300S Plus?',
+    'Welcher Ersatzfilter passt in den Beurer LR 401 Premium?',
+  ];
+  const cases = [
+    ['beurer-lr401','LR 401','69309','https://www.beurer.com/de/p/69309/'],
+    ['levoit-core-300s','Core 300S',null,'https://levoit.de/products/levoit-core-300-und-core-300s-ersatzfilter-hepa-filter'],
+  ];
+  const models = [...cases.map(([model])=>model),'unknown','levoit-core-300s-pro','levoit-core-300s-p','philips-ac2889','beurer-lr405'];
+  const searches = [...queries,...unrelated];
+  const compact = compactReplies([
+    ...searches.map(frage=>toolCall(compactFind,{frage})),
+    ...models.map(model=>toolCall(compactRun,{name,eingaben:{model}})),
+  ]);
+  for (const [index,frage] of queries.entries()) {
+    const first = compact[index].result.structuredContent.tools[0];
+    assert.equal(first?.name,name,frage);
+    assert.deepEqual(first,findTools(frage).tools[0]);
+    assert.deepEqual([first.citation_url,first.guide_url],[citation,guide]);
+    assert.deepEqual(first.inputSchema.required,['model']);
+    assert.deepEqual(first.inputSchema.properties.model.enum,['levoit-core-300s','beurer-lr401','unknown']);
+  }
+  for (const [index,frage] of unrelated.entries()) {
+    const hits = compact[queries.length+index].result.structuredContent.tools;
+    assert.ok(!hits.some(tool=>tool.name===name),frage);
+  }
+  const jobs = models.map((model,index)=>({jsonrpc:'2.0',id:index+1,...toolCall(name,{model})}));
+  const standard = new Map(readStdio(jobs).map(reply=>[reply.id,reply.result]));
+  const date = new Date();
+  const days = (Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate()) - Date.parse('2026-11-15')) / 86400000;
+  const evidenceCurrent = days >= 0 && days <= 30;
+  for (const [index,model] of models.entries()) {
+    const result = standard.get(index+1);
+    assert.deepEqual(result,compact[searches.length+index].result);
+    if (model !== 'unknown' && index >= cases.length) {
+      assert.equal(result.isError,true);
+      assert.equal(result.structuredContent,undefined);
+      continue;
+    }
+    assert.equal(result.isError,false);
+    const data = result.structuredContent;
+    assert.deepEqual([data.citation_url,data.guide_url],[citation,guide]);
+    if (model === 'unknown') {
+      assert.equal(data.status,'identify_model');
+      for (const field of ['model_guide_url','manufacturer_source','part_number']) assert.equal(Object.hasOwn(data,field),false);
+    } else {
+      const [,modelLabel,part,source] = cases[index];
+      assert.equal(data.status,evidenceCurrent?'documented_variant':'source_recheck');
+      assert.equal(data.exact_model,modelLabel);
+      assert.equal(data.manufacturer_source,source);
+      assert.equal(data.source_checked,'2026-11-15');
+      assert.equal(data.part_number,evidenceCurrent?part:null);
+      assert.equal(typeof data.filter_name,evidenceCurrent?'string':'object');
+      if (!evidenceCurrent) assert.equal(data.filter_name,null);
+      assert.equal(data.model_guide_url,citation+'#'+model);
+    }
+    assert.doesNotMatch(result.content[0].text,/https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('both offline stdio profiles make cellar ventilation decisions from five measured values', () => {
   const name = 'keller_lueften_taupunkt_messwerte';
   const legacy = 'taupunkt_lueften';
