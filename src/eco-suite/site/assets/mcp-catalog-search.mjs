@@ -3,14 +3,14 @@ import {asksForTrotecTtk70Filter} from './trotec-ttk70-hepa-filter-intent.mjs';
 import {asksForNarrowKaercherNozzle, asksForWindowVacClearance, focusWindowVacQuestion, glassvacModel, windowVacCharging} from './kaercher-saugduese-intent.mjs';
 import {asksAboutCoffeeFilterMaintenance, asksForCoffeeWaterFilterMatch} from './kaffee-wasserfilter-intent.mjs';
 import {asksForTrotecTtk75EcoConditions, namesTrotecTtk75Eco} from './trotec-ttk75-eco-intent.mjs';
-import {asksForCoolingNoiseComparison} from './cooling-noise-intent.mjs';
+import {asksForCoolingNoiseComparison} from './cooling-noise-intent.mjs?v=f0bcc0785943';
 import {asksForTesamollWindowProfile} from './tesamoll-profile-intent.mjs';
 import {exactGermanFilterModel} from './exact-filter-intent.mjs';
 import {philipsHumidifierFilterSection} from './philips-humidifier-filter-intent.mjs';
 import {asksForElectricBlanketCost, isElectricBlanketQuestion} from './electric-blanket-cost-intent.mjs';
 import {asksForHygrometerComparison} from './hygrometer-comparison-intent.mjs';
 import {asksForN90ModelIdentity, namesAnotherPacWithoutN90} from './n90-model-intent.mjs';
-import {asksForPortaSplitWindowLip, namesDifferentPortaSplit} from './portasplit-fensterfalz-intent.mjs';
+import {asksForPortaSplitWindowLip, namesDifferentPortaSplit, namesOriginalPortaSplitExactly} from './portasplit-fensterfalz-intent.mjs?v=66ae5fbd590d';
 import {asksForCellarVentilationCheck} from './cellar-ventilation-intent.mjs';
 import {asksForDehumidifierDrainRoute} from './dehumidifier-drain-intent.mjs';
 
@@ -340,7 +340,8 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const n90IdentityTool = 'pac_n90_ean_abgleichen';
   const tesamollProfile = asksForTesamollWindowProfile(focus.query);
   const tesamollTool = 'tesamoll_fensterdichtung_profil_pruefen';
-  const portaSplitLip = asksForPortaSplitWindowLip(focus.query);
+  const portaSplitLip = (query.length === bounded.length && namesOriginalPortaSplitExactly(exact)) ||
+    asksForPortaSplitWindowLip(focus.query);
   const portaSplitVariant = namesDifferentPortaSplit(focus.query);
   const portaSplitLipTool = 'midea_portasplit_fensterfalz_pruefen';
   const singleLaundry = asksForSingleLaundryCost(focus.query);
@@ -363,6 +364,7 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
     if (entry.tool.name === tesamollTool && !tesamollProfile) continue;
     if (entry.tool.name === 'tesa_tuerbodenprofil_belag_groesster_spalt' && tesamollProfile) continue;
     if (entry.tool.name === portaSplitLipTool && !portaSplitLip) continue;
+    if (entry.tool.name === coolingNoiseTool && portaSplitVariant) continue;
     if (entry.tool.name === 'midea_portasplit_fensterhalterung_pruefen' && portaSplitVariant) continue;
     if (entry.tool.name === 'pac_n90_energielabel_zu_stromkosten' && (blanketQuestion || n90Identity || otherPacModel || coolingNoise || trotecOnly)) continue;
     if (entry.tool.name === fritzValveTool && !fritzValve) continue;

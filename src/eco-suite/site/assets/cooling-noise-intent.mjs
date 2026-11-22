@@ -1,4 +1,4 @@
-import {namesDifferentPortaSplit} from './portasplit-fensterfalz-intent.mjs';
+import {namesDifferentPortaSplit} from './portasplit-fensterfalz-intent.mjs?v=66ae5fbd590d';
 
 export function asksForCoolingNoiseComparison(query) {
   if (namesDifferentPortaSplit(query) ||
