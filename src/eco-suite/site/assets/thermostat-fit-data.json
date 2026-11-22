@@ -15,6 +15,14 @@
       "label": "tado° X"
     },
     {
+      "id": "bosch-ii-m",
+      "label": "Bosch Heizkörper-Thermostat II [+M] · 8750002861"
+    },
+    {
+      "id": "fritz-302",
+      "label": "FRITZ!Smart Thermo 302 / FRITZ!DECT 302 · 20003120"
+    },
+    {
       "id": "other",
       "label": "Andere Marke / Modell unklar"
     }
@@ -44,10 +52,93 @@
       "title": "tado° X: eigene Kompatibilität prüfen",
       "url": "https://help.tado.com/de/"
     },
+    "bosch-product": {
+      "title": "Bosch: Lieferumfang des Heizkörper-Thermostats II [+M]",
+      "url": "https://www.bosch-smarthome.com/de/de/produkte/heizung/heizkoerper-thermostat/"
+    },
+    "bosch-adapter": {
+      "title": "Bosch: Danfoss-RAV-Adapter, Gerätenummer und EAN",
+      "url": "https://www.bosch-smarthome.com/de/de/produkte/zubehoer-und-ersatzteile/ventiladapter/"
+    },
+    "bosch-guide": {
+      "title": "Bosch: Ventilbilder und Adapterempfehlungen",
+      "url": "https://www.bosch-smarthome.com/res/web/produkt/heizkoerper-thermostat2/pdf/8-750-002-943_V001_Valve_adapter_recommendations_ML_20240808.pdf"
+    },
+    "fritz-product": {
+      "title": "FRITZ!Smart Thermo 302: Lieferumfang für Artikel 20003120",
+      "url": "https://fritz.com/products/fritz-smart-thermo-302-20003120"
+    },
+    "fritz-valves": {
+      "title": "FRITZ!DECT 302: Heizungsventile und passende Adapter",
+      "url": "https://fritz.com/apps/knowledge-base/fritz-dect-302/3376_An-welchen-Heizungsventilen-kann-der-FRITZ-Heizkorperregler-eingesetzt-werden?market=de-de"
+    },
     "routine": {
       "title": "Verbraucherzentrale: Thermostat einstellen und wechseln",
       "url": "https://www.verbraucherzentrale.de/wissen/energie/heizen-und-warmwasser/heizkosten-sparen-thermostat-richtig-einstellen-und-wechseln-7940"
     }
+  },
+  "bosch": {
+    "reviewed": "2026-11-22",
+    "model": "8750002861",
+    "cases": [
+      {
+        "id": "danfoss-ra",
+        "label": "Danfoss RA",
+        "status": "adapter",
+        "title": "Danfoss RA: Der Adapter liegt bei",
+        "detail": "Gleiche die Ventilkennzeichnung mit den RA-Abbildungen in der Bosch-Ventilliste ab. Hast du RA bestätigt, kannst du den mitgelieferten Adapter des Bosch II [+M] verwenden.",
+        "source": "bosch-product",
+        "page": 9
+      },
+      {
+        "id": "danfoss-ravl",
+        "label": "Danfoss RAVL",
+        "status": "adapter",
+        "title": "Danfoss RAVL: Der Adapter liegt bei",
+        "detail": "Bosch zeigt für RAVL 25,5 mm mit vier Kerben. Bestätige den Ventiltyp anhand der Kennzeichnung und der Abbildungen, bevor du den mitgelieferten RAVL-Adapter auswählst.",
+        "source": "bosch-product",
+        "page": 10
+      },
+      {
+        "id": "danfoss-rav",
+        "label": "Danfoss RAV",
+        "status": "adapter",
+        "title": "Danfoss RAV: Separaten Adapter einplanen",
+        "detail": "Bosch zeigt für RAV 34 mm mit vier Kerben. Prüfe die Modellkennzeichnung und die Abbildungen. Für bestätigtes RAV führt Bosch ein separates Zubehör: 2er-Pack 8750002600, EAN 4062321692636.",
+        "source": "bosch-adapter",
+        "page": 9
+      }
+    ]
+  },
+  "fritz": {
+    "reviewed": "2026-11-22",
+    "model": "20003120",
+    "cases": [
+      {
+        "id": "danfoss-ra",
+        "label": "Danfoss RA",
+        "status": "adapter",
+        "title": "Danfoss RA: Den mitgelieferten Adapter nutzen",
+        "detail": "Der FRITZ!Smart Thermo 302 enthält einen RA-Adapter. Bestätige in den Ventilunterlagen, dass dein Anschluss dem in der FRITZ!-Liste genannten Danfoss RA mit Anschlussgewinde entspricht.",
+        "source": "fritz-valves"
+      },
+      {
+        "id": "danfoss-rav",
+        "label": "Danfoss RAV",
+        "status": "adapter",
+        "title": "Danfoss RAV: Separaten Adapter mit Pin einplanen",
+        "detail": "FRITZ! nennt für RAV 34 mm. Bestätige den Ventiltyp anhand der Modellkennzeichnung oder der Ventilunterlagen. Für diesen Anschluss brauchst du einen RAV-Adapter mit Pin aus dem Fachhandel.",
+        "source": "fritz-valves"
+      },
+      {
+        "id": "danfoss-ravl",
+        "label": "Danfoss RAVL",
+        "status": "adapter",
+        "title": "Danfoss RAVL: Separaten Adapter einplanen",
+        "detail": "Für das bestätigte RAVL-Ventil mit 25,5 mm führt FRITZ! einen gesonderten RAVL-Adapter aus dem Fachhandel auf. Gleiche vor der Auswahl Ventilbezeichnung und Maß ab.",
+        "source": "fritz-valves"
+      }
+    ]
   },
   "cases": [
     {

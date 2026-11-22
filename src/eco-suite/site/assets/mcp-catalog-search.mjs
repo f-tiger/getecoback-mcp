@@ -235,6 +235,17 @@ function asksForSingleLaundryCost(query) {
     /\b(?:durchschnittlich[a-z]*|mittler[a-z]*|gemittelt[a-z]*)\b/.test(query) && /\b(?:stunden?|laufzeit)\b/.test(query);
 }
 
+const fritzValveTool = 'fritz_302_danfoss_adapter';
+function asksForFritzValveAdapter(query) {
+  const model = /\b(?:fritz[!\s-]*(?:(?:smart[ -]*)?thermo(?:stat)?[ -]*|dect[ -]*|heizkoerperthermostat[ -]*)?302|20003120)\b/.test(query);
+  if (!model || /\b(?:tado|bosch|homematic|heimeier|oventrop|301|firmware|fritzos|fritz!os|router|usb|repeater|batterie[a-z]*|heizkosten|zeitplan[a-z]*)\b/.test(query)) return false;
+  const namedValve = /\b(?:danfoss|ravl|rav|ra)\b/.test(query);
+  if (namedValve && /\b(?:adapter[a-z]*|[a-z]*adapter|pin|dabei|beiliegt|mitgeliefert[a-z]*|enthalten|dazukaufen|lieferumfang|paket|pass[te][a-z]*|montier[a-z]*)\b/.test(query)) return true;
+  if (namedValve && /\bseparat\b[^?!.]*\b(?:gekauft|kaufen|bestellt|bestellen)\b/.test(query)) return true;
+  const adapter = /\b(?:ventiladapter|adapter|adapters|ventil(?:typ|modell)?|heizungsventil)\b/.test(query);
+  return adapter && /\b(?:welche[rsnm]?|unbekannt[a-z]*|unklar[a-z]*|nicht\s+(?:erkenn[a-z]*|identifizier[a-z]*|sicher)|erkenne\b[^?!.]*\bnicht)\b/.test(query);
+}
+
 function asksForHumidifierEfficiency(query) {
   const comparesModels = /\blb[\s-]*55\b/.test(query) && /\boskar\b/.test(query);
   const namesHumidifier = /\b(?:luft)?befeuchter(?:s|n)?\b/.test(query);
@@ -309,9 +320,13 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   if (!unique.length) return [];
   const terms = unique.length > 24 ? [...unique.slice(0, 12), ...unique.slice(-12)] : unique;
   const singleLaundry = asksForSingleLaundryCost(focus.query);
+  const fritzValve = asksForFritzValveAdapter(focus.query);
   const termCount = terms.length;
   const matches = [];
   for (const entry of index) {
+    if (entry.tool.name === fritzValveTool && !fritzValve) continue;
+    if (fritzValve && (entry.tool.name === 'fritz_302_router_firmware_mindeststand' ||
+        entry.tool.name === 'tado_x_oventrop_ventiladapter_pruefen')) continue;
     if (entry.tool.name === singleLaundryTool && !singleLaundry) continue;
     const weights = terms.map(({term, root}) => matchWeight(term, root, entry));
     const matched = weights.filter(Boolean).length;
@@ -341,7 +356,8 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   }
   const results = ranked.sort((a, b) => b.score - a.score).map(result => result.tool);
   let preferredName;
-  if (singleLaundry) preferredName = singleLaundryTool;
+  if (fritzValve) preferredName = fritzValveTool;
+  else if (singleLaundry) preferredName = singleLaundryTool;
   else if (asksForLaundryCostComparison(tokens)) preferredName = 'waesche_trocknungskosten';
   else if (asksForHumidifierEfficiency(focus.query)) preferredName = 'befeuchter_nennwatt_abgabeleistung_bezug';
   else if (asksAboutGlassvacFault(focus.query)) return results.filter(tool => tool.name !== glassvacTemperatureTool);
