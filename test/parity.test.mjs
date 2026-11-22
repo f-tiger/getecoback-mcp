@@ -27,6 +27,15 @@ const CASES = [
   ["heizleistung_watt", { qm: 20, strompreis_euro_kwh: 0 }],
   ["taupunkt_lueften", { aussen_temp_c: 18, aussen_luftfeuchte_prozent: 60, innen_temp_c: 16 }],
   ...[
+    ["TTK 70 HEPA","vor_dezember_2023","7710000024"],
+    ["TTK 70 HEPA","dezember_2023","7710000024"],
+    ["TTK 70 HEPA Plus","nach_dezember_2023","7710000077"],
+    ["TTK 70 HEPA Plus","vor_dezember_2023","7710000024"],
+    ["TTK 70 HEPA","unbekannt","7710000024"],
+    ["TTK 70 HEPA","vor_dezember_2023","7710000080"],
+    ["TTK 70 HEPA Pro","vor_dezember_2023","7710000024"],
+  ].map(([modell, bauzeit, angebot_kennung]) => ["trotec_ttk70_hepa_filter_generation", { modell, bauzeit, angebot_kennung }]),
+  ...[
     ["WV 2 Plus Multi Edition","2.633-112.0","komplette_saugduese"],
     ["WV 3 Comfort Precision+ Black","2.633-605.0","komplette_saugduese"],
     ["WV 8 Signature Line","2.633-532.0","komplette_saugduese"],
@@ -200,9 +209,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 2019 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 2020 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,2019);
+  assert.equal(expandedDefinitions.length,2020);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);

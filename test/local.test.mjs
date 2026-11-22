@@ -450,6 +450,100 @@ function compactReplies(requests) {
   });
 }
 
+test('offline stdio preserves the Trotec TTK 70 HEPA production boundary and filter evidence', () => {
+  const name = 'trotec_ttk70_hepa_filter_generation';
+  const citation = 'https://getecoback.com/guide/trotec-luftentfeuchter-test.html';
+  const guide = citation + '#ttk70-hepa-filter';
+  const old = '7710000024', later = '7710000077', dust = '7710000080';
+  const before = 'vor_dezember_2023', december = 'dezember_2023', after = 'nach_dezember_2023';
+  const model = 'TTK 70 HEPA', plus = 'TTK 70 HEPA Plus', unknown = 'unbekannt';
+  const confirmed = 'aelterer_hepa_filter_belegt', conflict = 'herstellerangaben_widerspruechlich';
+  const cases = [
+    [model,before,old,confirmed,old],
+    [model,before,later,'angebot_kennung_abgleichen',old],
+    [model,before,unknown,'angebot_kennung_abgleichen',old],
+    [model,december,old,'uebergangsmonat_offen',null],
+    [plus,december,later,'uebergangsmonat_offen',null],
+    [plus,after,later,conflict,null],
+    [model,after,old,conflict,null],
+    [plus,before,old,'modell_und_bauzeit_abgleichen',null],
+    [model,unknown,old,'typenschild_pruefen',null],
+    [unknown,before,old,'typenschild_pruefen',null],
+    [model,before,dust,'separater_staubluftfilter',null],
+  ];
+  const invalid = [
+    {modell:'TTK 70 HEPA Pro',bauzeit:before,angebot_kennung:old},
+    {modell:model,bauzeit:'2023',angebot_kennung:old},
+    {modell:model,bauzeit:before,angebot_kennung:7710000024},
+    {modell:model,bauzeit:before,angebot_kennung:'77100000240'},
+    {modell:model,angebot_kennung:old},
+  ];
+  const positive = [
+    'Welcher HEPA-Ersatzfilter passt zu meinem Trotec TTK 70 HEPA? Auf dem Typenschild steht Dezember 2023.',
+    'Mein Trotec TTK 70 HEPA Plus ist Baujahr 2024. Passt 7710000024 oder 7710000077?',
+    'TTK70HEPA: Ist 7710000080 ein Ersatz für den HEPA-Filter 7710000077?',
+    '7710000024',
+    'Trotec 7.710.000.077',
+  ];
+  const other = [
+    ['Wie oft muss ich den Filter in meinem Trotec TTK 70 HEPA reinigen?',null],
+    ['Wie wechsle ich beim TTK 70 HEPA den Filter?',null],
+    ['Trotec TTK 70 HEPA Plus Staubvorfilter 7710000080',null],
+    ['7710000080',null],
+    ['Trotec 7710000077 für TTK 72 E?',null],
+    ['Nicht für den TTK 70 HEPA, sondern für einen Meaco Arete One: Passt der HEPA Ersatzfilter 7710000024?',null],
+    ['Beim Kauf dachte ich an den TTK 70 HEPA, aber es ist ein Comfee MDDF-20DEN7. Welcher Ersatzfilter passt?',null],
+    ['Passt der Ersatzfilter 7710000077 in meinen Trotec TTK 70 HEPA Deluxe?',null],
+    ['Passt 7710000077 für den TTK 70 HEPA Plus 2.0?',null],
+    ['TTK 70 HEPA Plus Deluxe mit 7710000077?',null],
+    ['Für meinen Trotec TTK 70 HEPA Plus brauche ich nur einen Staub-Filter als Ersatzfilter.',null],
+    ['Levoit Core 300S HEPA-Filter','luftreiniger_ersatzfilter_zuordnung'],
+    ['Wie viele Liter zieht der TTK 75 ECO im kalten Keller bei 10 Grad?','trotec_ttk75_eco_pruefpunkt'],
+  ];
+  const searches = [...positive, ...other.map(([query]) => query)];
+  const inputs = [...cases.map(([modell, bauzeit, angebot_kennung]) => ({modell,bauzeit,angebot_kennung})), ...invalid];
+  const compact = compactReplies([
+    ...searches.map(frage => toolCall(compactFind, {frage})),
+    ...inputs.map(eingaben => toolCall(compactRun, {name, eingaben})),
+  ]);
+  for (const [index, query] of searches.entries()) {
+    const hits = compact[index].result.structuredContent.tools;
+    const first = hits[0];
+    assert.deepEqual(first, findTools(query).tools[0]);
+    if (index >= positive.length) {
+      const expected = other[index - positive.length][1];
+      if (expected) assert.equal(first?.name, expected, query);
+      assert.ok(!hits.some(tool => tool.name === name), query);
+      continue;
+    }
+    assert.equal(first?.name, name, query);
+    assert.deepEqual([first.citation_url, first.guide_url], [citation, guide]);
+    assert.deepEqual(first.inputSchema.required, ['modell','bauzeit','angebot_kennung']);
+  }
+  const jobs = inputs.map((input, index) => ({jsonrpc: '2.0', id: index + 1, ...toolCall(name, input)}));
+  const full = new Map(readStdio(jobs).map(reply => [reply.id, reply.result]));
+  for (const [index] of inputs.entries()) {
+    const result = full.get(index + 1);
+    assert.deepEqual(result, compact[searches.length + index].result);
+    if (index >= cases.length) {
+      assert.equal(result.isError, true);
+      assert.equal(result.structuredContent, undefined);
+      continue;
+    }
+    assert.equal(result.isError, false);
+    const data = result.structuredContent;
+    const [,,,status, part] = cases[index];
+    assert.deepEqual([data.status,data.dokumentierter_hepa_filter,data.markt,data.quellen_geprueft_am],
+      [status,part,'Deutschland','2026-11-22']);
+    assert.deepEqual([data.citation_url, data.guide_url], [citation, guide]);
+    assert.deepEqual(data.quellen.map(item => item.artikelnummer), [old,later,dust]);
+    assert.ok(data.quellen.every(item => new URL(item.url).hostname === 'de.trotec.com'));
+    assert.match(data.quellen[1].fundstelle, /ab Baujahr.*bis Baujahr/);
+    assert.match(data.hinweis, /Kaufmonat bestimmt die Generation nicht/);
+    assert.doesNotMatch(result.content[0].text, /https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('offline stdio identifies the complete Kärcher narrow nozzle separately from the replacement lip', () => {
   const name = 'fenstersauger_170mm_saugduese_geraetezuordnung';
   const lip = 'fenstersauger_170mm_abziehlippe_geraetefamilie';

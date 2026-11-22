@@ -24,6 +24,11 @@ const windowSealPage = '/guide/fenster-zugluft-mietwohnung.html';
 const tesaWindowGuide = 'https://www.tesa.com/de-de/buero-und-zuhause/do-it-yourself-magazin/fensterdichtung-erneuern.html';
 const tesaConsumerCatalogue = 'https://www.tesa.com/de-de/files/download/11555752%2C4%2Ctesa-consumerkatalog-2024-online.pdf';
 const tesamollWindowGaps = {E:[1,3.5], P:[2,5], D:[3,7]};
+const trotec70Filters = {
+  earlier: {artikelnummer:'7710000024', url:'https://de.trotec.com/shop/hepa-filter-fuer-ttk-70-hepa.html'},
+  later: {artikelnummer:'7710000077', url:'https://de.trotec.com/shop/hepa-filter-fuer-ttk-70-hepa-plus-ab-bj-12-23.html'},
+  dust: {artikelnummer:'7710000080', url:'https://de.trotec.com/shop/luftfilter-fuer-ttk-70-hepa-plus-ab-bj-12-23.html'},
+};
 const trotec75EcoPage = '/guide/trotec-luftentfeuchter-test.html';
 const trotec75EcoManual = 'https://de.trotec.com/fileadmin/downloads/Entfeuchtung/TTK75ECO/TRT-BA-TTK75ECO-TC-010-DE.pdf';
 const trotec75EcoSupplier = 'https://www.baushop-express.com/trotec-kondensationsentfeuchter-ttk-eco.html';
@@ -252,6 +257,54 @@ export const evidenceNext = [
     },
     example:{args:{modell:'ttk_75_eco',temperatur_c:10,luftfeuchte_prozent:60},
       expect:{status:'kein_pruefpunkt',dokumentierter_entzug_l_24h:null,lieferantenwert_l_24h:null}},
+  },
+  {
+    name:'trotec_ttk70_hepa_filter_generation',
+    description:'Trotec TTK 70 HEPA / HEPA Plus: HEPA-Ersatzfilter 7710000024 und 7710000077 nach Bauzeit abgleichen, widersprüchliche Angaben im Dezember 2023 prüfen und Staub-Vorfilter 7710000080 unterscheiden — Check exact German replacement filter evidence.',
+    page:trotec75EcoPage,
+    guide_url:'https://getecoback.com'+trotec75EcoPage+'#ttk70-hepa-filter',
+    properties:{
+      modell:choice('Vollständiger Modellname des deutschen Geräts aus dem Typenschild. Bei anderem oder unklarem Modell unbekannt wählen.', 'TTK 70 HEPA','TTK 70 HEPA Plus','unbekannt'),
+      bauzeit:choice('Am Typenschild belegte Bauzeit. Ein Kaufdatum genügt nicht. Für ein Baujahr 2023 ohne erkennbaren Monat unbekannt wählen.', 'vor_dezember_2023','dezember_2023','nach_dezember_2023','unbekannt'),
+      angebot_kennung:choice('Artikelnummer am konkreten Angebot. Bei fehlender oder anderer Nummer unbekannt wählen.', trotec70Filters.earlier.artikelnummer,trotec70Filters.later.artikelnummer,trotec70Filters.dust.artikelnummer,'unbekannt'),
+    },
+    calculate({modell,bauzeit,angebot_kennung}) {
+      const {earlier,later,dust}=trotec70Filters;
+      const olderModel = modell === 'TTK 70 HEPA' && bauzeit === 'vor_dezember_2023';
+      let status;
+      if (angebot_kennung === dust.artikelnummer) {
+        status = 'separater_staubluftfilter';
+      } else if (modell === 'unbekannt' || bauzeit === 'unbekannt') {
+        status = 'typenschild_pruefen';
+      } else if (bauzeit === 'dezember_2023') {
+        status = 'uebergangsmonat_offen';
+      } else if (bauzeit === 'nach_dezember_2023') {
+        status = 'herstellerangaben_widerspruechlich';
+      } else if (!olderModel) {
+        status = 'modell_und_bauzeit_abgleichen';
+      } else if (angebot_kennung === earlier.artikelnummer) {
+        status = 'aelterer_hepa_filter_belegt';
+      } else {
+        status = 'angebot_kennung_abgleichen';
+      }
+      return {
+        status,
+        markt:'Deutschland',
+        dokumentierter_hepa_filter:olderModel && angebot_kennung !== dust.artikelnummer ? earlier.artikelnummer : null,
+        vor_kauf:status === 'aelterer_hepa_filter_belegt'
+          ? 'vorhandenen_passenden_filter_nach_anleitung_beurteilen_und_kennung_abgleichen'
+          : 'kauf_zurueckstellen_und_typenschild_sowie_teil_beim_hersteller_abgleichen',
+        quellen:[
+          {...earlier, fundstelle:'Älterer HEPA-Filter, TTK 70 HEPA bis Baujahr 12/2023.'},
+          {...later, fundstelle:'Überschrift ab Baujahr 12/2023, Merkmalliste bis Baujahr 12/2023. Die Seite widerspricht sich.'},
+          {...dust, fundstelle:'Separater Luftfilter. Das Angebot bezeichnet ihn nicht als HEPA-Ersatzfilter.'},
+        ],
+        quellen_geprueft_am:'2026-11-22',
+        hinweis:'Bei Dezember 2023, späterer Bauzeit oder unklarer Kennung beim Hersteller die passende HEPA-Teilenummer mit Foto vom Typenschild und vorhandenen Filter bestätigen lassen. Der Kaufmonat bestimmt die Generation nicht.',
+      };
+    },
+    example:{args:{modell:'TTK 70 HEPA Plus',bauzeit:'nach_dezember_2023',angebot_kennung:'7710000077'},
+      expect:{status:'herstellerangaben_widerspruechlich',dokumentierter_hepa_filter:null}},
   },
   {
     name:'tesamoll_fensterdichtung_profil_pruefen',
