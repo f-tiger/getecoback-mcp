@@ -29,6 +29,9 @@ const CASES = [
   ["luftreiniger_ersatzfilter_zuordnung", { model: "beurer-lr401" }],
   ["luftreiniger_ersatzfilter_zuordnung", { model: "levoit-core-300s" }],
   ["luftreiniger_ersatzfilter_zuordnung", { model: "levoit-core-300s-p" }],
+  ["philips_verdunsterfilter_zuordnung", { model: "HU4803/01", candidate: "FY2401/30" }],
+  ["philips_verdunsterfilter_zuordnung", { model: "HU2716/10", candidate: "FY2401/30" }],
+  ["philips_verdunsterfilter_zuordnung", { model: "unknown", candidate: "FY2401/30" }],
   ["keller_lueften_taupunkt_messwerte", { aussen_c: 10, aussen_rh_prozent: 80, innen_c: 17, innen_rh_prozent: 65, wand_c: 7 }],
   ["keller_lueften_taupunkt_messwerte", { aussen_c: 10, aussen_rh_prozent: 80, innen_c: 17, innen_rh_prozent: 65, wand_c: 15 }],
   ["keller_lueften_taupunkt_messwerte", { aussen_c: 10, aussen_rh_prozent: 80, innen_c: 17, wand_c: 15 }],
@@ -130,9 +133,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 2013 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 2014 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,2013);
+  assert.equal(expandedDefinitions.length,2014);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);

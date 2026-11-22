@@ -1,4 +1,5 @@
 import {exactGermanFilterModel} from './exact-filter-intent.mjs';
+import {philipsHumidifierFilterSection} from './philips-humidifier-filter-intent.mjs';
 import {asksForCellarVentilationCheck} from './cellar-ventilation-intent.mjs';
 import {asksForDehumidifierDrainRoute} from './dehumidifier-drain-intent.mjs';
 
@@ -325,12 +326,15 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const terms = unique.length > 24 ? [...unique.slice(0, 12), ...unique.slice(-12)] : unique;
   const cellarVentilation = asksForCellarVentilationCheck(focus.query);
   const cellarVentilationTool = 'keller_lueften_taupunkt_messwerte';
+  const philipsFilter = philipsHumidifierFilterSection(focus.query);
+  const philipsFilterTool = 'philips_verdunsterfilter_zuordnung';
   const singleLaundry = asksForSingleLaundryCost(focus.query);
   const fritzValve = asksForFritzValveAdapter(focus.query);
   const termCount = terms.length;
   const matches = [];
   for (const entry of index) {
     if (entry.tool.name === cellarVentilationTool && !cellarVentilation) continue;
+    if (entry.tool.name === philipsFilterTool && !philipsFilter) continue;
     if (entry.tool.name === fritzValveTool && !fritzValve) continue;
     if (fritzValve && (entry.tool.name === 'fritz_302_router_firmware_mindeststand' ||
         entry.tool.name === 'tado_x_oventrop_ventiladapter_pruefen')) continue;
@@ -364,6 +368,7 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const results = ranked.sort((a, b) => b.score - a.score).map(result => result.tool);
   let preferredName;
   if (exactGermanFilterModel(focus.query)) preferredName = 'luftreiniger_ersatzfilter_zuordnung';
+  else if (philipsFilter) preferredName = philipsFilterTool;
   else if (asksForDehumidifierDrainRoute(focus.query)) preferredName = 'entfeuchter_ablaufcheck';
   else if (cellarVentilation) preferredName = cellarVentilationTool;
   else if (fritzValve) preferredName = fritzValveTool;

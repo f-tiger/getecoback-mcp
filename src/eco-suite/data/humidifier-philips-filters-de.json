@@ -1,0 +1,20 @@
+{
+  "checked": "2026-11-22",
+  "max_age_days": 90,
+  "market": "DE",
+  "manufacturer_source": "https://acc.philips.de/c-e/ho/luftreiniger-und-luftbefeuchter/air-purifier-filter-replacement",
+  "models": [
+    {
+      "device": "HU4803/01",
+      "part": "FY2401/30",
+      "anchor": "philips-hu4803-01",
+      "source": "https://www.documents.philips.com/assets/20210905/91037a0820b34b43a068ad9a00af98a4.pdf"
+    },
+    {
+      "device": "HU2716/10",
+      "part": "FY3446/30",
+      "anchor": "philips-hu2716-10",
+      "source": "https://www.documents.philips.com/assets/20220208/0ddd8e50b11a4e5a9161ae3601001daf.pdf"
+    }
+  ]
+}
