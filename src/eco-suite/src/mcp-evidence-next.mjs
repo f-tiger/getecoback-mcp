@@ -4,6 +4,7 @@ import thermostatFit from '../site/assets/thermostat-fit-data.json' with {type:'
 import robots from '../data/robot-catalog.json' with {type:'json'};
 import humidifiers from '../data/humidifier-catalog.json' with {type:'json'};
 import {PORTASPLIT_ENTRY_PAGE, PORTASPLIT_ENTRY_URL, PORTASPLIT_GUIDE_URL} from './portasplit-entry.mjs';
+import {CELLAR_VENTILATION_ANCHOR, CELLAR_VENTILATION_BOUNDS, CELLAR_VENTILATION_PAGE, checkCellarVentilation} from '../site/assets/keller-lueften-check.mjs';
 
 const method = '/wie-wir-empfehlen.html';
 const cold = '/guide/luftentfeuchter-keller.html';
@@ -20,6 +21,7 @@ const number = (description, minimum, maximum) => ({type:'number', minimum, maxi
 const money = description => number(description, 0, 50000);
 const missing = entries => Object.entries(entries).filter(([,ok]) => !ok).map(([key]) => key);
 const rounded = value => Math.round(value * 100) / 100;
+const cellarMeasurement = (key, description) => number(description, ...CELLAR_VENTILATION_BOUNDS[key]);
 
 function n90ModelStatus(ean, modell) {
   if (ean !== n90Ean) return 'ean_abweicht';
@@ -36,6 +38,29 @@ const tadoXOventrop = new Map([
 ]);
 
 export const evidenceNext = [
+  {
+    name:'keller_lueften_taupunkt_messwerte',
+    description:'Keller lüften? Innen und außen Temperatur und relative Luftfeuchte messen, die kälteste Wand eintragen und Trocknung und Kondensation prüfen — Compare paired indoor/outdoor dew points and the coldest measured wall to assess basement drying and condensation.',
+    page:CELLAR_VENTILATION_PAGE,
+    guide_url:'https://getecoback.com' + CELLAR_VENTILATION_PAGE + CELLAR_VENTILATION_ANCHOR,
+    properties:{
+      aussen_c:cellarMeasurement('aussen_c','Gleichzeitig gemessene Außentemperatur im Schatten in °C.'),
+      aussen_rh_prozent:cellarMeasurement('aussen_rh_prozent','Zeitgleich gemessene relative Luftfeuchte draußen in Prozent.'),
+      innen_c:cellarMeasurement('innen_c','Gleichzeitig gemessene Raumlufttemperatur im Keller in °C.'),
+      innen_rh_prozent:cellarMeasurement('innen_rh_prozent','Zeitgleich gemessene relative Luftfeuchte im Keller in Prozent.'),
+      wand_c:cellarMeasurement('wand_c','Tatsächlich gemessene Temperatur an der kältesten betrachteten Wandstelle in °C.'),
+    },
+    calculate(values) {
+      return {
+        ...checkCellarVentilation(values),
+        quellen_url:'https://www.umweltbundesamt.de/themen/gesundheit/umwelteinfluesse-auf-den-menschen/schimmel/wie-luefte-ich-richtig-tipps-tricks-zur',
+        verbraucherzentrale_url:'https://www.verbraucherzentrale.de/wissen/energie/strom-sparen/heizen-und-lueften-so-gehts-richtig-10426',
+        quellen_geprueft_am:'2026-11-22',
+        hinweis:'Der Taupunktvergleich ist eine Näherung bei ähnlichem Luftdruck. Im 1-°C-Orientierungsband noch einmal messen und die Genauigkeit der eigenen Fühler beachten. Bei sichtbarer Nässe oder wiederkehrendem Schimmel die Ursache vor dem Gerätekauf klären. Notwendige Lüftung bleibt separat.',
+      };
+    },
+    example:{args:{aussen_c:28,aussen_rh_prozent:60,innen_c:17,innen_rh_prozent:65,wand_c:15},expect:{status:'kondensationsrisiko',aussen_taupunkt_c:19.5,innen_taupunkt_c:10.4}},
+  },
   {
     name:'geraet_testzitat_einordnen',
     description:'Prüfen, wie eng ein Testsieger-Zitat formuliert werden muss — Qualify a best-in-test claim by model, test group and date.',

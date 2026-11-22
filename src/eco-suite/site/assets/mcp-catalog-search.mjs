@@ -1,3 +1,4 @@
+import {asksForCellarVentilationCheck} from './cellar-ventilation-intent.mjs';
 import {asksForDehumidifierDrainRoute} from './dehumidifier-drain-intent.mjs';
 
 const german = {ä:'ae', ö:'oe', ü:'ue', ß:'ss'};
@@ -321,11 +322,14 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const unique = [...observed.values()];
   if (!unique.length) return [];
   const terms = unique.length > 24 ? [...unique.slice(0, 12), ...unique.slice(-12)] : unique;
+  const cellarVentilation = asksForCellarVentilationCheck(focus.query);
+  const cellarVentilationTool = 'keller_lueften_taupunkt_messwerte';
   const singleLaundry = asksForSingleLaundryCost(focus.query);
   const fritzValve = asksForFritzValveAdapter(focus.query);
   const termCount = terms.length;
   const matches = [];
   for (const entry of index) {
+    if (entry.tool.name === cellarVentilationTool && !cellarVentilation) continue;
     if (entry.tool.name === fritzValveTool && !fritzValve) continue;
     if (fritzValve && (entry.tool.name === 'fritz_302_router_firmware_mindeststand' ||
         entry.tool.name === 'tado_x_oventrop_ventiladapter_pruefen')) continue;
@@ -359,6 +363,7 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const results = ranked.sort((a, b) => b.score - a.score).map(result => result.tool);
   let preferredName;
   if (asksForDehumidifierDrainRoute(focus.query)) preferredName = 'entfeuchter_ablaufcheck';
+  else if (cellarVentilation) preferredName = cellarVentilationTool;
   else if (fritzValve) preferredName = fritzValveTool;
   else if (singleLaundry) preferredName = singleLaundryTool;
   else if (asksForLaundryCostComparison(tokens)) preferredName = 'waesche_trocknungskosten';
