@@ -448,6 +448,59 @@ function compactReplies(requests) {
   });
 }
 
+test('both offline stdio profiles resolve the German condensation question and expose the same share link', () => {
+  const name = 'fenster_oberflaeche_taucheck';
+  const citation = 'https://getecoback.com/guide/fenster-beschlagen-innen.html';
+  const guide = citation + '#fenstersauger-gegen-kondenswasser';
+  const questions = [
+    'Fenstersauger gegen Kondenswasser',
+    'Hilft ein Fenstersauger gegen Kondenswasser am Fenster oder reicht ein Tuch?',
+    '20 Grad 60 % Luftfeuchtigkeit und Scheibe 10 Grad: Ist Kondenswasser am Fenster plausibel?',
+  ];
+  const room = {room_c:20, room_rh_pct:60};
+  const saturatedRoom = {room_c:23, room_rh_pct:100};
+  const cases = [
+    [{...room, surface_c:10}, 12, -2, true, 'unter_taupunkt'],
+    [{...room, surface_c:12}, 12, 0, false, 'nahe_am_taupunkt'],
+    [{...room, surface_c:14}, 12, 2, false, 'ueber_taupunkt'],
+    [{...saturatedRoom, surface_c:22}, 23, -1, true, 'nahe_am_taupunkt'],
+    [{...saturatedRoom, surface_c:24}, 23, 1, false, 'nahe_am_taupunkt'],
+  ];
+  const inputs = [...cases.map(([measurements]) => measurements), room];
+  const compact = compactReplies([
+    ...questions.map(frage => toolCall(compactFind, {frage})),
+    ...inputs.map(eingaben => toolCall(compactRun, {name, eingaben})),
+  ]);
+  for (const [index, question] of questions.entries()) {
+    const first = compact[index].result.structuredContent.tools[0];
+    assert.equal(first?.name, name, question);
+    assert.equal(first.guide_url, guide);
+    assert.equal(first.citation_url, citation);
+    assert.deepEqual(first, findTools(question).tools[0]);
+  }
+
+  const jobs = inputs.map((args, index) => ({jsonrpc:'2.0', id:index + 1, ...toolCall(name, args)}));
+  const fullById = new Map(readStdio(jobs).map(reply => [reply.id, reply.result]));
+  for (const [index, [{surface_c}, dewPoint, margin, possible, interpretation]] of cases.entries()) {
+    const result = fullById.get(index + 1);
+    assert.deepEqual(result, compact[questions.length + index].result);
+    assert.equal(result.isError, false);
+    const output = result.structuredContent;
+    assert.equal(output.dew_point_c, dewPoint, `surface ${surface_c} °C`);
+    assert.equal(output.surface_margin_c, margin);
+    assert.equal(output.condensation_possible, possible);
+    assert.equal(output.messlage, interpretation);
+    assert.equal(output.citation_url, citation);
+    assert.equal(output.guide_url, guide);
+    assert.equal(output.share_url, guide);
+    assert.doesNotMatch(JSON.stringify(output), /https:\/\/[^"]*amazon\.|[?&]tag=/i);
+  }
+  const missingSurface = fullById.get(inputs.length);
+  assert.deepEqual(missingSurface, compact.at(-1).result);
+  assert.equal(missingSurface.isError, true);
+  assert.equal(missingSurface.structuredContent, undefined);
+});
+
 test('German model corrections keep charging temperatures and LED observations on their own window vacuum', async () => {
   const bosch = 'glassvac_kalt_lagern_einschalten_laden_getrennt';
   const kaercher = 'fenstersauger_wv3_wv8_led_muster_einordnen';

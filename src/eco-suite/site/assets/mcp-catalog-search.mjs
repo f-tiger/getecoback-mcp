@@ -129,6 +129,7 @@ const taskWords = new Map([
   ['tado_x_oventrop_ventiladapter_pruefen', 'oventrop ventil heizungsventil heizkoerperventil unidh unil vindo th gewinde gewindesteigung 30mm m30 adapterring 1011445 4026755228717'],
   ['pac_n90_energielabel_zu_stromkosten', 'delonghi pinguino n90 eco silent 8004399512351 labelstunde energielabel energieetikett stromverbrauch arbeitspreis strompreis cent zwischenzaehler gemessen verbrauch lauf stand stunden kw kwh kosten kostet'],
   ['entfeuchter_ablaufcheck', 'abflussschlauch ablaufschlauch abfluss auslass keller oben hoeher fuehren ableiten kondensat'],
+  ['fenster_oberflaeche_taucheck', 'fenstersauger kondenswasser kondensat glas innenscheibe taupunkt scheibentemperatur wischen wischlappen tuch'],
   ['luftreiniger_ersatzfilter_zuordnung', 'passt ersatzfilter luftreinigermodell luftreiniger filternummer'],
   ['waesche_trockenweg_sortierplan', 'liegeplaetze leine liegend liegen haengend'],
   ['textil_masshaltigkeit_vor_nach_pflege', 'stoff waschen eingelaufen geschrumpft schrumpfung'],
