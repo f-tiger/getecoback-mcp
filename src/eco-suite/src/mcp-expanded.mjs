@@ -79,6 +79,10 @@ import {mikrowellenBelege} from './mcp-mikrowellen-belege.mjs';
 import {kuechenwaagenBelege} from './mcp-kuechenwaagen-belege.mjs';
 import {wasserkocherBelege} from './mcp-wasserkocher-belege.mjs';
 import {toasterBelege} from './mcp-toaster-belege.mjs';
+import {kaercherFensterlippe} from './mcp-kaercher-fensterteile.mjs';
+import {kaercherFenstersaugerTools} from './mcp-kaercher-fenstersauger.mjs';
+import {glassvacBelege} from './mcp-glassvac-belege.mjs';
+import {evidenceGuideUrl} from './mcp-evidence-guides.mjs';
 
 export const expandedDefinitions = [
   ['Strom & Haushalt', householdSuite],
@@ -162,7 +166,11 @@ export const expandedDefinitions = [
   ["Küchenwaagen", kuechenwaagenBelege],
   ["Wasserkocherbelege", wasserkocherBelege],
   ["Toasterbelege", toasterBelege],
-].flatMap(([category, definitions]) => definitions.map(tool => ({...tool, category})));
+  ['Fenstersauger', [kaercherFensterlippe, ...kaercherFenstersaugerTools, ...glassvacBelege]],
+].flatMap(([category, definitions]) => definitions.map(tool => {
+  const guide_url = evidenceGuideUrl(category, tool.page);
+  return {...tool, category, ...(guide_url ? {guide_url} : {})};
+}));
 
 const handlers = new Map(expandedDefinitions.map(tool => [tool.name, tool]));
 export const isExpandedTool = name => handlers.has(name);
@@ -184,9 +192,10 @@ export const expandedTools = expandedDefinitions.map(({name, description, proper
   annotations: {readOnlyHint:true, openWorldHint:false},
 }));
 
-export const expandedCatalog = expandedTools.map((tool, index) => ({
-  ...tool, category:expandedDefinitions[index].category, page:expandedDefinitions[index].page,
-}));
+export const expandedCatalog = expandedTools.map((tool, index) => {
+  const {category, page, guide_url} = expandedDefinitions[index];
+  return {...tool, category, page, ...(guide_url ? {guide_url} : {})};
+});
 
 function valid(schema, value) {
   if (typeof value !== schema.type || (schema.enum && !schema.enum.includes(value))) return false;
@@ -219,6 +228,7 @@ export function expandedCall(name, args) {
   const structuredContent = {
     ...data,
     citation_url:'https://getecoback.com'+tool.page,
+    ...(tool.guide_url ? {guide_url:tool.guide_url} : {}),
     disclosure:'Quelle: EcoBack. Die Website enthält gekennzeichnete Affiliate-Links.',
   };
   const text = JSON.stringify(structuredContent, null, 2);
