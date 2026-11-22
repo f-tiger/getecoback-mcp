@@ -6,7 +6,7 @@ Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
 [Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
-<!-- count -->2028<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2029<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -2206,6 +2206,7 @@ separately measured loads reach different levels of dryness.
 | `bosch_tat8613_kruemelschublade_oder_broetchenaufsatz_pflege` | Match the documented cleaning method to the observed location. |
 | `bosch_tat8613_kruemelschublade_vor_betrieb_vorhanden` | Check the removable tray as required equipment. |
 | `fenstersauger_170mm_abziehlippe_geraetefamilie` | Check exact manufacturer compatibility for two narrow window-vacuum blades. |
+| `fenstersauger_170mm_saugduese_geraetezuordnung` | Check an exact German model and complete narrow suction nozzle. |
 | `fenstersauger_kaercher_fluessigkeitsgrenze_und_tank` | Check whether the documented intended-use liquid limit is exceeded. |
 | `fenstersauger_wv3_wv8_led_muster_einordnen` | Decode the exact LED pattern with the phase shown in the German troubleshooting table. |
 | `fenstersauger_wv3_wv8_akkuwechsel_service_oder_reserve` | Separate service replacement from a detachable spare pack. |
@@ -2230,7 +2231,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->2028<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2029<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.

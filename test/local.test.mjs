@@ -450,6 +450,91 @@ function compactReplies(requests) {
   });
 }
 
+test('offline stdio identifies the complete Kärcher narrow nozzle separately from the replacement lip', () => {
+  const name = 'fenstersauger_170mm_saugduese_geraetezuordnung';
+  const lip = 'fenstersauger_170mm_abziehlippe_geraetefamilie';
+  const citation = 'https://getecoback.com/produkte.html';
+  const guide = citation + '#kaercher-170mm-saugduese';
+  const complete = 'komplette_saugduese';
+  const confirmed = 'herstellerliste_bestaetigt';
+  const open = 'zuordnung_offen';
+  const cases = [
+    ['WV 2 Plus Multi Edition','2.633-112.0',complete,confirmed,['2.633-112.0'],['2.633-112.0']],
+    ['WV 3 Comfort Precision+ Black','2.633-605.0',complete,confirmed,['2.633-605.0'],['2.633-605.0']],
+    ['WV 8 Signature Line','2.633-532.0',complete,confirmed,['2.633-532.0'],['2.633-532.0']],
+    ['WV 6 Plus','2.633-512.0',complete,confirmed,['2.633-512.0','2.633-532.0'],['2.633-512.0','2.633-532.0']],
+    ['WV 8 Signature Line','2.633-112.0',complete,'kombination_nicht_belegt',['2.633-532.0'],['2.633-112.0','2.633-532.0']],
+    ['unbekannt','2.633-532.0',complete,open,[],['2.633-532.0']],
+    ['WV 8 Signature Line','unbekannt',complete,open,['2.633-532.0'],['2.633-532.0']],
+    ['WV 8 Signature Line','unbekannt','nur_abziehlippe','nur_abziehlippe',['2.633-532.0'],['2.633-532.0']],
+    ['WV 8 Signature Line','2.633-532.0','unbekannt',open,['2.633-532.0'],['2.633-532.0']],
+    ['unbekannt','unbekannt','unbekannt',open,[],[]],
+  ];
+  const invalid = [
+    {geraet:'WV 3',teilenummer:'2.633-605.0',angebotsart:complete},
+    {geraet:'WV 8 Signature Line',teilenummer:'2.633-513.0',angebotsart:'nur_abziehlippe'},
+    {geraet:'WV 8 Signature Line',teilenummer:'26335320',angebotsart:complete},
+    {geraet:'WV 8 Signature Line',teilenummer:'2.633-532.0'},
+    {geraet:'WV 8 Signature Line',teilenummer:'2.633-532.0',angebotsart:'beides'},
+  ];
+  const related = [
+    'Welche schmale Düse mit 170 mm passt auf meinen Kärcher WV 8 Signature Line?',
+    'Passt die komplette 2.633-605.0 Saugdüse an den Kärcher WV 3 Comfort Precision+ Black?',
+    'Kann ich die 2.633-112.0 für den WV 2 Plus Multi Edition nachkaufen?',
+  ];
+  const other = [
+    ['Passt die 170 mm Gummilippe 2.633-104.0 auf meinen Kärcher WV 3?',lip],
+    ['Gummilippe 2.633-513.0 für WV 8 Signature Line',lip],
+    ['Welcher 170 mm breite Saugkopf passt zwischen meine Sprossen bei 160 mm Glasbreite?','fenstersauger_sprossenfenster_duesenbreite'],
+    ['Meine Scheibe ist 170 mm breit, beim WV 8 sind links und rechts je 5 mm Luft nötig. Passt die schmale Saugdüse?',
+      'fenstersauger_sprossenfenster_duesenbreite'],
+    ['Beim Kärcher WV 3: Passt der Saugkopf 2.633-605.0 zwischen meine Sprossen mit 170 mm Glasbreite?',
+      'fenstersauger_sprossenfenster_duesenbreite'],
+    ['Kärcher WV 8 LED blinkt beim Laden, was bedeutet das?','fenstersauger_wv3_wv8_led_muster_einordnen'],
+    ['Kann ich eine 170 mm Saugdüse an meinem Bosch GlassVAC montieren?',null],
+  ];
+  const searches = [...related, ...other.map(([query]) => query)];
+  const inputs = [...cases.map(([geraet, teilenummer, angebotsart]) => ({geraet, teilenummer, angebotsart})), ...invalid];
+  const compact = compactReplies([
+    ...searches.map(frage => toolCall(compactFind, {frage})),
+    ...inputs.map(eingaben => toolCall(compactRun, {name, eingaben})),
+  ]);
+  for (const [index, query] of searches.entries()) {
+    const first = compact[index].result.structuredContent.tools[0];
+    assert.deepEqual(first, findTools(query).tools[0]);
+    if (index >= related.length) {
+      const expected = other[index - related.length][1];
+      if (expected) assert.equal(first?.name, expected, query);
+      assert.notEqual(first?.name, name, query);
+      continue;
+    }
+    assert.equal(first?.name, name, query);
+    assert.deepEqual([first.citation_url, first.guide_url], [citation, guide]);
+    assert.deepEqual(first.inputSchema.required, ['geraet','teilenummer','angebotsart']);
+  }
+  const jobs = inputs.map((input, index) => ({jsonrpc: '2.0', id: index + 1, ...toolCall(name, input)}));
+  const full = new Map(readStdio(jobs).map(reply => [reply.id, reply.result]));
+  for (const [index] of inputs.entries()) {
+    const result = full.get(index + 1);
+    assert.deepEqual(result, compact[searches.length + index].result);
+    if (index >= cases.length) {
+      assert.equal(result.isError, true);
+      assert.equal(result.structuredContent, undefined);
+      continue;
+    }
+    assert.equal(result.isError, false);
+    const data = result.structuredContent;
+    const [,,,status, documented, evidence] = cases[index];
+    assert.deepEqual([data.status, data.markt, data.dokumentierte_duesen], [status, 'Deutschland', documented]);
+    assert.deepEqual([data.citation_url, data.guide_url], [citation, guide]);
+    assert.deepEqual(data.belege.map(item => item.teilenummer), evidence);
+    assert.ok(data.belege.every(item => new URL(item.url).hostname === 'www.karcher.com' &&
+      item.url.endsWith('p' + item.teilenummer.replace(/\D/g, '')) && item.geprueft_am === '2026-11-22'));
+    assert.match(data.hinweis, /170 mm.*Nennbreite/);
+    assert.doesNotMatch(result.content[0].text, /https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('offline stdio distinguishes exact coffee filter compatibility from upkeep and unrelated filters', () => {
   const name = 'kaffeevollautomat_intenza_aquaclean_filterfamilie_modellpruefung';
   const citation = 'https://getecoback.com/produkte.html';

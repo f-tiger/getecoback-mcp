@@ -79,7 +79,7 @@ import {mikrowellenBelege} from './mcp-mikrowellen-belege.mjs';
 import {kuechenwaagenBelege} from './mcp-kuechenwaagen-belege.mjs';
 import {wasserkocherBelege} from './mcp-wasserkocher-belege.mjs';
 import {toasterBelege} from './mcp-toaster-belege.mjs';
-import {kaercherFensterlippe} from './mcp-kaercher-fensterteile.mjs';
+import {kaercherFensterduese, kaercherFensterlippe} from './mcp-kaercher-fensterteile.mjs';
 import {kaercherFenstersaugerTools} from './mcp-kaercher-fenstersauger.mjs';
 import {glassvacBelege} from './mcp-glassvac-belege.mjs';
 import {fenstersaugerSprossenKauf} from './mcp-fenstersauger-kauf.mjs';
@@ -167,7 +167,7 @@ export const expandedDefinitions = [
   ["Küchenwaagen", kuechenwaagenBelege],
   ["Wasserkocherbelege", wasserkocherBelege],
   ["Toasterbelege", toasterBelege],
-  ['Fenstersauger', [kaercherFensterlippe, ...kaercherFenstersaugerTools, ...glassvacBelege, fenstersaugerSprossenKauf]],
+  ['Fenstersauger', [kaercherFensterlippe, kaercherFensterduese, ...kaercherFenstersaugerTools, ...glassvacBelege, fenstersaugerSprossenKauf]],
 ].flatMap(([category, definitions]) => definitions.map(tool => {
   const guide_url = evidenceGuideUrl(category, tool.page, tool.name);
   return {...tool, category, ...(guide_url ? {guide_url} : {})};

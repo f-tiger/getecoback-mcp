@@ -1,3 +1,4 @@
+import {asksForNarrowKaercherNozzle, asksForWindowVacClearance, focusWindowVacQuestion, glassvacModel, windowVacCharging} from './kaercher-saugduese-intent.mjs';
 import {asksAboutCoffeeFilterMaintenance, asksForCoffeeWaterFilterMatch} from './kaffee-wasserfilter-intent.mjs';
 import {asksForTrotecTtk75EcoConditions, namesTrotecTtk75Eco} from './trotec-ttk75-eco-intent.mjs';
 import {asksForCoolingNoiseComparison} from './cooling-noise-intent.mjs';
@@ -270,9 +271,6 @@ function asksForHumidifierEfficiency(query) {
 }
 
 const glassvacTemperatureTool = 'glassvac_kalt_lagern_einschalten_laden_getrennt';
-const glassvacModel = /\b(?:glass[ -]?vac|06008b7000)\b/;
-const kaercherWindowVac = /\b(?:wv[ -]*[238]|kaercher[ -]+fenstersauger)\b/;
-const windowVacCharging = /\b(?:laden|aufladen|aufzuladen|aufladung|einstecken|ladenetzteil|ans\s+ladegeraet|(?:in|an)\s+die\s+steckdose)\b/;
 
 function asksForGlassvacTemperature(query) {
   const cold = /\b(?:frost[a-z]*|bodenfrost|gefroren[a-z]*|gefrier[a-z]*|minus[a-z]*|kaelte|unter\s+null)\b|[−-]\s*\d+(?:[,.]\d+)?\s*(?:°\s*c|grad)\b/.test(query);
@@ -287,25 +285,6 @@ function asksForGlassvacConnectorPhoto(query) {
 function asksAboutGlassvacFault(query) {
   return glassvacModel.test(query) && /\b(?:leds?|blink[a-z]*)\b/.test(query) &&
     /\b(?:kaputt|defekt[a-z]*|fehler|fehlersuche)\b/.test(query);
-}
-
-function focusWindowVacQuestion(query) {
-  if (!glassvacModel.test(query) || !kaercherWindowVac.test(query)) return {query};
-  const pivots = [...query.matchAll(/\b(?:stattdessen|korrektur|ich\s+(?:meine|meinte)|gemeint\s+ist|sondern|jetzt(?:\s+(?:habe\s+ich|nutze\s+ich|geht\s+es\s+um|zum))?)\b/g)];
-  for (const pivot of pivots.reverse()) {
-    const previous = query.slice(0,pivot.index);
-    if (pivot[0] === 'jetzt' && !/\b(?:alt[a-z]*|frueher|zuvor|vorher|wollte|bislang)\b/.test(previous)) continue;
-    const current = query.slice(pivot.index+pivot[0].length).trim();
-    const bosch = current.match(glassvacModel);
-    const kaercher = current.match(kaercherWindowVac);
-    if (Boolean(bosch) === Boolean(kaercher)) continue;
-    const model = bosch ?? kaercher;
-    if (/\b(?:nicht|kein[a-z]*)\b/.test(current.slice(0,model.index))) continue;
-    if (kaercher && glassvacModel.test(previous)) return {query:current, omitPrefix:'glassvac_'};
-    if (bosch && kaercherWindowVac.test(previous)) return {query:current, omitPrefix:'fenstersauger_wv'};
-  }
-  // A charging question with two possible subjects has no single model limit.
-  return windowVacCharging.test(query) ? null : {query};
 }
 
 export function findCatalogueTools(index, {query='', category='', name=null}={}) {
@@ -341,6 +320,8 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const blanketCostTool = 'heizdecke_stromkosten_nennleistung';
   const hygrometerComparison = asksForHygrometerComparison(focus.query);
   const hygrometerComparisonTool = 'hygrometer_messbereiche';
+  const narrowNozzle = asksForNarrowKaercherNozzle(focus.query);
+  const narrowNozzleTool = 'fenstersauger_170mm_saugduese_geraetezuordnung';
   const coffeeFilterMatch = asksForCoffeeWaterFilterMatch(focus.query);
   const coffeeMaintenance = asksAboutCoffeeFilterMaintenance(focus.query);
   const coffeeFilterTool = 'kaffeevollautomat_intenza_aquaclean_filterfamilie_modellpruefung';
@@ -363,6 +344,7 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const matches = [];
   for (const entry of index) {
     if (entry.tool.name === cellarVentilationTool && !cellarVentilation) continue;
+    if (entry.tool.name === narrowNozzleTool && !narrowNozzle) continue;
     if (entry.tool.name === philipsFilterTool && !philipsFilter) continue;
     if (entry.tool.name === blanketCostTool && !blanketCost) continue;
     if (entry.tool.name === 'hygrometer_zweipunkt_referenz_abgleich' && hygrometerComparison) continue;
@@ -411,6 +393,8 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   let preferredName;
   if (exactGermanFilterModel(focus.query)) preferredName = 'luftreiniger_ersatzfilter_zuordnung';
   else if (philipsFilter) preferredName = philipsFilterTool;
+  else if (asksForWindowVacClearance(focus.query)) preferredName = 'fenstersauger_sprossenfenster_duesenbreite';
+  else if (narrowNozzle) preferredName = narrowNozzleTool;
   else if (coffeeFilterMatch) preferredName = coffeeFilterTool;
   else if (blanketCost) preferredName = blanketCostTool;
   else if (hygrometerComparison) preferredName = hygrometerComparisonTool;

@@ -27,6 +27,15 @@ const CASES = [
   ["heizleistung_watt", { qm: 20, strompreis_euro_kwh: 0 }],
   ["taupunkt_lueften", { aussen_temp_c: 18, aussen_luftfeuchte_prozent: 60, innen_temp_c: 16 }],
   ...[
+    ["WV 2 Plus Multi Edition","2.633-112.0","komplette_saugduese"],
+    ["WV 3 Comfort Precision+ Black","2.633-605.0","komplette_saugduese"],
+    ["WV 8 Signature Line","2.633-532.0","komplette_saugduese"],
+    ["WV 6 Plus","2.633-512.0","komplette_saugduese"],
+    ["WV 8 Signature Line","2.633-112.0","komplette_saugduese"],
+    ["unbekannt","2.633-532.0","komplette_saugduese"],
+    ["WV 8 Signature Line","unbekannt","nur_abziehlippe"],
+  ].map(([geraet, teilenummer, angebotsart]) => ["fenstersauger_170mm_saugduese_geraetezuordnung", { geraet, teilenummer, angebotsart }]),
+  ...[
     ["EP2220/10", "AquaClean"], ["EP2231/40", "TCZ7003"],
     ["TIE20301", "TCZ7033"], ["ECAM22.110.B", "DLSC002"],
     ["anderes_modell", "AquaClean"], ["EP2220", "AquaClean"],
@@ -191,9 +200,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 2018 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 2019 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,2018);
+  assert.equal(expandedDefinitions.length,2019);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);
