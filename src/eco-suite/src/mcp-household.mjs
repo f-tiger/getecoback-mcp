@@ -1,5 +1,5 @@
 import {measured, replacement} from '../site/assets/household-math.mjs';
-import {laundry} from '../site/assets/laundry-math.mjs';
+import {laundry, laundryShareText, LAUNDRY_SHARE_URL} from '../site/assets/laundry-math.mjs';
 
 const number = (description, minimum, maximum) => ({type:'number', description, minimum, maximum});
 const price = number('Eigener Strompreis in EUR/kWh.', 0, 5);
@@ -24,8 +24,16 @@ export const householdSuite = [
     name:'waesche_trocknungskosten', description:'Messwerte für zwei Trocknungswege vergleichen — Compare measured energy costs for equally dry laundry.',
     page:'/waeschetrockner-oder-luftentfeuchter.html', example:{args:{dryer:2,dehum:1,price:0.3,comparable:false},expect:{lower_cost:'unconfirmed'}}, properties:{dryer:number('Trockner: kWh pro Ladung.',0,20),dehum:number('Entfeuchter: gemessene kWh pro Ladung.',0,100),comparable:{type:'boolean',description:'Gleiche Wäschemenge und Endtrockenheit erreicht?'},price},
     calculate(args) {
-      const r=laundry({...args,dryerBasis:'cycle',method:'measured',currency:'EUR',loads:0,purchase:0});
-      return {dryer_eur_per_load:r.dryerCost,dehumidifier_eur_per_load:r.dehumCost,lower_cost:r.winner,assumption:'Bei unterschiedlicher Endtrockenheit bleibt der Vergleich offen.'};
+      const input = {...args, dryerBasis:'cycle', method:'measured', currency:'EUR', loads:0, purchase:0};
+      const r = laundry(input);
+      return {
+        dryer_eur_per_load:r.dryerCost,
+        dehumidifier_eur_per_load:r.dehumCost,
+        lower_cost:r.winner,
+        assumption:'Bei unterschiedlicher Endtrockenheit bleibt der Vergleich offen.',
+        share_text_de:laundryShareText(input, 'entered'),
+        share_url:LAUNDRY_SHARE_URL,
+      };
     }
   }
 ];

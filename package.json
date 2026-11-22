@@ -1,6 +1,6 @@
 {
   "name": "getecoback-mcp",
-  "version": "1.22.0",
+  "version": "1.22.1",
   "description": "EcoBack indoor climate tools for Germany: dehumidifier drainage and pump checks by model, moisture decisions, BTU sizing, window seals, energy costs and guide search.",
   "type": "module",
   "bin": {
