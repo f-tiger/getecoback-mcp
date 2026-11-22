@@ -6,7 +6,7 @@ Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
 [Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
-<!-- count -->2024<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2023<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -203,7 +203,7 @@ separately measured loads reach different levels of dryness.
 | `geraetewechsel_rechnen` | Compare the cost of keeping an appliance with replacing it. |
 | `waesche_trocknungskosten` | Compare measured energy costs for equally dry laundry. |
 | `luftentfeuchter_waesche_einzelkosten` | Calculate a single dehumidifier drying run without assuming a dryer reading. |
-| `fenster_oberflaeche_taucheck` | Check an actual indoor glass or wall surface temperature against the indoor dew point. |
+| `fenster_oberflaeche_taucheck` | Check a measured indoor glass or wall surface against the dew point. |
 | `fenster_beschlag_einordnen` | Interpret the side on which window condensation is observed. |
 | `raumluft_wassermenge` | Estimate the grams of water in room air above a chosen relative humidity. |
 | `luftfeuchte_bei_temperaturwechsel` | Estimate changed relative humidity for a fixed air-water mass. |
@@ -287,7 +287,6 @@ separately measured loads reach different levels of dryness.
 | `luftreiniger_filter_faelligkeit` | Assess a particulate filter change using condition and manufacturer instructions. |
 | `luftreiniger_cadr_raumcheck` | Estimate equivalent particulate clean-air delivery in a measured room. |
 | `luftbefeuchter_modellpflege` | Retrieve model-specific humidifier care and consumables. |
-| `philips_verdunsterfilter_zuordnung` | Resolve exact German Philips humidifier filter parts. |
 | `poolroboter_beckencheck` | Assess debris, obstacles and basket care for a pool robot. |
 | `maehroboter_gartencheck` | Check narrow routes, measured slopes and navigation conditions. |
 | `ersatzteil_druck_eignung` | Triage a small missing part or organizer for 3D printing. |
@@ -2226,7 +2225,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->2024<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2023<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
