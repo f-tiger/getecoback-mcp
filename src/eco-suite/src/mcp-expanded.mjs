@@ -187,9 +187,10 @@ export function catalogueExample(name) {
   };
 }
 
-export const expandedTools = expandedDefinitions.map(({name, description, properties}) => ({
+export const expandedTools = expandedDefinitions.map(({name, description, properties, required, oneOf}) => ({
   name, description,
-  inputSchema: {type:'object', properties, required:Object.keys(properties), additionalProperties:false},
+  inputSchema: {type:'object', properties, required:required ?? Object.keys(properties), additionalProperties:false,
+    ...(oneOf ? {oneOf} : {})},
   annotations: {readOnlyHint:true, openWorldHint:false},
 }));
 
@@ -212,10 +213,10 @@ function toolError(text) {
 export function expandedCall(name, args) {
   const tool = handlers.get(name);
   if (!tool) return null;
-  const properties = Object.entries(tool.properties);
+  const required = tool.required ?? Object.keys(tool.properties);
   if (!args || typeof args !== 'object' || Array.isArray(args) ||
-      Object.keys(args).length !== properties.length ||
-      !properties.every(([key, schema]) => Object.hasOwn(args,key) && valid(schema,args[key]))) {
+      !required.every(key => Object.hasOwn(args,key)) ||
+      !Object.keys(args).every(key => Object.hasOwn(tool.properties,key) && valid(tool.properties[key],args[key]))) {
     return toolError('Eingaben mit tools/list abgleichen. Das Tool braucht alle angegebenen Werte und Einheiten.');
   }
 

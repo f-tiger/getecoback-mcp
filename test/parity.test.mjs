@@ -26,6 +26,8 @@ const CASES = [
   ["heizleistung_watt", { qm: 30, daemmung: "schlecht", strompreis_euro_kwh: 0.35 }],
   ["heizleistung_watt", { qm: 20, strompreis_euro_kwh: 0 }],
   ["taupunkt_lueften", { aussen_temp_c: 18, aussen_luftfeuchte_prozent: 60, innen_temp_c: 16 }],
+  ["luftentfeuchter_waesche_einzelkosten", { method: "estimate", watts: 200, hours: 6, price: 0.35 }],
+  ["luftentfeuchter_waesche_einzelkosten", { method: "estimate", watts: 200, hours: 6, dehum: 1.8, price: 0.35 }],
   ...['zu_heiss','zu_kalt','stickige_luft'].map(problem=>['geraet_wahl',{problem,qm:20}]),
   ["geraet_wahl", { problem: "unknown" }],
   ...[{}, {purpose:'damage'}, {humidity:'normal'}, {humidity:'high',temperature:'cold'}, {purpose:'laundry',humidity:'high',temperature:'warm'}, {humidity:'high',temperature:'warm'}, {purpose:'invalid'}].map(args=>['geraet_wahl',{problem:'feucht_schimmel',...args}]),
@@ -118,9 +120,9 @@ test("drainage choices preserve exact model evidence and structured results", as
   }
 });
 
-test("all 2010 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
+test("all 2011 deterministic suite tools have hosted and stdio parity on the documented examples", async () => {
   const {expandedDefinitions} = await import("../src/eco-suite/src/mcp-expanded.mjs");
-  assert.equal(expandedDefinitions.length,2010);
+  assert.equal(expandedDefinitions.length,2011);
   for (let position=0; position<expandedDefinitions.length; position+=4) {
     await Promise.all(expandedDefinitions.slice(position,position+4).map(async ({name,example}) => {
       const [local,remote] = await Promise.all([callTool(name,example.args),remoteCall(name,example.args)]);

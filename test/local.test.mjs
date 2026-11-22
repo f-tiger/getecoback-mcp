@@ -448,6 +448,67 @@ function compactReplies(requests) {
   });
 }
 
+test('both offline profiles compute a single laundry run without a dryer reading', () => {
+  const name = 'luftentfeuchter_waesche_einzelkosten';
+  const comparison = 'waesche_trocknungskosten';
+  const citation = 'https://getecoback.com/waeschetrockner-oder-luftentfeuchter.html';
+  const guide = citation + '#luftentfeuchter-waesche-kosten';
+  const lookup = [
+    ['Was kostet eine Waschladung mit meinem Luftentfeuchter? 1,8 kWh, 0,35 Euro/kWh.', name],
+    ['Was kostet mich die Wäsche mit Entfeuchter, durchschnittlich 200 Watt über 6 Stunden?', name],
+    ['Was kostet das Trocknen pro Ladung mit Wäschetrockner oder Luftentfeuchter?', comparison],
+  ];
+  const valid = [
+    [{method:'measured',dehum:1.8,price:0.35},1.8,0.63],
+    [{method:'estimate',watts:200,hours:6,price:0.35},1.2,0.42],
+    [{method:'measured',dehum:0,price:0},0,0],
+  ];
+  const inputs = [
+    ...valid.map(([input])=>input),
+    {method:'measured',dehum:1.8,watts:200,price:0.35},
+    {method:'estimate',watts:200,price:0.35},
+    {method:'estimate',watts:200,hours:6,dehum:1.8,price:0.35},
+    {method:'measured',dehum:1.8,price:0.35,dryer:0},
+  ];
+  const compact = compactReplies([
+    ...lookup.map(([frage])=>toolCall(compactFind,{frage})),
+    ...inputs.map(eingaben=>toolCall(compactRun,{name,eingaben})),
+  ]);
+  for (const [index,[question,expected]] of lookup.entries()) {
+    const first = compact[index].result.structuredContent.tools[0];
+    assert.equal(first?.name,expected,question);
+    assert.deepEqual(first,findTools(question).tools[0]);
+    if (expected === name) {
+      assert.equal(first.citation_url,citation);
+      assert.equal(first.guide_url,guide);
+      assert.deepEqual(first.inputSchema.required,['method','price']);
+      assert.equal(first.inputSchema.oneOf.length,2);
+    }
+  }
+  assert.equal(findTools(name).tools[0]?.name,name);
+  assert.ok(!findTools('Was kostet Wäsche mit Luftentfeuchter laut Typenschild und Nennleistung?').tools.some(t=>t.name===name));
+
+  const jobs = inputs.map((input,index)=>({jsonrpc:'2.0',id:index+1,...toolCall(name,input)}));
+  const standard = new Map(readStdio(jobs).map(reply=>[reply.id,reply.result]));
+  for (const [index,input] of inputs.entries()) {
+    const result = standard.get(index+1);
+    assert.deepEqual(result,compact[lookup.length+index].result);
+    if (index >= valid.length) {
+      assert.equal(result.isError,true);
+      assert.equal(result.structuredContent,undefined);
+      continue;
+    }
+    const [, kwh, cost] = valid[index];
+    assert.equal(result.isError,false);
+    const output = result.structuredContent;
+    assert.deepEqual([output.kwh,output.cost,output.basis],[kwh,cost,input.method]);
+    assert.deepEqual([output.citation_url,output.guide_url,output.share_url],[citation,guide,guide]);
+    assert.ok(output.share_text_de.includes(guide));
+    assert.equal(Object.hasOwn(output,'lower_cost'),false);
+    assert.doesNotMatch(result.content[0].text,/https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('both offline stdio profiles keep decimal window widths on the measured fit boundary', () => {
   const name = 'fenstersauger_sprossenfenster_duesenbreite';
   const entry = 'https://getecoback.com/produkte.html?mcp_entry=fenstersauger-breitencheck#fenstersauger-duesenbreite';

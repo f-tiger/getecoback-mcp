@@ -224,6 +224,17 @@ function asksForLaundryCostComparison(terms) {
     !terms.some(term => /^(?:kaufpreis|anschaffung|amortis|rentier|rechnet|gleichzeitig$|ausgeschaltet$|abgeschaltet$)/.test(term));
 }
 
+const singleLaundryTool = 'luftentfeuchter_waesche_einzelkosten';
+function asksForSingleLaundryCost(query) {
+  if (!/\b(?:luft)?entfeuchter(?:s|n)?\b/.test(query) ||
+      !/\b(?:kostet|kosten|stromkosten|strompreis|stromgeld|euro|cent)\b/.test(query)) return false;
+  if (/\b(?:gleichzeitig|parallel|zusammen|abgeschaltet|ausgeschaltet|kaufpreis|anschaffung[a-z]*|amortis[a-z]*|rentier[a-z]*|rechnet|typenschild|nennleistung|nennwatt|herstellerangabe[a-z]*)\b/.test(query)) return false;
+  const hasDryer = /\b(?:waesche)?trockner(?:s|n)?\b/.test(query);
+  if (hasDryer && !/\b(?:kein(?:en)?|ohne(?:\s+(?:den|einen|meinen))?)\s+(?:waesche)?trockner\b/.test(query)) return false;
+  return /\b(?:waesche(?:ladung(?:en)?)?|waschladung(?:en)?|ladung(?:en)?|trocknungsgang|trocknungsdurchgang)\b/.test(query) ||
+    /\b(?:durchschnittlich[a-z]*|mittler[a-z]*|gemittelt[a-z]*)\b/.test(query) && /\b(?:stunden?|laufzeit)\b/.test(query);
+}
+
 function asksForHumidifierEfficiency(query) {
   const comparesModels = /\blb[\s-]*55\b/.test(query) && /\boskar\b/.test(query);
   const namesHumidifier = /\b(?:luft)?befeuchter(?:s|n)?\b/.test(query);
@@ -297,9 +308,11 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const unique = [...observed.values()];
   if (!unique.length) return [];
   const terms = unique.length > 24 ? [...unique.slice(0, 12), ...unique.slice(-12)] : unique;
+  const singleLaundry = asksForSingleLaundryCost(focus.query);
   const termCount = terms.length;
   const matches = [];
   for (const entry of index) {
+    if (entry.tool.name === singleLaundryTool && !singleLaundry) continue;
     const weights = terms.map(({term, root}) => matchWeight(term, root, entry));
     const matched = weights.filter(Boolean).length;
     if (!matched) continue;
@@ -328,7 +341,8 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   }
   const results = ranked.sort((a, b) => b.score - a.score).map(result => result.tool);
   let preferredName;
-  if (asksForLaundryCostComparison(tokens)) preferredName = 'waesche_trocknungskosten';
+  if (singleLaundry) preferredName = singleLaundryTool;
+  else if (asksForLaundryCostComparison(tokens)) preferredName = 'waesche_trocknungskosten';
   else if (asksForHumidifierEfficiency(focus.query)) preferredName = 'befeuchter_nennwatt_abgabeleistung_bezug';
   else if (asksAboutGlassvacFault(focus.query)) return results.filter(tool => tool.name !== glassvacTemperatureTool);
   else if (asksForGlassvacTemperature(focus.query)) preferredName = glassvacTemperatureTool;
