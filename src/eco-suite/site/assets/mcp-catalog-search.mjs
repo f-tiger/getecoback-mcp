@@ -233,6 +233,25 @@ function asksForHumidifierEfficiency(query) {
     (asksForOutput || (comparesModels && asksForWaterInAir));
 }
 
+const glassvacTemperatureTool = 'glassvac_kalt_lagern_einschalten_laden_getrennt';
+const glassvacModel = /\b(?:glass[ -]?vac|06008b7000)\b/;
+
+function asksForGlassvacTemperature(query) {
+  const cold = /\b(?:frost[a-z]*|bodenfrost|gefroren[a-z]*|gefrier[a-z]*|minus[a-z]*|kaelte|unter\s+null)\b|[−-]\s*\d+(?:[,.]\d+)?\s*(?:°\s*c|grad)\b/.test(query);
+  const charging = /\b(?:laden|aufladen|aufzuladen|aufladung|einstecken|ladenetzteil|ans\s+ladegeraet|(?:in|an)\s+die\s+steckdose)\b/.test(query);
+  return glassvacModel.test(query) && cold && charging;
+}
+
+function asksForGlassvacConnectorPhoto(query) {
+  return glassvacModel.test(query) && /\b(?:ladeanschluss|usb[ -]?anschluss|ladebuchse)\b/.test(query) &&
+    /\b(?:foto|angebotsfoto|abbildung)\b/.test(query);
+}
+
+function asksAboutGlassvacFault(query) {
+  return glassvacModel.test(query) && /\b(?:leds?|blink[a-z]*)\b/.test(query) &&
+    /\b(?:kaputt|defekt[a-z]*|fehler|fehlersuche)\b/.test(query);
+}
+
 export function findCatalogueTools(index, {query='', category='', name=null}={}) {
   const eligible = entry => (!category || category === entry.tool.category) && (name === null || name === entry.tool.name);
   const bounded = query.slice(0, 512);
@@ -286,6 +305,9 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   let preferredName;
   if (asksForLaundryCostComparison(tokens)) preferredName = 'waesche_trocknungskosten';
   else if (asksForHumidifierEfficiency(exact)) preferredName = 'befeuchter_nennwatt_abgabeleistung_bezug';
+  else if (asksAboutGlassvacFault(exact)) return results.filter(tool => tool.name !== glassvacTemperatureTool);
+  else if (asksForGlassvacTemperature(exact)) preferredName = glassvacTemperatureTool;
+  else if (asksForGlassvacConnectorPhoto(exact)) return results.filter(tool => tool.name !== glassvacTemperatureTool);
   else return results;
 
   // These questions can match too few published terms for the ordinary threshold.

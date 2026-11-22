@@ -169,7 +169,7 @@ export const expandedDefinitions = [
   ["Toasterbelege", toasterBelege],
   ['Fenstersauger', [kaercherFensterlippe, ...kaercherFenstersaugerTools, ...glassvacBelege, fenstersaugerSprossenKauf]],
 ].flatMap(([category, definitions]) => definitions.map(tool => {
-  const guide_url = evidenceGuideUrl(category, tool.page);
+  const guide_url = evidenceGuideUrl(category, tool.page, tool.name);
   return {...tool, category, ...(guide_url ? {guide_url} : {})};
 }));
 

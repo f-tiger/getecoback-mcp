@@ -41,7 +41,7 @@ export const glassvacBelege = [
     }, {flaeche:'poroes_oder_saugend', aufnahme:'wasser_kuehl_oder_zimmerwarm'}, {im_geprueften_einsatzbereich:false}),
 
   entry('glassvac_kalt_lagern_einschalten_laden_getrennt',
-    'Vergleicht die Umgebungstemperatur für Lagerung, Einschalten und Aufladen des Bosch GlassVAC und beachtet die zusätzliche Mindestgrenze beim Start — Separate storage, cold-start and charging limits.',
+    'Vergleicht die aktuell gemessene Umgebungstemperatur mit den Bedingungen für Lagerung, Einschalten und Aufladen des Bosch GlassVAC Sets. Frost vergangener Stunden ersetzt keine aktuelle Messung — Check current temperature against storage, startup and charging limits.',
     {umgebung_c:{type:'number', description:'Vor Ort gemessene Umgebungstemperatur in °C für den betreffenden Vorgang.', minimum:-70, maximum:100}},
     'S. 4–5, technische Daten und Fußnoten zur Umgebungstemperatur', ({umgebung_c}) => ({
       im_lagerbereich:umgebung_c >= -20 && umgebung_c <= 50,

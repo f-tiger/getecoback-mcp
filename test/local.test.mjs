@@ -446,6 +446,59 @@ function compactReplies(requests) {
   });
 }
 
+test('GlassVAC frost questions distinguish charging, startup and storage using the measured temperature', () => {
+  const name = 'glassvac_kalt_lagern_einschalten_laden_getrennt';
+  const guide = 'https://getecoback.com/produkte.html#bosch-glassvac-einsatz-und-pflege';
+  const queries = [
+    'Der Bosch GlassVAC 06008B7000 liegt seit gestern im unbeheizten Schuppen. Darf ich den Akku dort bei minus 3 Grad aufladen?',
+    'Mein Bosch-Fenstersauger 06008B7000 stand über Nacht bei Frost in der Garage. Kann er gleich ans Ladegerät?',
+  ];
+  for (const query of queries) assert.equal(findTools(query).tools[0]?.name, name);
+  for (const query of [
+    'Bosch GlassVAC 06008B7000: Welchen Ladeanschluss zeigt das Foto aus der kalten Garage?',
+    'Wie lädt man den Kärcher WV 8 bei −3 °C in der Garage?',
+    'Welches USB-Kabel passt zum Bosch GlassVAC 06008B7000?',
+    'Die LED an meinem GlassVAC blinkt beim Laden nach Frost. Ist der Akku defekt?',
+    'Mein Bosch GlassVAC ist nach Frost im Schuppen kaputt, die LED blinkt beim Laden. Wie kann ich den Fehler finden?',
+  ]) assert.notEqual(findTools(query).tools[0]?.name, name);
+
+  const model = {paketkennung:'06008B7000', handbuch_zugeordnet:true};
+  const inputs = [
+    {...model, umgebung_c:-8}, {...model, umgebung_c:2}, model,
+    {...model, umgebung_c:-8, paketkennung:'06008B7200'},
+    {...model, umgebung_c:2, handbuch_zugeordnet:false},
+  ];
+  const [found, ...compact] = compactReplies([
+    toolCall(compactFind, {frage:queries[1]}),
+    ...inputs.map(eingaben => toolCall(compactRun, {name, eingaben})),
+  ]);
+  const tool = found.result.structuredContent.tools[0];
+  assert.equal(tool.name, name);
+  assert.equal(tool.guide_url, guide);
+  assert.ok(tool.inputSchema.required.includes('umgebung_c'));
+  const native = readStdio(inputs.map((args, index) => ({
+    jsonrpc:'2.0', id:index + 1, ...toolCall(name, args),
+  })));
+  for (const [index, reply] of compact.entries()) {
+    assert.deepEqual(reply.result, native.find(message => message.id === index + 1).result);
+  }
+  for (const [index, start, charge] of [[0, false, false], [1, true, true]]) {
+    const result = compact[index].result.structuredContent;
+    assert.equal(result.im_lagerbereich, true);
+    assert.equal(result.einschalten_im_temperaturbereich, start);
+    assert.equal(result.im_empfohlenen_ladebereich, charge);
+    assert.equal(result.guide_url, guide);
+    assert.equal(result.citation_url, 'https://getecoback.com/produkte.html');
+    assert.match(result.beleg.fundstelle, /S\. 4–5/);
+  }
+  assert.equal(compact[2].result.isError, true);
+  for (const reply of compact.slice(3)) {
+    assert.equal(reply.result.structuredContent.status, 'modell_oder_handbuch_offen');
+    assert.equal(reply.result.structuredContent.beleg, null);
+    assert.equal(Object.hasOwn(reply.result.structuredContent, 'im_empfohlenen_ladebereich'), false);
+  }
+});
+
 test('offline humidifier efficiency questions require output and watts from matching settings', async () => {
   const name = 'befeuchter_nennwatt_abgabeleistung_bezug';
   const citation = 'https://getecoback.com/guide/luftbefeuchter-stromverbrauch.html';

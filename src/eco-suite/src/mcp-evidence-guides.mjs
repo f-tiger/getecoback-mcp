@@ -15,8 +15,12 @@ const sections = new Map([
   ['Modellunterlagen', ['/guide/luftbefeuchter-stromverbrauch.html', 'effizienz-vergleichen']],
 ]);
 
-export function evidenceGuideUrl(category, page) {
-  const section = sections.get(category);
+const toolSections = new Map([
+  ['glassvac_kalt_lagern_einschalten_laden_getrennt', [productGuide, 'bosch-glassvac-einsatz-und-pflege']],
+]);
+
+export function evidenceGuideUrl(category, page, name) {
+  const section = toolSections.get(name) ?? sections.get(category);
   if (section && section[0] === page) return 'https://getecoback.com' + page + '#' + section[1];
   return undefined;
 }
