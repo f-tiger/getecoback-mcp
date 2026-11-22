@@ -1,3 +1,4 @@
+import {asksForTesamollWindowProfile} from './tesamoll-profile-intent.mjs';
 import {exactGermanFilterModel} from './exact-filter-intent.mjs';
 import {philipsHumidifierFilterSection} from './philips-humidifier-filter-intent.mjs';
 import {asksForElectricBlanketCost, isElectricBlanketQuestion} from './electric-blanket-cost-intent.mjs';
@@ -340,6 +341,8 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const n90Identity = asksForN90ModelIdentity(focus.query);
   const otherPacModel = namesAnotherPacWithoutN90(focus.query);
   const n90IdentityTool = 'pac_n90_ean_abgleichen';
+  const tesamollProfile = asksForTesamollWindowProfile(focus.query);
+  const tesamollTool = 'tesamoll_fensterdichtung_profil_pruefen';
   const portaSplitLip = asksForPortaSplitWindowLip(focus.query);
   const portaSplitVariant = namesDifferentPortaSplit(focus.query);
   const portaSplitLipTool = 'midea_portasplit_fensterfalz_pruefen';
@@ -353,6 +356,8 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
     if (entry.tool.name === blanketCostTool && !blanketCost) continue;
     if (entry.tool.name === 'hygrometer_zweipunkt_referenz_abgleich' && hygrometerComparison) continue;
     if (entry.tool.name === n90IdentityTool && !n90Identity) continue;
+    if (entry.tool.name === tesamollTool && !tesamollProfile) continue;
+    if (entry.tool.name === 'tesa_tuerbodenprofil_belag_groesster_spalt' && tesamollProfile) continue;
     if (entry.tool.name === portaSplitLipTool && !portaSplitLip) continue;
     if (entry.tool.name === 'midea_portasplit_fensterhalterung_pruefen' && portaSplitVariant) continue;
     if (entry.tool.name === 'pac_n90_energielabel_zu_stromkosten' && (blanketQuestion || n90Identity || otherPacModel)) continue;
@@ -393,6 +398,7 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   else if (blanketCost) preferredName = blanketCostTool;
   else if (hygrometerComparison) preferredName = hygrometerComparisonTool;
   else if (n90Identity) preferredName = n90IdentityTool;
+  else if (tesamollProfile) preferredName = tesamollTool;
   else if (portaSplitLip) preferredName = portaSplitLipTool;
   else if (asksForDehumidifierDrainRoute(focus.query)) preferredName = 'entfeuchter_ablaufcheck';
   else if (cellarVentilation) preferredName = cellarVentilationTool;
