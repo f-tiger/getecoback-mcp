@@ -13,7 +13,7 @@ import { CELLAR_RESOURCE, CELLAR_RESOURCE_TEXT } from "./cellar-resource.mjs";
 const PROTOCOL_VERSION = "2025-06-18";
 import {pageTools} from './eco-suite/src/mcp-pagination.mjs';
 
-const SERVER_INFO = { name: "getecoback-raumklima", version: "1.22.24" };
+const SERVER_INFO = { name: "getecoback-raumklima", version: "1.22.25" };
 const assistant = process.argv.slice(2).includes('--compact') ? await import('./assistant-tools.mjs') : null;
 const availableTools = assistant?.ASSISTANT_TOOLS ?? TOOLS;
 const runTool = assistant?.callAssistantTool ?? callTool;
