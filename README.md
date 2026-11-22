@@ -2004,7 +2004,7 @@ separately measured loads reach different levels of dryness.
 | `led_arbeitsflaeche_drei_luxpunkte_gegen_basis` | Check a matched centre-and-edge lux comparison before treating a spot as an even task light. |
 | `delonghi_dlsc002_filter_variante_aussehen_ersatzkauf` | Check a documented De’Longhi filter design difference before buying another filter. |
 | `kaffeevollautomat_wasserfilter_lieferumfang_start_ohne_nachkauf` | Distinguish catalogued, optional and delivered water filters before an initial purchase. |
-| `kaffeevollautomat_intenza_aquaclean_filterfamilie_modellpruefung` | Match the candidate coffee filter family to the exact German model. |
+| `kaffeevollautomat_intenza_aquaclean_filterfamilie_modellpruefung` | Verify the documented replacement water filter family or part for a German coffee machine. |
 | `delonghi_magnifica_filter_stillstand_drei_wochen` | Check the separate installed-filter limits for idle and ordinary use. |
 | `philips_aquaclean_orange_blinkt_blau_filteranzeige` | Interpret a Philips AquaClean indicator using the observed appliance history. |
 | `philips_gebrauchtkaffee_aquaclean_filterlos_oder_einstieg` | Resolve a used Philips filter purchase against the documented activation prerequisites. |

@@ -1,3 +1,4 @@
+import {asksAboutCoffeeFilterMaintenance, asksForCoffeeWaterFilterMatch} from './kaffee-wasserfilter-intent.mjs';
 import {asksForTrotecTtk75EcoConditions, namesTrotecTtk75Eco} from './trotec-ttk75-eco-intent.mjs';
 import {asksForCoolingNoiseComparison} from './cooling-noise-intent.mjs';
 import {asksForTesamollWindowProfile} from './tesamoll-profile-intent.mjs';
@@ -340,6 +341,9 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const blanketCostTool = 'heizdecke_stromkosten_nennleistung';
   const hygrometerComparison = asksForHygrometerComparison(focus.query);
   const hygrometerComparisonTool = 'hygrometer_messbereiche';
+  const coffeeFilterMatch = asksForCoffeeWaterFilterMatch(focus.query);
+  const coffeeMaintenance = asksAboutCoffeeFilterMaintenance(focus.query);
+  const coffeeFilterTool = 'kaffeevollautomat_intenza_aquaclean_filterfamilie_modellpruefung';
   const trotecConditions = asksForTrotecTtk75EcoConditions(focus.query);
   const trotecTool = 'trotec_ttk75_eco_pruefpunkt';
   const trotecOnly = namesTrotecTtk75Eco(focus.query) && !/\b(?:meaco|arete|comfee|pac[ -]*n[ -]*90|8004399512351)\b/.test(focus.query);
@@ -364,6 +368,8 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
     if (entry.tool.name === 'hygrometer_zweipunkt_referenz_abgleich' && hygrometerComparison) continue;
     if (entry.tool.name === n90IdentityTool && !n90Identity) continue;
     if (entry.tool.name === n90IdentityTool && coolingNoise) continue;
+    if (entry.tool.name === coffeeFilterTool && coffeeMaintenance) continue;
+    if (entry.tool.name === 'delonghi_magnifica_filter_stillstand_drei_wochen' && coffeeFilterMatch) continue;
     if (entry.tool.name === trotecTool && !trotecConditions) continue;
     if (entry.tool.name === 'kellerentfeuchter_pruefpunkt_abgleichen' && trotecOnly) continue;
     if (entry.tool.name === tesamollTool && !tesamollProfile) continue;
@@ -405,6 +411,7 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   let preferredName;
   if (exactGermanFilterModel(focus.query)) preferredName = 'luftreiniger_ersatzfilter_zuordnung';
   else if (philipsFilter) preferredName = philipsFilterTool;
+  else if (coffeeFilterMatch) preferredName = coffeeFilterTool;
   else if (blanketCost) preferredName = blanketCostTool;
   else if (hygrometerComparison) preferredName = hygrometerComparisonTool;
   else if (coolingNoise) preferredName = coolingNoiseTool;

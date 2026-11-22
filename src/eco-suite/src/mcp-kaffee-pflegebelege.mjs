@@ -12,6 +12,8 @@ const pLatteSupport = 'https://acc.philips.de/c-p/EP2231_40/series-2200-kaffeevo
 const pClassicSupport = 'https://acc.philips.de/c-p/EP2220_10/series-2200-kaffeevollautomat/support';
 const pLatteSheet = 'https://www.download.p4c.philips.com/files/e/ep2231_40/ep2231_40_pss_deuat.pdf';
 const pClassicSheet = 'https://www.documents.philips.com/assets/20210904/3ea44c9845d84f26818ead990053f95e.pdf';
+const pPack = 'CA6903/10';
+const pPackSource = 'https://acc.philips.de/c-p/CA6903_10/kalk-und-wasserfilter';
 const pOil = 'https://acc.philips.de/c-f/XC000014495/wie-verwende-ich-die-philips-kaffeefettl%C3%B6ser-tabletten';
 const pGrounds = 'https://acc.philips.de/c-t/XC000015554/auf-der-philips-espressomaschine-wird-die-meldung-kaffeesatzbeh%C3%A4lter-leeren-empty-ground-container-angezeigt-obwohl-der-kaffeesatzbeh%C3%A4lter-leer-ist';
 const pRinseWater = 'https://acc.philips.de/c-t/XC000004110/meine-philips-espressomaschine-ist-undicht';
@@ -67,14 +69,22 @@ export const kaffeePflegebelege = [
     {herstellerangabe:'im_herstellerpaket_aufgefuehrt',entscheidungsstand:'zuordnung_und_lieferung_klaeren'}),
 
   tool('kaffeevollautomat_intenza_aquaclean_filterfamilie_modellpruefung',
-    'Vergleicht BRITA Intenza und Philips AquaClean anhand der genauen Kaffeemaschine und Zubehörkennung — Match the candidate coffee filter family to the exact German model.',
+    'Passenden Ersatz-Wasserfilter anhand der vollständigen Kaffeemaschinenkennung prüfen: Philips AquaClean, Bosch TCZ7003/TCZ7033 und De’Longhi DLSC002 — Verify the documented replacement water filter family or part for a German coffee machine.',
     {modell:modelChoice('Vollständige Modellkennung aus den Unterlagen des deutschen Geräts.'),
-      filter:choice('Konkret belegte Kennung oder Familie des angebotenen Filters.','TCZ7003','TCZ7033','AquaClean','DLSC002','andere_kennung','offen')},
+      filter:choice('Konkret belegte Kennung oder Familie des angebotenen Filters.','TCZ7003','TCZ7033','AquaClean','DLSC002',pPack,'andere_kennung','offen')},
     ({modell,filter})=>{
-      const allowed=knownPhilips(modell)?['AquaClean']:modell===bosch?['TCZ7003','TCZ7033']:modell===delonghi?['DLSC002']:null;
-      const status=!allowed||filter==='offen'?'zuordnung_offen':allowed.includes(filter)?'in_unterlagen_belegt':knownPhilips(modell)&&(filter==='TCZ7003'||filter==='TCZ7033')?'brita_fuer_dieses_geraet_ausgeschlossen':'durch_gelesene_quellen_nicht_belegt';
+      const philips = knownPhilips(modell);
+      const allowed = philips ? ['AquaClean'] : modell===bosch ? ['TCZ7003','TCZ7033'] : modell===delonghi ? ['DLSC002'] : null;
+      const documentedPack = philips && filter===pPack;
+      const status=!allowed||filter==='offen'?'zuordnung_offen':allowed.includes(filter)||documentedPack?'in_unterlagen_belegt':philips&&(filter==='TCZ7003'||filter==='TCZ7033')?'brita_fuer_dieses_geraet_ausgeschlossen':'durch_gelesene_quellen_nicht_belegt';
+      const evidenceForModel = philips
+        ? [evidence(productSheets[modell],'Filterkompatibilität'),pEvidence(modell,'S. 82, Bestellen von Zubehör')]
+        : allowed ? evidence(productSheets[modell],'Wasserfilter als Modellzubehör') : null;
+      if (documentedPack) {
+        evidenceForModel.push({quelle:pPackSource,fundstelle:'CA6903/10, Kompatibilität mit Philips Series 2200',geprueft_am:'2026-11-22'});
+      }
       return {ausgewiesene_kennung_oder_familie:allowed,angebotszuordnung:status,
-        beleg:knownPhilips(modell)?[evidence(productSheets[modell],'Filterkompatibilität'),pEvidence(modell,'S. 82, Bestellen von Zubehör')]:allowed?evidence(productSheets[modell],'Wasserfilter als Modellzubehör'):null,
+        beleg:evidenceForModel,
         hinweis:'Bei einem unbekannten Modell, gekürztem Suffix oder einer nicht dokumentierten Kennung vor dem Kauf die Herstellerzuordnung klären.'};
     },{modell:lattego,filter:'TCZ7003'},
     {ausgewiesene_kennung_oder_familie:['AquaClean'],angebotszuordnung:'brita_fuer_dieses_geraet_ausgeschlossen'}),

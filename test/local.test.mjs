@@ -450,6 +450,100 @@ function compactReplies(requests) {
   });
 }
 
+test('offline stdio distinguishes exact coffee filter compatibility from upkeep and unrelated filters', () => {
+  const name = 'kaffeevollautomat_intenza_aquaclean_filterfamilie_modellpruefung';
+  const citation = 'https://getecoback.com/produkte.html';
+  const guide = citation + '#kaffee-wasserfilter';
+  const found = 'in_unterlagen_belegt';
+  const unresolved = 'zuordnung_offen';
+  const exactPackSource = 'https://acc.philips.de/c-p/CA6903_10/kalk-und-wasserfilter';
+  const cases = [
+    [{modell: 'EP2220/10', filter: 'AquaClean'}, found, ['AquaClean'], ['www.documents.philips.com','acc.philips.de']],
+    [{modell: 'EP2231/40', filter: 'TCZ7003'}, 'brita_fuer_dieses_geraet_ausgeschlossen',
+      ['AquaClean'], ['www.download.p4c.philips.com','acc.philips.de']],
+    [{modell: 'TIE20301', filter: 'TCZ7003'}, found, ['TCZ7003','TCZ7033'], ['media3.bsh-group.com']],
+    [{modell: 'TIE20301', filter: 'TCZ7033'}, found, ['TCZ7003','TCZ7033'], ['media3.bsh-group.com']],
+    [{modell: 'TIE20301', filter: 'DLSC002'}, 'durch_gelesene_quellen_nicht_belegt',
+      ['TCZ7003','TCZ7033'], ['media3.bsh-group.com']],
+    [{modell: 'ECAM22.110.B', filter: 'DLSC002'}, found, ['DLSC002'], ['www.delonghi.com']],
+    [{modell: 'offen', filter: 'AquaClean'}, unresolved, null, []],
+    [{modell: 'anderes_modell', filter: 'DLSC002'}, unresolved, null, []],
+    [{modell: 'EP2220/10', filter: 'offen'}, unresolved, ['AquaClean'], ['www.documents.philips.com','acc.philips.de']],
+    [{modell: 'EP2220/10', filter: 'CA6903/10'}, found,
+      ['AquaClean'], ['www.documents.philips.com','acc.philips.de','acc.philips.de']],
+    [{modell: 'EP2231/40', filter: 'CA6903/10'}, found,
+      ['AquaClean'], ['www.download.p4c.philips.com','acc.philips.de','acc.philips.de']],
+    [{modell: 'TIE20301', filter: 'CA6903/10'}, 'durch_gelesene_quellen_nicht_belegt',
+      ['TCZ7003','TCZ7033'], ['media3.bsh-group.com']],
+  ];
+  const invalid = [{modell: 'EP2220', filter: 'AquaClean'}, {modell: 'ECAM22.110', filter: 'DLSC002'},
+    {modell: 'EP2220/10', filter: 'CA6903/11'},
+    {modell: 'TIE20301', filter: 'TCZ8003'}, {modell: 'EP2220/10'}, {filter: 'AquaClean'}];
+  const related = [
+    'Welcher Wasserfilter passt in meine Philips EP2220/10: AquaClean oder BRITA Intenza?',
+    'Passt AquaClean CA6903/10 in die Philips EP2220/10?',
+    'Passt CA6903/10 in meinen Philips LatteGo EP2231/40?',
+    'Passt TCZ7003 in Bosch TIE20301?',
+    'Bosch TIE20301 TCZ7003 oder TCZ7033 als Wasserfilter',
+    'Passt DLSC002 in meine DeLonghi ECAM22.110.B?',
+  ];
+  const other = [
+    ['Mein AquaClean blinkt orange beim Philips EP2220/10, was heißt das?', 'philips_aquaclean_orange_blinkt_blau_filteranzeige'],
+    ['Der Filter DLSC002 blieb nach vier Wochen Stillstand in der DeLonghi ECAM22.110.B. Muss ich ihn tauschen?',
+      'delonghi_magnifica_filter_stillstand_drei_wochen'],
+    ['Kann ich den Philips EP2220/10 AquaClean nach dem Filterwechsel zurücksetzen?', null],
+    ['Wie wechsle ich den AquaClean Filter beim Philips EP2231/40 und setze die Anzeige zurück?', null],
+    ['Passt ein AquaClean CA6903/10 in Philips EP2220/11?', null],
+    ['Nicht die Philips EP2220/10, sondern EP2220/12: passt AquaClean CA6903/10?', null],
+    ['Ersatzfilter für Levoit Core 300S', 'luftreiniger_ersatzfilter_zuordnung'],
+  ];
+  const searches = [...related, ...other.map(([query]) => query)];
+  const inputs = [...cases.map(([input]) => input), ...invalid];
+  const compact = compactReplies([
+    ...searches.map(frage => toolCall(compactFind, {frage})),
+    ...inputs.map(eingaben => toolCall(compactRun, {name, eingaben})),
+  ]);
+  for (const [index, query] of searches.entries()) {
+    const hits = compact[index].result.structuredContent.tools;
+    const first = hits[0];
+    assert.deepEqual(first, findTools(query).tools[0]);
+    if (index >= related.length) {
+      const expected = other[index - related.length][1];
+      if (expected) assert.equal(first?.name, expected, query);
+      assert.notEqual(first?.name, name, query);
+      continue;
+    }
+    assert.equal(first?.name, name, query);
+    assert.deepEqual([first.citation_url, first.guide_url], [citation, guide]);
+    assert.deepEqual(first.inputSchema.required, ['modell','filter']);
+  }
+  const jobs = inputs.map((input, index) => ({jsonrpc: '2.0', id: index + 1, ...toolCall(name, input)}));
+  const full = new Map(readStdio(jobs).map(reply => [reply.id, reply.result]));
+  for (const [index] of inputs.entries()) {
+    const result = full.get(index + 1);
+    assert.deepEqual(result, compact[searches.length + index].result);
+    if (index >= cases.length) {
+      assert.equal(result.isError, true);
+      assert.equal(result.structuredContent, undefined);
+      continue;
+    }
+    assert.equal(result.isError, false);
+    const data = result.structuredContent;
+    const [, status, allowed, hosts] = cases[index];
+    assert.deepEqual([data.angebotszuordnung, data.ausgewiesene_kennung_oder_familie], [status, allowed]);
+    assert.deepEqual([data.citation_url, data.guide_url], [citation, guide]);
+    const evidence = [data.beleg].flat().filter(Boolean);
+    assert.deepEqual(evidence.map(item => new URL(item.quelle).hostname), hosts);
+    const packReference = evidence.find(item => item.quelle === exactPackSource);
+    const exactPack = inputs[index].filter === 'CA6903/10' && status === found;
+    if (exactPack) assert.match(packReference?.fundstelle, /CA6903\/10.*Series 2200/);
+    else assert.equal(packReference, undefined);
+    assert.ok(evidence.every(item => item.fundstelle &&
+      item.geprueft_am === (item === packReference ? '2026-11-22' : '2026-11-20')));
+    assert.doesNotMatch(result.content[0].text, /https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('offline stdio distinguishes exact Trotec TTK 75 ECO evidence and unsupported conditions', () => {
   const name = 'trotec_ttk75_eco_pruefpunkt';
   const citation = 'https://getecoback.com/guide/trotec-luftentfeuchter-test.html';
