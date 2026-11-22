@@ -6,7 +6,7 @@ Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
 [Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
-<!-- count -->2014<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2015<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -2202,6 +2202,7 @@ separately measured loads reach different levels of dryness.
 | `glassvac_schmutzwassertank_spuelen_oeffnung_ablass` | Distinguish rinse fill from drainage using the Bosch maintenance procedure. |
 | `glassvac_streifen_auf_glas_wischblatt_sichtbefund` | Distinguish a replacement indication from cosmetic marks. |
 | `glassvac_spruehapplikator_tropft_montage_ursache` | Check a loose spray-applicator assembly without assigning a suction-unit leak to it. |
+| `fenstersauger_sprossenfenster_duesenbreite` | Shortlist four German window-vacuum packages after measuring the narrowest clear pane and allowing a side margin. |
 <!-- tools:end -->
 
 ## Can a MeacoDry Arete One 20L drain uphill into a sink?
@@ -2215,7 +2216,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->2014<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2015<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
