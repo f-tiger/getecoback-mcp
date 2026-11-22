@@ -24,15 +24,15 @@ The tool table below is not hand-written: `sync.mjs` rebuilds it from the live s
 
 ## Connect
 
-**[EcoBack MCPB 1.22.7 herunterladen](https://github.com/f-tiger/agi-site/releases/download/fleet-mcp-registry-2026-10-10/ecoback-local-tools-1.22.7.mcpb)**
+**[EcoBack MCPB 1.22.8 herunterladen](https://github.com/f-tiger/agi-site/releases/download/fleet-mcp-registry-2026-10-10/ecoback-local-tools-1.22.8.mcpb)**
 
 Öffne die heruntergeladene `.mcpb`-Datei über die MCPB-Installation deines Clients.
 Für den lokalen Betrieb brauchst du Node.js 22 oder neuer. Berechnungen laufen
 lokal. Nur auf Anfrage ruft EcoBack Wetterdaten oder ausgewählte Ratgeber ab.
 
 SHA-256 der verlinkten Datei
-`3b9135b27f0cf86fd8d46c015d550a96e62b88e603c29c63ed93dbbb3bd92478`.
-[Registrierte Version 1.22.7](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fecoback-local-tools/versions/1.22.7)
+`033262e5c8e9cb2e57b2bc80e383afc8500fd081cc67d5dfa7fbc96494ba4844`.
+[Registrierte Version 1.22.8](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fecoback-local-tools/versions/1.22.8)
 · [Aktuellste Version im offiziellen MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fecoback-local-tools/versions/latest).
 
 <details>
