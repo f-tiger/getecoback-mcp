@@ -2204,7 +2204,7 @@ separately measured loads reach different levels of dryness.
 | `fenstersauger_kaercher_glasreiniger_schaum_spiritus` | Check documented cleaner scope without inferring material compatibility. |
 | `fenstersauger_wv3_wv8_hochglanz_glas_temperatur_probe` | Check the documented temperature exclusion and inconspicuous microfiber test. |
 | `glassvac_aufnahme_glatte_nicht_poroese_flaeche` | Check documented liquid pickup and surface scope, including dry dust. |
-| `glassvac_kalt_lagern_einschalten_laden_getrennt` | Separate storage, cold-start and charging limits. |
+| `glassvac_kalt_lagern_einschalten_laden_getrennt` | Check current temperature against storage, startup and charging limits. |
 | `glassvac_schmutzwassertank_spuelen_oeffnung_ablass` | Distinguish rinse fill from drainage using the Bosch maintenance procedure. |
 | `glassvac_streifen_auf_glas_wischblatt_sichtbefund` | Distinguish a replacement indication from cosmetic marks. |
 | `glassvac_spruehapplikator_tropft_montage_ursache` | Check a loose spray-applicator assembly without assigning a suction-unit leak to it. |
