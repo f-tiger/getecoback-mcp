@@ -1,7 +1,33 @@
 // Decisions are deliberately limited to reviewed, exact model/valve categories.
+function knownValve(data, valve) {
+  return valve === 'unknown' || data.cases.some(row => row.id === valve)
+    || Boolean(data.bosch?.cases.some(row => row.id === valve))
+    || Boolean(data.fritz?.cases.some(row => row.id === valve));
+}
+
 export function decision(data, model, valve) {
-  if (!data.models.some(x => x.id === model) || !['unknown', ...data.cases.map(x => x.id)].includes(valve)) {
-    model = 'unknown'; valve = 'unknown';
+  if (!data.models.some(x => x.id === model)) model = 'unknown';
+  if (!knownValve(data, valve)) {
+    if (model !== 'bosch-ii-m' && model !== 'fritz-302') model = 'unknown';
+    valve = 'unknown';
+  }
+  if (model === 'bosch-ii-m') {
+    const row = data.bosch?.cases.find(candidate => candidate.id === valve);
+    if (row) return {...row};
+    return {
+      status:'unverified', title:'Ventil am Bosch II [+M] noch ungeklärt',
+      detail:'Prüfe die Kennzeichnung am Ventil und vergleiche sie mit den Bildern in der Bosch-Ventilliste. Bleibt das Modell unklar, vorerst keinen Adapter kaufen.',
+      source:'bosch-guide'
+    };
+  }
+  if (model === 'fritz-302') {
+    const row = data.fritz?.cases.find(candidate => candidate.id === valve);
+    if (row) return {...row};
+    return {
+      status:'unverified', title:'Ventil für den FRITZ!Smart Thermo 302 noch ungeklärt',
+      detail:'Gleiche Modellbezeichnung und Anschluss mit der FRITZ!-Ventilliste ab. Solange der Ventiltyp offen ist, behalte den vorhandenen Kopf und kaufe noch keinen Adapter.',
+      source:'fritz-valves'
+    };
   }
   if (model === 'tado-x') return {status:'unverified', title:'tado° X benötigt seine eigene Prüfung', detail:'Die Zuordnungen für V3+ gelten hier nicht. Prüfe die genaue X-Ausführung in der separaten Herstellerhilfe; aus dieser Auswahl folgt keine Adapterempfehlung.', source:'x'};
   if (model !== 'tado-v3') return {status:'unverified', title:'Gerätemodell zuerst klären', detail:'Noch keine passende Zuordnung. Hersteller, genaue Modellgeneration und Ventil müssen zusammen geprüft werden. Für andere Marken gilt deren eigene Freigabe; diese Tabelle ist kein Universaladapter-Ratgeber.', source:model === 'other' ? 'routine' : 'overview'};
@@ -12,7 +38,7 @@ export function decision(data, model, valve) {
 
 export function selectionFromHash(hash, data) {
   const match = /^#ventilcheck=([a-z0-9-]+):([a-z0-9-]+)$/.exec(hash);
-  if (!match || !data.models.some(x => x.id === match[1]) || !['unknown', ...data.cases.map(x => x.id)].includes(match[2])) return null;
+  if (!match || !data.models.some(x => x.id === match[1]) || !knownValve(data, match[2])) return null;
   return {model:match[1],valve:match[2]};
 }
 
@@ -21,7 +47,7 @@ export function selectionLink(model, valve, data) {
   return `https://getecoback.com/guide/smarte-heizkoerperthermostate-lohnen-sich.html#ventilcheck=${model}:${valve}`;
 }
 
-const allowedSource = url => /^https:\/\/(?:support\.tado\.com|help\.tado\.com|cdn\.brandfolder\.io|www\.verbraucherzentrale\.de)\//.test(url);
+const allowedSource = url => /^https:\/\/(?:support\.tado\.com|help\.tado\.com|cdn\.brandfolder\.io|www\.verbraucherzentrale\.de|www\.bosch-smarthome\.com|fritz\.com)\//.test(url);
 if (typeof document !== 'undefined') for (const root of document.querySelectorAll('[data-valve-check]')) {
   const data = JSON.parse(root.querySelector('[data-valve-data]').textContent);
   const model = root.querySelector('[name=valve-model]'), valve = root.querySelector('[name=valve-connection]');

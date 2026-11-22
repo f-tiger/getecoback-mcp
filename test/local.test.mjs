@@ -448,6 +448,88 @@ function compactReplies(requests) {
   });
 }
 
+test('both offline profiles use exact FRITZ 302 Danfoss evidence and leave unresolved valves open', () => {
+  const name = 'fritz_302_danfoss_adapter';
+  const citation = 'https://getecoback.com/guide/smarte-heizkoerperthermostate-lohnen-sich.html';
+  const guide = citation + '#fritz-302-danfoss-adapter';
+  const searches = [
+    'Ist der Adapter für Danfoss RA beim FRITZ!Smart Thermo 302 dabei?',
+    'Welchen Adapter brauche ich für das unbekannte Ventil am FRITZ!Smart Thermo 302?',
+    'Danfoss RAV mit Pin beim FRITZ!DECT 302, Artikel 20003120?',
+  ];
+  const cases = [
+    ['20003120','danfoss-ra','adapter_im_lieferumfang',true,null],
+    ['20003120','danfoss-rav','adapter_separat',false,true],
+    ['20003120','danfoss-ravl','adapter_separat',false,null],
+    ['20003120','anders_oder_unbekannt','modell_oder_ventil_klaeren',null,null],
+    ['andere_oder_unbekannt','danfoss-ra','modell_oder_ventil_klaeren',null,null],
+  ];
+  const inputs = [
+    ...cases.map(([artikelnummer,ventil])=>({artikelnummer,ventil})),
+    {artikelnummer:'20003120',ventil:'34 mm'},
+    {ventil:'danfoss-ra'},
+  ];
+  const compact = compactReplies([
+    ...searches.map(frage=>toolCall(compactFind,{frage})),
+    ...inputs.map(eingaben=>toolCall(compactRun,{name,eingaben})),
+  ]);
+  for (const [index,frage] of searches.entries()) {
+    const first = compact[index].result.structuredContent.tools[0];
+    assert.equal(first?.name,name,frage);
+    assert.deepEqual(first,findTools(frage).tools[0]);
+    assert.equal(first.citation_url,citation);
+    assert.equal(first.guide_url,guide);
+  }
+  assert.equal(findTools(name).tools[0]?.name,name);
+  for (const unrelated of [
+    'Welche Firmware braucht der FRITZ!DECT 302 an meinem Router?',
+    'FRITZ!DECT 302 und Bosch II [+M] am Danfoss RAV vergleichen',
+  ]) {
+    assert.ok(!findTools(unrelated).tools.some(tool=>tool.name === name),unrelated);
+  }
+
+  const jobs = inputs.map((input,index)=>({jsonrpc:'2.0',id:index+1,...toolCall(name,input)}));
+  const standard = new Map(readStdio(jobs).map(reply=>[reply.id,reply.result]));
+  for (const [index] of inputs.entries()) {
+    const result = standard.get(index+1);
+    assert.deepEqual(result,compact[searches.length+index].result);
+    if (index >= cases.length) {
+      assert.equal(result.isError,true);
+      assert.equal(result.structuredContent,undefined);
+      continue;
+    }
+    const [, , status,included,pin] = cases[index];
+    assert.equal(result.isError,false);
+    const output = result.structuredContent;
+    assert.deepEqual([output.status,output.adapter_im_lieferumfang,output.adapter_mit_pin_dokumentiert],[status,included,pin]);
+    assert.deepEqual([output.citation_url,output.guide_url,output.quellenmarkt],[citation,guide,'DE']);
+    assert.equal(output.quellen_geprueft_am,'2026-11-22');
+    assert.match(output.quellen_url,/^https:\/\/fritz\.com\/apps\/knowledge-base\/fritz-dect-302\/3376_/);
+    assert.equal(output.produkt_url,'https://fritz.com/products/fritz-smart-thermo-302-20003120');
+    assert.doesNotMatch(result.content[0].text,/https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
+test('the general thermostat tool keeps FRITZ, Bosch and tado evidence separate', async () => {
+  const name = 'thermostat_ventilabgleich';
+  const cases = [
+    [{model:'fritz-302',valve:'danfoss-ravl'},'adapter','2026-11-22','fritz.com',/Separaten Adapter/],
+    [{model:'bosch-ii-m',valve:'danfoss-ravl'},'adapter','2026-11-22','www.bosch-smarthome.com',/Adapter liegt bei/],
+    [{model:'tado-v3',valve:'heimeier-m30'},'direct','2026-10-31','cdn.brandfolder.io',/ohne Adapter/],
+  ];
+  const compact = compactReplies(cases.map(([eingaben])=>toolCall(compactRun,{name,eingaben})));
+  for (const [index,[input,status,reviewed,authority,title]] of cases.entries()) {
+    const result = await callTool(name,input);
+    assert.deepEqual(result,compact[index].result);
+    assert.equal(result.isError,false);
+    const data = result.structuredContent;
+    assert.equal(data.status,status);
+    assert.equal(data.reviewed_on,reviewed);
+    assert.equal(new URL(data.manufacturer_or_guidance_url).hostname,authority);
+    assert.match(data.title,title);
+  }
+});
+
 test('both offline profiles compute a single laundry run without a dryer reading', () => {
   const name = 'luftentfeuchter_waesche_einzelkosten';
   const comparison = 'waesche_trocknungskosten';

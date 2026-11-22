@@ -1,8 +1,6 @@
-import {createRequire} from 'node:module';
-const require=createRequire(import.meta.url);
 import { calculate as winter } from '../site/assets/winter-math.mjs';
 import { decision as valveDecision } from '../site/assets/thermostat-fit.mjs';
-const valveData = require('../site/assets/thermostat-fit-data.json');
+import valveData from '../site/assets/thermostat-fit-data.json' with {type: 'json'};
 
 const number = (description, minimum, maximum) => ({type: 'number', description, minimum, maximum});
 const choice = (description, values) => ({type: 'string', description, enum: values});
@@ -16,6 +14,9 @@ const radiator = guide('heizkoerper-wird-nicht-warm');
 const draft = guide('fenster-zugluft-mietwohnung');
 const heatCompare = guide('heizkosten-vergleich-rechner');
 const energyPrice = number('Arbeitspreis in EUR/kWh.', 0, 5);
+const documentedValves = ['unknown', ...new Set(
+  [...valveData.cases, ...(valveData.bosch?.cases ?? []), ...(valveData.fritz?.cases ?? [])].map(({id}) => id))];
+const reviewDates = {'bosch-ii-m': valveData.bosch?.reviewed, 'fritz-302': valveData.fritz?.reviewed};
 
 export const winterSuite = [
   {
@@ -61,15 +62,15 @@ export const winterSuite = [
   },
   {
     name: 'thermostat_ventilabgleich',
-    description: 'Bekanntes Heizkörperventil gegen die geprüfte tado°-V3+-Kompatibilitätsliste abgleichen — Check a known radiator valve against reviewed tado V3+ records.',
+    description: 'Ein bekanntes Heizkörperventil anhand der Herstellerunterlagen für die gewählte Gerätegeneration prüfen — Check a known radiator valve against the selected model’s documentation.',
     page: thermostat,
     properties: {
       model: choice('Thermostat-Generation aus der Geräteanleitung.', valveData.models.map(({id}) => id)),
-      valve: choice('Eindeutig identifizierter Ventilanschluss oder unknown.', ['unknown', ...valveData.cases.map(({id}) => id)]),
+      valve: choice('Eindeutig identifizierter Ventilanschluss oder unknown.', documentedValves),
     },
     calculate({model, valve}) {
       const {status, title, detail, source} = valveDecision(valveData, model, valve);
-      return {status, title, detail, reviewed_on: valveData.reviewed, manufacturer_or_guidance_url: valveData.sources[source].url};
+      return {status, title, detail, reviewed_on: reviewDates[model] ?? valveData.reviewed, manufacturer_or_guidance_url: valveData.sources[source].url};
     },
     example: {args: {model: 'tado-v3', valve: 'heimeier-m30'}, expect: {status: 'direct'}},
   },

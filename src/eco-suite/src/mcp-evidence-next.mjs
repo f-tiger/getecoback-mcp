@@ -1,10 +1,9 @@
-import {createRequire} from 'node:module';
+import dehumidifiers from '../data/dehum-catalog.json' with {type:'json'};
+import thermostats from '../data/thermostat-catalog.json' with {type:'json'};
+import thermostatFit from '../site/assets/thermostat-fit-data.json' with {type:'json'};
+import robots from '../data/robot-catalog.json' with {type:'json'};
+import humidifiers from '../data/humidifier-catalog.json' with {type:'json'};
 import {PORTASPLIT_ENTRY_PAGE, PORTASPLIT_ENTRY_URL, PORTASPLIT_GUIDE_URL} from './portasplit-entry.mjs';
-const require=createRequire(import.meta.url);
-const dehumidifiers = require('../data/dehum-catalog.json');
-const thermostats = require('../data/thermostat-catalog.json');
-const robots = require('../data/robot-catalog.json');
-const humidifiers = require('../data/humidifier-catalog.json');
 
 const method = '/wie-wir-empfehlen.html';
 const cold = '/guide/luftentfeuchter-keller.html';
@@ -277,6 +276,37 @@ export const evidenceNext = [
         herstellerhinweis:kit.care, quellen_url:kit.source, grenze:'Hochrechnung mit unverändertem Preis. Gerät und Zubehör gesondert.'};
     },
     example:{args:{funktion:'zusaetzliche_automatisierung',jahrespreis_eur:25,preis_geprueft:true,jahre:3},expect:{funktionskosten_eur:75}},
+  },
+  {
+    name:'fritz_302_danfoss_adapter',
+    description:'Welcher Adapter gehört zum FRITZ!Smart Thermo 302 (FRITZ!DECT 302), Artikel 20003120, bei Danfoss RA, RAV oder RAVL? Unbekanntes Ventil vor dem Kauf identifizieren — Check the documented adapter for the German FRITZ! 302 package.',
+    page:thermo,
+    guide_url:'https://getecoback.com' + thermo + '#fritz-302-danfoss-adapter',
+    properties:{
+      artikelnummer:choice('Artikelnummer des deutschen Thermostatpakets laut Packung oder Produktunterlagen.', '20003120','andere_oder_unbekannt'),
+      ventil:choice('Am Ventil oder in seinen Unterlagen eindeutig identifizierte Familie. Ein Durchmesser allein genügt nicht.', 'danfoss-ra','danfoss-rav','danfoss-ravl','anders_oder_unbekannt'),
+    },
+    calculate({artikelnummer,ventil}) {
+      const {fritz,sources} = thermostatFit;
+      const valve = artikelnummer === fritz.model && fritz.cases.find(entry => entry.id === ventil);
+      const evidence = {
+        quellenmarkt:'DE', quellen_geprueft_am:fritz.reviewed,
+        quellen_url:sources['fritz-valves'].url, produkt_url:sources['fritz-product'].url,
+      };
+      if (!valve) return {
+        ...evidence, status:'modell_oder_ventil_klaeren',
+        adapter_im_lieferumfang:null, adapter_mit_pin_dokumentiert:null,
+        naechster_schritt:'Keinen Adapter auf Verdacht kaufen. Artikelnummer und Ventilkennzeichnung in den Unterlagen abgleichen. Ein Durchmesser allein identifiziert kein Ventil.',
+      };
+      const included = valve.id === 'danfoss-ra';
+      return {
+        ...evidence, status:included ? 'adapter_im_lieferumfang' : 'adapter_separat',
+        ventil:valve.label, adapter_im_lieferumfang:included,
+        adapter_mit_pin_dokumentiert:valve.id === 'danfoss-rav' ? true : null,
+        herstellerangabe:valve.title, naechster_schritt:valve.detail,
+      };
+    },
+    example:{args:{artikelnummer:'20003120',ventil:'danfoss-rav'},expect:{status:'adapter_separat',adapter_im_lieferumfang:false,adapter_mit_pin_dokumentiert:true}},
   },
   {
     name:'tado_x_oventrop_ventiladapter_pruefen',
