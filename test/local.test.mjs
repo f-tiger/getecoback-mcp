@@ -450,6 +450,79 @@ function compactReplies(requests) {
   });
 }
 
+test('offline stdio distinguishes exact Philips humidifier filters, variants and unknown models', () => {
+  const name = 'philips_verdunsterfilter_zuordnung';
+  const citation = 'https://getecoback.com/guide/luftbefeuchter-ratgeber.html';
+  const guide = citation + '#philips-verdunsterfilter';
+  const source = 'https://acc.philips.de/c-e/ho/luftreiniger-und-luftbefeuchter/air-purifier-filter-replacement';
+  const queries = [
+    'Welcher Ersatzfilter passt zum Philips HU4803/01?',
+    'Passt FY2401/30 in den Philips HU2716/10?',
+    'Welchen Filter braucht mein Philips Series 2000 Luftbefeuchter?',
+  ];
+  const unrelated = [
+    'Welcher Ersatzfilter passt in den Philips Luftreiniger AC2889?',
+    'Wie oft sollte ich den Filter meines Philips HU4803/01 wechseln?',
+  ];
+  const cases = [
+    [{model:'HU4803/01'},'documented_variant','FY2401/30','#philips-hu4803-01'],
+    [{model:'HU2716/10',candidate:' fy3446/30 '},'documented_variant','FY3446/30','#philips-hu2716-10'],
+    [{model:'HU2716/10',candidate:'FY2401/30'},'candidate_not_documented','FY3446/30','#philips-hu2716-10'],
+    [{model:'HU4803/01',candidate:'FY2401/31'},'candidate_not_documented','FY2401/30','#philips-hu4803-01'],
+    [{model:'unknown',candidate:'FY2401/30'},'identify_model',null,null],
+  ];
+  const invalid = [{model:'HU4803/03'},{model:'HU2716'},{model:'AC2889'},{candidate:'FY2401/30'},
+    {model:'HU4803/01',candidate:''},{model:'HU4803/01',candidate:'X'.repeat(25)}];
+  const inputs = [...cases.map(([args])=>args),...invalid];
+  const lookup = [...queries,...unrelated];
+  const compact = compactReplies([
+    ...lookup.map(frage=>toolCall(compactFind,{frage})),
+    ...inputs.map(eingaben=>toolCall(compactRun,{name,eingaben})),
+  ]);
+  for (const [index,frage] of queries.entries()) {
+    const first = compact[index].result.structuredContent.tools[0];
+    assert.equal(first?.name,name,frage);
+    assert.deepEqual(first,findTools(frage).tools[0]);
+    assert.deepEqual([first.citation_url,first.guide_url],[citation,guide]);
+    assert.deepEqual(first.inputSchema.required,['model']);
+    assert.deepEqual(first.inputSchema.properties.model.enum,['HU4803/01','HU2716/10','unknown']);
+  }
+  for (const [index,frage] of unrelated.entries()) {
+    const hits = compact[queries.length+index].result.structuredContent.tools;
+    assert.ok(!hits.some(tool=>tool.name===name),frage);
+  }
+  const jobs = inputs.map((args,index)=>({jsonrpc:'2.0',id:index+1,...toolCall(name,args)}));
+  const standard = new Map(readStdio(jobs).map(reply=>[reply.id,reply.result]));
+  const now = new Date();
+  const days = (Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()) - Date.parse('2026-11-22')) / 86400000;
+  const fresh = days >= 0 && days <= 90;
+  for (const [index,args] of inputs.entries()) {
+    const result = standard.get(index+1);
+    assert.deepEqual(result,compact[lookup.length+index].result);
+    if (index >= cases.length) {
+      assert.equal(result.isError,true);
+      assert.equal(result.structuredContent,undefined);
+      continue;
+    }
+    assert.equal(result.isError,false);
+    const data = result.structuredContent;
+    const [,status,part,anchor] = cases[index];
+    assert.deepEqual([data.citation_url,data.guide_url,data.manufacturer_source,data.source_checked,data.market],
+      [citation,guide,source,'2026-11-22','DE']);
+    assert.equal(data.status,!anchor || fresh ? status : 'source_recheck');
+    assert.equal(data.part_number,fresh ? part : null);
+    if (anchor) {
+      assert.equal(data.exact_model,args.model);
+      assert.equal(data.model_guide_url,citation+anchor);
+      assert.equal(new URL(data.manufacturer_datasheet).hostname,'www.documents.philips.com');
+    } else {
+      assert.equal(Object.hasOwn(data,'model_guide_url'),false);
+      assert.equal(Object.hasOwn(data,'manufacturer_datasheet'),false);
+    }
+    assert.doesNotMatch(result.content[0].text,/https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
+
 test('both offline stdio profiles find exact German replacement filters without using unsupported variants', () => {
   const name = 'luftreiniger_ersatzfilter_zuordnung';
   const citation = 'https://getecoback.com/ersatzfilter.html';

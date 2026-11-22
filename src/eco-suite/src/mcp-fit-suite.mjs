@@ -3,6 +3,7 @@ const require=createRequire(import.meta.url);
 const robotCatalog = require('../data/robot-catalog.json');
 const humidifierCatalog = require('../data/humidifier-catalog.json');
 const filterCatalog = require('../data/filter-finder-de.json');
+const philipsFilters = require('../data/humidifier-philips-filters-de.json');
 import {availability} from '../site/assets/filter-care-core.mjs';
 import {CARE, careDecision} from '../site/assets/upkeep-decisions-rules.mjs';
 import {SCHEMA, decide} from '../site/assets/family-workshop-rules.mjs';
@@ -11,6 +12,8 @@ const robotPage = '/guide/saugroboter-kaufberatung.html';
 const floorPage = '/guide/saugwischer-kaufberatung.html';
 const filterPage = '/ersatzfilter.html';
 const filterUrl = 'https://getecoback.com' + filterPage;
+const humidifierPage = '/guide/luftbefeuchter-ratgeber.html';
+const humidifierUrl = 'https://getecoback.com' + humidifierPage;
 const workshopPage = '/familienwerkstatt.html';
 
 const number = (description, minimum, maximum) => ({type:'number', minimum, maximum, description});
@@ -255,7 +258,7 @@ export const fitSuite = [
   {
     name:'luftbefeuchter_modellpflege',
     description:'Dokumentierte Tankpflege und passende Verschleißteile nach exakter Befeuchter-Variante abrufen — Retrieve model-specific humidifier care and consumables.',
-    page:'/guide/luftbefeuchter-ratgeber.html',
+    page:humidifierPage,
     properties:{model:choice('Exakte Variante der deutschen Auswahl.', ...humidifierModels.map(({id})=>id),'unknown')},
     calculate({model}) {
       const item = humidifierModels.find(entry=>entry.id === model);
@@ -267,6 +270,40 @@ export const fitSuite = [
         manufacturer_sources:item.sources.map(key=>humidifierCatalog.sources[key].url)};
     },
     example:{args:{model:'unknown'},expect:{status:'identify_model'}},
+  },
+  {
+    name:'philips_verdunsterfilter_zuordnung',
+    description:'Philips Series 2000 Verdunsterfilter und Ersatzfilter nach vollständigem Typenschild prüfen: HU4803/01, HU2716/10, FY2401/30 und FY3446/30 — Resolve exact German Philips humidifier filter parts.',
+    page:humidifierPage,
+    guide_url:humidifierUrl+'#philips-verdunsterfilter',
+    properties:{
+      model:choice('Vollständige Gerätekennung vom Typenschild. Bei bloßer Serienangabe, anderer Endung oder unbekanntem Modell: unknown.', ...philipsFilters.models.map(row=>row.device), 'unknown'),
+      candidate:{type:'string', minLength:1, maxLength:24, description:'Optional: Angebotsnummer einschließlich Schrägstrich und Endung, z. B. FY2401/30. Keine anderen Angaben eingeben.'},
+    },
+    required:['model'],
+    calculate({model,candidate}) {
+      if (candidate !== undefined && (!candidate.trim() || candidate.length > 24)) {
+        throw new RangeError('Die optionale Filternummer muss 1 bis 24 Zeichen enthalten.');
+      }
+      const source = {market:philipsFilters.market, manufacturer_source:philipsFilters.manufacturer_source,
+        source_checked:philipsFilters.checked};
+      const item = philipsFilters.models.find(row=>row.device === model);
+      if (!item) return {...source, status:'identify_model', part_number:null,
+        next_step:'Vollständige HU-Gerätenummer einschließlich Endung am Typenschild nachsehen. Series 2000 oder eine Filterpackung allein reicht nicht. Bis zur Klärung keinen Filter auswählen.'};
+      const modelEvidence = {...source, exact_model:item.device, manufacturer_datasheet:item.source,
+        model_guide_url:humidifierUrl+'#'+item.anchor};
+      if (!freshness(philipsFilters.checked,philipsFilters.max_age_days)) {
+        return {...modelEvidence, status:'source_recheck', part_number:null,
+          next_step:'Aktuelle deutsche Herstellerliste prüfen, bevor du einen Filter auswählst.'};
+      }
+      const different = candidate !== undefined && candidate.replace(/\s+/g,'').toUpperCase() !== item.part;
+      return {...modelEvidence, status:different ? 'candidate_not_documented' : 'documented_variant',
+        part_number:item.part, next_step:different ?
+          'Für die eingegebene Filternummer ist hier keine Zuordnung belegt. Vergleiche die dokumentierte Nummer inklusive Endung mit Angebot und Herstellertabelle.' :
+          'Genaue Nummer einschließlich Endung abgleichen. Die Zuordnung beantwortet die Passformfrage; ob ein Wechsel fällig ist, steht in der Geräteanleitung.'};
+    },
+    example:{args:{model:'HU2716/10'},
+      expect:{exact_model:'HU2716/10',model_guide_url:humidifierUrl+'#philips-hu2716-10'}},
   },
   {
     name:'poolroboter_beckencheck',
