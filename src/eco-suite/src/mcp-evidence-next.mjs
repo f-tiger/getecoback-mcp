@@ -18,6 +18,15 @@ const money = description => number(description, 0, 50000);
 const missing = entries => Object.entries(entries).filter(([,ok]) => !ok).map(([key]) => key);
 const rounded = value => Math.round(value * 100) / 100;
 
+const tadoXValveTable = 'https://cdn.bfldr.com/607DGEMS/at/hqb8tzxsq4cmchcjxsxtwhh/DE_SRTx_compatibility_Links.pdf';
+const tadoXAdapterHelp = 'https://help.tado.com/de/articles/8949346-brauche-ich-einen-adapter-um-meinen-smarten-heizkorper-thermostat-x-zu-montieren';
+const tadoXValveHelp = 'https://help.tado.com/de/articles/8949334-welche-heizkorperventile-sind-mit-dem-smarten-heizkorper-thermostat-x-von-tado-kompatibel';
+const tadoXOventrop = new Map([
+  ['unidh', {pitch:'m30_1_0', adapter:true}],
+  ['unil', {pitch:'m30_1_0', adapter:true}],
+  ['vindo_th', {pitch:'m30_1_5', adapter:false}],
+]);
+
 export const evidenceNext = [
   {
     name:'geraet_testzitat_einordnen',
@@ -216,6 +225,52 @@ export const evidenceNext = [
         herstellerhinweis:kit.care, quellen_url:kit.source, grenze:'Hochrechnung mit unverändertem Preis. Gerät und Zubehör gesondert.'};
     },
     example:{args:{funktion:'zusaetzliche_automatisierung',jahrespreis_eur:25,preis_geprueft:true,jahre:3},expect:{funktionskosten_eur:75}},
+  },
+  {
+    name:'tado_x_oventrop_ventiladapter_pruefen',
+    description:'tado° X am Oventrop-Heizkörperventil prüfen: UniDH und UniL M30 × 1,0 benötigen einen separaten Adapter, Vindo TH M30 × 1,5 ist direkt dokumentiert. 30 mm allein reicht nicht — Check exact Oventrop valve and thread before buying a tado X thermostat.',
+    page:thermo,
+    guide_url:'https://getecoback.com' + thermo + '#tado-x-oventrop',
+    properties:{
+      ventilmodell:choice('Sicher erkanntes Oventrop-Modell am vorhandenen Ventil.', 'unidh','unil','vindo_th','anders_oder_unbekannt'),
+      gewinde:choice('Belegte Gewindegröße und Steigung (nicht allein aus 30 mm Durchmesser ableiten).', 'm30_1_0','m30_1_5','anders','unbekannt'),
+      ventilzustand:choice('Vor Ort festgestellter Ventiltyp und Zustand.', 'thermostatisch_unauffaellig','manuell','beschaedigt_oder_undicht','unbekannt'),
+    },
+    calculate({ventilmodell,gewinde,ventilzustand}) {
+      const valve = tadoXOventrop.get(ventilmodell);
+      const sources = {
+        quellenmarkt:'DE', quellenstand:'tado° X Kompatibilitätsliste V2, Oktober 2026', quellen_geprueft_am:'2026-11-20',
+        quellen_url:tadoXValveTable, adapter_hinweis_url:tadoXAdapterHelp, ventil_hinweis_url:tadoXValveHelp,
+        grenze:'Gilt für den smarten Heizkörper-Thermostat X und die hier aufgeführten Ventile. Kein Beleg für V3+, Systemzentrale oder den Zustand am eigenen Heizkörper.',
+      };
+      const stop = (status, naechster_schritt) => ({
+        ...sources, status, adapter_artikelnummer:null, adapter_ean:null, adapter_im_x_lieferumfang:null, naechster_schritt,
+      });
+      if (ventilzustand === 'beschaedigt_oder_undicht') {
+        return stop('zustand_klaeren', 'Nichts bestellen oder montieren. Ein beschädigtes, rostiges oder undichtes Ventil zuerst fachlich prüfen lassen.');
+      }
+      if (ventilzustand === 'manuell') {
+        return stop('manuelles_ventil_nicht_kompatibel', 'Für dieses manuelle Ventil kein tado° X bestellen. Einen möglichen Ventiltausch mit einem Fachbetrieb klären.');
+      }
+      if (ventilzustand === 'unbekannt' || !valve || gewinde === 'unbekannt') {
+        return stop('ventilbeleg_fehlend', 'Vor dem Kauf thermostatischen Ventiltyp, genaue Modellbezeichnung und Gewindesteigung prüfen. Ein Außendurchmesser von etwa 30 mm reicht nicht.');
+      }
+      if (gewinde !== valve.pitch) {
+        return stop('modell_gewinde_widerspruch', 'Mit der Modellkennzeichnung und der Gewindeangabe den Widerspruch klären. Bis dahin kein Thermostat oder Adapter bestellen.');
+      }
+      return {...sources,
+        status:valve.adapter ? 'separater_adapter_erforderlich' : 'direktmontage_dokumentiert',
+        quellen_url:`${tadoXValveTable}#page=${valve.adapter ? 7 : 6}`,
+        adapter_artikelnummer:valve.adapter ? '1011445' : null,
+        adapter_ean:valve.adapter ? '4026755228717' : null,
+        adapter_im_x_lieferumfang:valve.adapter ? false : null,
+        naechster_schritt:valve.adapter
+          ? 'Vor der Bestellung des Thermostats den separat benötigten Adapter 1011445 und den Lieferumfang des konkreten Angebots abgleichen.'
+          : 'Für die dokumentierte Direktmontage ist kein Adapter nötig. Das Angebot auf Thermostat X und die benötigte Systemzentrale prüfen.',
+      };
+    },
+    example:{args:{ventilmodell:'unidh',gewinde:'m30_1_0',ventilzustand:'thermostatisch_unauffaellig'},
+      expect:{status:'separater_adapter_erforderlich',adapter_artikelnummer:'1011445',adapter_ean:'4026755228717',adapter_im_x_lieferumfang:false}},
   },
   {
     name:'klima_kuehlleistung_einheit_abgleich',

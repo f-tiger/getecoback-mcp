@@ -6,7 +6,7 @@ Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
 [Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
-<!-- count -->2018<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2019<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -372,6 +372,7 @@ separately measured loads reach different levels of dryness.
 | `auslands_datenblatt_de_angebot` | Check how an overseas datasheet applies to a German offer. |
 | `thermostat_funkzentrale_abgleichen` | Match an existing hub to a documented smart radiator thermostat ecosystem. |
 | `tado_x_funktionskosten_pruefen` | Identify possible recurring fees for the intended tado X app function. |
+| `tado_x_oventrop_ventiladapter_pruefen` | Check exact Oventrop valve and thread before buying a tado X thermostat. |
 | `klima_kuehlleistung_einheit_abgleich` | Normalize two published cooling capacity figures, with a test-condition gate. |
 | `klima_heizfunktion_datenblatt_nachweis` | Verify the documented heating principle in a reversible AC. |
 | `luftreiniger_hepa_werbeaussage_pruefen` | Distinguish a filter class declaration from tested whole-device performance. |
@@ -2220,7 +2221,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->2018<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2019<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.

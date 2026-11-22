@@ -38,6 +38,49 @@ test('offline lookup preserves every exact name and input schema', () => {
   }
 });
 
+test('offline finder and adapter check keep exact tado X valve evidence', async () => {
+  const name = 'tado_x_oventrop_ventiladapter_pruefen';
+  const guide = 'https://getecoback.com/guide/smarte-heizkoerperthermostate-lohnen-sich.html';
+  const found = findTools('tado X Oventrop UniDH M30 adapter 1011445').tools[0];
+  assert.equal(found.name, name);
+  assert.equal(found.citation_url, guide);
+  assert.equal(found.guide_url, guide + '#tado-x-oventrop');
+
+  const result = (...values) => callTool(name, Object.fromEntries(
+    ['ventilmodell','gewinde','ventilzustand'].map((key,index) => [key, values[index]])
+  ));
+  const okay = 'thermostatisch_unauffaellig';
+  for (const model of ['unidh','unil']) {
+    const {structuredContent: data} = await result(model,'m30_1_0',okay);
+    assert.equal(data.status,'separater_adapter_erforderlich');
+    assert.equal(data.adapter_artikelnummer,'1011445');
+    assert.equal(data.adapter_ean,'4026755228717');
+    assert.equal(data.adapter_im_x_lieferumfang,false);
+    assert.match(data.quellen_url,/compatibility_Links\.pdf#page=7$/);
+  }
+  const direct = (await result('vindo_th','m30_1_5',okay)).structuredContent;
+  assert.equal(direct.status,'direktmontage_dokumentiert');
+  assert.equal(direct.adapter_artikelnummer,null);
+  assert.match(direct.quellen_url,/compatibility_Links\.pdf#page=6$/);
+
+  for (const [input, status] of [
+    [['unidh','m30_1_5',okay],'modell_gewinde_widerspruch'],
+    [['unidh','unbekannt',okay],'ventilbeleg_fehlend'],
+    [['anders_oder_unbekannt','m30_1_0',okay],'ventilbeleg_fehlend'],
+    [['unidh','m30_1_0','manuell'],'manuelles_ventil_nicht_kompatibel'],
+    [['unidh','m30_1_0','beschaedigt_oder_undicht'],'zustand_klaeren'],
+    [['unidh','m30_1_0','unbekannt'],'ventilbeleg_fehlend'],
+  ]) {
+    const {structuredContent: data} = await result(...input);
+    assert.equal(data.status,status);
+    assert.equal(data.adapter_artikelnummer,null);
+    assert.equal(data.adapter_ean,null);
+    assert.equal(data.adapter_im_x_lieferumfang,null);
+    assert.equal(data.citation_url,guide);
+    assert.doesNotMatch(JSON.stringify(data),/https:\/\/[^"]*amazon\.|[?&]tag=/i);
+  }
+});
+
 test('German questions find tools beyond the first page and keep reviewed examples', async () => {
   const drainage = findTools('Kann ich den Abflussschlauch nach oben führen?').tools[0];
   assert.equal(drainage.name, 'entfeuchter_ablaufcheck');
