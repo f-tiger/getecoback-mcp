@@ -13,7 +13,7 @@ const routes = {
   },
   level_or_uphill: {
     outcome: 'pump_check',
-    answer: 'Bei fehlendem Gefälle ist ein Schwerkraftablauf nicht gesichert. Prüfe eine für das genaue Modell freigegebene Pumpe und ob ihre zulässige Förderhöhe deinen Wasserweg abdeckt. Ein Schlauchanschluss allein belegt keine Pumpe. Bis zur Klärung kommen Tankbetrieb oder ein anderer Standort infrage.',
+    answer: 'Auch eine kurze Schwelle unterbricht das durchgehende Gefälle, selbst wenn der Zielablauf tiefer liegt. Prüfe eine für das genaue Modell freigegebene Pumpe, ihre zulässige Förderhöhe und die bestätigte Schlauchstrecke. Ein Schlauchanschluss allein belegt keine Pumpe. Bis zur Klärung kommen Tankbetrieb oder ein anderer Standort infrage.',
   },
   no_drain: {
     outcome: 'tank',
@@ -41,9 +41,15 @@ const sourceMarkets = [
   ['https://www.feelcomfee.com/de/', 'DE'],
   ['https://www.meaco.com/products/', 'UK'],
 ];
+const areteOneAccessory = {
+  note: 'Der deutsche Meaco-Vertrieb führt die separat erhältliche Pumpe für den Arete One 20L. Er nennt bis zu 2,5 m Förderhöhe und einen mitgelieferten 3-m-Schlauch für die Pumpe. Ein Wasserweg mit 6 m am Boden und weiteren 1,5 m Anstieg ist damit nicht bestätigt. Eine längere Schlauchstrecke und den Lieferumfang des Grundgeräts separat klären.',
+  source_url: 'https://www.meaco.de/produkt/meaco-dry-arete-one-pumpe/',
+  source_label: 'Deutscher Meaco-Vertrieb (AirSain): Arete One Pumpenzubehör',
+  source_market: 'DE',
+  checked: '2026-11-22',
+};
 const notes = {
   'stadler-lukas': 'Beim Lukas weiss L-031E gehört ein 100-cm-Schlauch zum Lieferumfang. Sein Ende muss tiefer liegen als der Anfang. Daraus folgt keine Freigabe für eine Förderung nach oben.',
-  'meaco-one-20': 'Meaco UK nennt für den Arete One 20L eine separat erhältliche Pumpe zur Entwässerung nach oben. Laut UK-Hersteller ist ein Adapter, aber kein Schlauch enthalten. Prüfe Förderhöhe, Zubehör und Lieferumfang für die genaue deutsche Ausführung.',
   'meaco-two-12': 'Der deutsche Anbieter nennt für den Arete Two 12L einen kontinuierlichen Kondensatablauf. Die Pumpenangabe zur Arete One 20L belegt keine Eignung für diese 12-Liter-Variante.',
 };
 const input = {
@@ -63,6 +69,7 @@ export const drainTool = {
 function modelEvidence(id) {
   const product = verifiedProducts.get(id);
   if (!product) return null;
+  if (id === 'meaco-one-20') return {name: product.name, variant: product.variant, ...areteOneAccessory};
   return {
     name: product.name,
     variant: product.variant,
@@ -70,7 +77,7 @@ function modelEvidence(id) {
     source_url: product.source,
     source_label: product.source_label,
     source_market: sourceMarkets.find(([prefix]) => product.source.startsWith(prefix))?.[1] ?? 'unknown',
-    checked: ['stadler-lukas', 'meaco-one-20'].includes(id) ? '2026-11-18' : catalog.checked,
+    checked: id === 'stadler-lukas' ? '2026-11-18' : catalog.checked,
   };
 }
 

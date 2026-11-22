@@ -422,6 +422,8 @@ test('default and compact stdio expose the same offline German cellar evidence r
   assert.match(text, /Ursache klären/);
   assert.match(text, /Kauf verzichten/);
   assert.match(text, /Tankalarm aktiv/);
+  assert.match(text, /kurze Schwelle.*tiefer liegendem Zielablauf/i);
+  assert.match(text, /https:\/\/www\.meaco\.de\/produkt\/meaco-dry-arete-one-pumpe\/\).*DE, geprüft 2026-11-22/);
   const sourceHosts = new Set(['eu.meaco.com','www.meaco.com','www.meaco.de','www.feelcomfee.com','www.stadlerform.com','getecoback.com']);
   for (const match of text.matchAll(/https?:\/\/[^\s)<>]+/g)) {
     const url = new URL(match[0]);
@@ -447,6 +449,69 @@ function compactReplies(requests) {
     return byId.get(job.id);
   });
 }
+
+test('both offline profiles find the short-uphill condensate route and preserve exact model evidence', () => {
+  const name = 'entfeuchter_ablaufcheck';
+  const citation = 'https://getecoback.com/guide/luftentfeuchter-keller.html';
+  const guide = citation + '?utm_source=eco-mcp&utm_medium=referral&utm_campaign=keller-ablauf#ablauf-vor-kauf';
+  const source = 'https://www.meaco.de/produkt/meaco-dry-arete-one-pumpe/';
+  const queries = [
+    'Kellerentfeuchter: Mein Kondensatschlauch muss kurz über eine Türschwelle, aber der Abfluss liegt tiefer. Läuft das Wasser trotzdem ab?',
+    'Der Ablaufschlauch vom Luftentfeuchter steigt kurz über die Türschwelle und fällt danach zum tieferen Bodenablauf. Brauche ich eine Pumpe?',
+    'Kann ich den Abflussschlauch nach oben führen?',
+  ];
+  const unrelated = [
+    'Mein Kondensatschlauch muss kurz über eine Türschwelle, aber der Abfluss liegt tiefer. Läuft das Wasser trotzdem ab?',
+    'Meine Waschmaschine pumpt nicht ab. Kann der Ablaufschlauch über die Türschwelle?',
+    'Darf ich einen Kabelkanal über die Türschwelle im Keller führen?',
+  ];
+  const cases = [
+    [{drain:'level_or_uphill',model:'meaco-one-20'},'pump_check','DE'],
+    [{drain:'level_or_uphill',model:'meaco-two-12',moisture:'normal'},'pump_check','DE'],
+    [{drain:'downhill',model:'stadler-lukas'},'gravity_check','DE'],
+    [{drain:'no_drain'},'tank',null],
+    [{drain:'unknown',moisture:'damage'},'inspect_route',null],
+  ];
+  const compact = compactReplies([
+    ...[...queries,...unrelated].map(frage=>toolCall(compactFind,{frage})),
+    ...cases.map(([eingaben])=>toolCall(compactRun,{name,eingaben})),
+  ]);
+  for (const [index,frage] of queries.entries()) {
+    const first = compact[index].result.structuredContent.tools[0];
+    assert.equal(first?.name,name,frage);
+    assert.deepEqual(first,findTools(frage).tools[0]);
+    assert.equal(first.citation_url,citation);
+    assert.equal(first.guide_url,guide);
+    assert.deepEqual(first.inputSchema.required,['drain']);
+    assert.deepEqual(first.example_arguments,cases[0][0]);
+  }
+  for (const [index,frage] of unrelated.entries()) {
+    const hits = compact[queries.length+index].result.structuredContent.tools;
+    assert.ok(!hits.some(tool=>tool.name===name),frage);
+  }
+  const jobs = cases.map(([input],index)=>({jsonrpc:'2.0',id:index+1,...toolCall(name,input)}));
+  const standard = new Map(readStdio(jobs).map(reply=>[reply.id,reply.result]));
+  for (const [index,[input,outcome,market]] of cases.entries()) {
+    const result = standard.get(index+1);
+    assert.deepEqual(result,compact[queries.length+unrelated.length+index].result);
+    assert.equal(result.isError,false);
+    const output = result.structuredContent;
+    assert.deepEqual([output.outcome,output.citation_url,output.guide_url],[outcome,citation,guide]);
+    assert.equal(output.model_evidence?.source_market ?? null,market);
+    if (input.model==='meaco-one-20') {
+      assert.equal(output.model_evidence.source_url,source);
+      assert.equal(output.model_evidence.checked,'2026-11-22');
+      assert.match(output.model_evidence.note,/2[,.]5\s*m\b/);
+      assert.match(output.model_evidence.note,/3(?:\s+|-)m\b/);
+      assert.match(output.model_evidence.note,/6\s*m.+1[,.]5\s*m.+nicht bestätigt/);
+      assert.match(output.answer,/Schwelle/i);
+      assert.match(output.answer,/tiefer/i);
+    } else {
+      assert.notEqual(output.model_evidence?.source_url,source);
+    }
+    assert.doesNotMatch(result.content[0].text,/https?:\/\/[^"\s]*(?:amazon\.|amzn\.)|[?&]tag=/i);
+  }
+});
 
 test('both offline profiles use exact FRITZ 302 Danfoss evidence and leave unresolved valves open', () => {
   const name = 'fritz_302_danfoss_adapter';
