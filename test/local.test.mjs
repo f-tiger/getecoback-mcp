@@ -923,7 +923,9 @@ test('offline stdio separates air-conditioner noise quantities, conditions and f
     'Wie laut ist die Midea PortaSplit nachts?',
     'Ist die PortaSplit Lite mit 39 dB oder der N90 mit 64 dB leiser?',
   ];
-  const searches = [...lookups.map(([query]) => query), ...other];
+  const unsupportedEans = ['4048164122424', '4048164122301'].map(ean =>
+    `Midea PortaSplit EAN ${ean} oder PAC N90, 39 dB Schalldruck und 64 dB Schallleistung vergleichen`);
+  const searches = [...lookups.map(([query]) => query), ...other, ...unsupportedEans];
   const inputs = [...cases.map(([change]) => ({...base, ...change})), ...invalid];
   const compact = compactReplies([
     ...searches.map(frage => toolCall(compactFind, {frage})),
@@ -933,6 +935,10 @@ test('offline stdio separates air-conditioner noise quantities, conditions and f
     const hits = compact[index].result.structuredContent.tools;
     const first = hits[0];
     assert.deepEqual(first, findTools(query).tools[0]);
+    if (index >= lookups.length + other.length) {
+      assert.ok(hits.every(tool => tool.name !== name), query);
+      continue;
+    }
     if (index >= lookups.length) {
       assert.notEqual(first?.name, name, query);
       continue;
@@ -1069,6 +1075,10 @@ test('offline stdio uses only the documented PortaSplit window-lip limits', () =
     {...input, angebot_ean: 123456789012}, {...input, falzbreite_mm: -1},
     {...input, falzhoehe_mm: undefined}, {...input, zusaetzliches_mass: 5}];
   const queries = [
+    ['4048164116478', name],
+    ['EAN 4048164116478', name],
+    ['Midea Porta-Split Original', name],
+    ['Fensterfalzbreite für EAN 4048164116478 prüfen', name],
     ['Midea PortaSplit Fensterfalz 60 mm breit, reicht die Standardhalterung?', name],
     ['Muss ich bei der Midea PortaSplit die Gummidichtung beim Fensterrahmen mitmessen?', name],
     ['Die PortaSplit passt nicht ans Fenster, wo muss ich die Rahmendicke messen?', name],
@@ -1078,6 +1088,10 @@ test('offline stdio uses only the documented PortaSplit window-lip limits', () =
   const otherVariants = [
     'Midea PortaSplit Pro: Passt die Standardhalterung an meinen 60 mm Fensterfalz?',
     'Midea PortaSplit Lite Dachfenster Universalhalterung',
+    'PortaSplit 4048164122424 Fensterfalz',
+    'PortaSplit 4048164122301 Fensterfalz',
+    'PortaSplit 4048164116478 oder 4048164122424 Fensterfalz',
+    'Midea PortaSplit Cool 4048164116478 Fensterfalz',
   ];
   const args = [...cases.map(([change]) => ({...input, ...change})), ...invalid];
   const searches = [...queries.map(([query]) => query), ...otherVariants];
@@ -1089,6 +1103,7 @@ test('offline stdio uses only the documented PortaSplit window-lip limits', () =
     const hits = compact[index].result.structuredContent.tools;
     const first = hits[0];
     assert.deepEqual(first, findTools(query).tools[0]);
+    if (index < 2) assert.deepEqual(hits.map(tool => tool.name), [name], query);
     if (index >= queries.length) {
       assert.ok(!hits.some(tool => [name, bracketTool].includes(tool.name)), query);
       continue;
