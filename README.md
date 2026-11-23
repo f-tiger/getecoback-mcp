@@ -366,7 +366,7 @@ separately measured loads reach different levels of dryness.
 | `maehroboter_steigungsprofil` | Compare measured grade with the exact limit for mowing area, boundary or passage. |
 | `maehroboter_maehfenster` | Estimate whether a mowing plan fits user-supplied permitted and supervised time windows. |
 | `schubladentrenner_zuschnitt` | Size a non-load-bearing drawer divider prototype from internal dimensions and clearance. |
-| `keller_lueften_taupunkt_messwerte` | Compare paired indoor/outdoor dew points and the coldest measured wall to assess basement drying and condensation. |
+| `keller_lueften_taupunkt_messwerte` | Compare indoor and outdoor dew points and the coldest measured wall. Returns a shareable German summary and the calculator link. |
 | `geraet_testzitat_einordnen` | Qualify a best-in-test claim by model, test group and date. |
 | `haendler_link_modellnachweis` | Identify what a merchant link establishes about the exact model. |
 | `angebot_lagerstatus_zitieren` | Qualify an availability quote by exact offer and observation date. |
