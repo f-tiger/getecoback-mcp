@@ -24,14 +24,23 @@ const cellarTestSources = {
   'meaco-one-20': {
     model:'MeacoDry Arete One 20L',
     source:'https://eu.meaco.com/products/meacodry-arete-one-20l-luftentfeuchter-luftreiniger',
+    checked:'2026-11-23',
     points:[{c:10, rh:60, litres:3.4, watts:180}, {c:20, rh:60, litres:8.5, watts:216}],
+  },
+  'meaco-two-12': {
+    model:'MeacoDry Arete Two 12L',
+    source:'https://eu.meaco.com/products/meacodry-arete-two-12l-luftentfeuchter-luftreiniger',
+    checked:'2026-11-23',
+    points:[{c:10, rh:60, litres:1.97, watts:111}, {c:20, rh:60, litres:5.4, watts:136}],
   },
   'comfee-mddf20': {
     model:'Comfee MDDF-20DEN7 ohne WF',
     source:'https://www.feelcomfee.com/content/dam/comfee-aem/de/produkte/klimatisieren-heizen/mddf-20den7/comfee-MDDF-20DEN7-Datenblatt.pdf#page=2',
+    checked:'2026-11-20',
     points:[],
   },
 };
+const germanNumber = new Intl.NumberFormat('de-DE');
 
 export const moistureSuite = [
   {
@@ -214,11 +223,11 @@ export const moistureSuite = [
   },
   {
     name:'kellerentfeuchter_pruefpunkt_abgleichen',
-    description:'Welche Entzugsleistung in Litern pro Tag und wie viel Watt nennt der Hersteller bei meiner gemessenen Kellertemperatur und Luftfeuchte? Prüfpunkte für Meaco Arete One 20L und Comfee MDDF-20DEN7 bei 10 oder 20 Grad und 60 Prozent vergleichen — Match a measured cellar condition to a documented German dehumidifier test point.',
+    description:'Welche Entzugsleistung in Litern pro Tag und wie viel Watt nennt der Hersteller bei meiner gemessenen Kellertemperatur und Luftfeuchte? Prüfpunkte für Meaco Arete One 20L, Arete Two 12L und Comfee MDDF-20DEN7 bei 10 oder 20 Grad und 60 Prozent abgleichen — Match a measured cellar condition to a documented German dehumidifier test point.',
     page:cellarGuide,
     guide_url:'https://getecoback.com' + cellarGuide + '#kalter-keller',
     properties:{
-      modell:choice('Genaue Ausführung laut Typenschild: MeacoDry Arete One 20L oder Comfee MDDF-20DEN7 ohne WF.', Object.keys(cellarTestSources)),
+      modell:choice('Genaue Ausführung laut Typenschild: MeacoDry Arete One 20L, Arete Two 12L oder Comfee MDDF-20DEN7 ohne WF.', Object.keys(cellarTestSources)),
       temperatur_c:number('Gemessene Lufttemperatur am Messort in °C.', -20, 50),
       relative_feuchte_pct:number('Am selben Ort und zur selben Zeit gemessene relative Luftfeuchte in Prozent.', 0, 100),
       wiederholt_gemessen:bool('Hast du Temperatur und Feuchte über mehrere Tage am gleichen Ort beobachtet?'),
@@ -227,7 +236,7 @@ export const moistureSuite = [
     calculate({modell, temperatur_c, relative_feuchte_pct, wiederholt_gemessen, befund}) {
       const source = cellarTestSources[modell];
       const evidence = {modell:source.model, liter_pro_tag:null, leistungsaufnahme_w:null, quellenmarkt:'DE',
-        quellenpruefung:'2026-11-20', quelle:source.source};
+        quellenpruefung:source.checked, quelle:source.source};
       if (befund === 'wassereintritt_oder_schaden') {
         return {...evidence, status:'ursache_klaeren', hinweis:'Bei eindringendem Wasser, nassen Wänden oder Schimmel zuerst die Ursache fachlich klären. Den Kauf zurückstellen.'};
       }
@@ -243,6 +252,7 @@ export const moistureSuite = [
       }
       return {...evidence, status:'hersteller_pruefpunkt', temperatur_c:point.c, relative_feuchte_pct:point.rh,
         liter_pro_tag:point.litres, leistungsaufnahme_w:point.watts,
+        model_guide_url:'https://getecoback.com' + cellarGuide + '#modell-' + modell,
         hinweis:'Hersteller-Prüfwert bei den angegebenen Bedingungen. Luftwechsel, Feuchtenachschub und Abtauphasen beeinflussen den tatsächlichen Entzug im Keller. Ursache und Wasserablauf vor der Auswahl prüfen.'};
     },
     example:{args:{modell:'meaco-one-20', temperatur_c:10, relative_feuchte_pct:60, wiederholt_gemessen:true, befund:'feuchte_auffaellig'},
@@ -257,21 +267,21 @@ export const moistureSuite = [
     },
     calculate({model}) {
       const product = coldModels.find(candidate=>candidate.id===model);
-      const evidence = {
-        'meaco-one-20':'Herstellerangabe UK: 3,4 L/Tag bei 10 °C und 60 % relativer Feuchte. Deutsche Ausführung separat prüfen.',
-        'meaco-two-12':'Der belegte Vergleichspunkt 5,40 L/Tag gilt bei 20 °C und 60 % relativer Feuchte. Kein gesicherter 10-°C-Wert im Katalog.',
-        'stadler-lukas':'Die genannte Betriebsgrenze von 5 °C liefert keinen Entzugswert für einen kalten Keller.',
-      };
+      const source = cellarTestSources[model];
+      const coldEvidence = source
+        ? source.points.map(point => `${point.c} °C und ${point.rh} % relative Feuchte: ${germanNumber.format(point.litres)} L/Tag bei ${point.watts} W.`).join(' ')
+        : 'Die genannte Betriebsgrenze von 5 °C liefert keinen Entzugswert für einen kalten Keller.';
       return {
         variant:product.variant,
-        cold_evidence:evidence[model],
-        source_url:product.source,
-        source_label:product.source_label,
+        cold_evidence:coldEvidence,
+        source_url:source?.source ?? product.source,
+        source_label:source ? 'Meaco DE, Herstellerdaten' : product.source_label,
+        ...(source ? {source_checked:source.checked, model_guide_url:'https://getecoback.com' + cellarGuide + '#modell-' + model} : {}),
         catalog_checked:catalog.checked,
         assumption:'Ein Vergleich erfordert dieselben Angaben zu Temperatur und relativer Feuchte. Betriebspunkt, Einsatzgrenze und Geräteleistung sind unterschiedliche Größen.',
       };
     },
-    example:{args:{model:'meaco-one-20'},expect:{source_url:'https://www.meaco.com/products/meacodry-arete-one-20l-dehumidifier-and-air-purifier'}},
+    example:{args:{model:'meaco-one-20'},expect:{source_url:cellarTestSources['meaco-one-20'].source}},
   },
   {
     name:'entfeuchter_tank_leerintervall',

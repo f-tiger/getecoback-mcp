@@ -369,6 +369,7 @@ test('default and compact stdio expose the same offline German cellar evidence r
   const uri = cellarUri;
   const mimeType = 'text/markdown';
   const meacoSource = 'https://eu.meaco.com/products/meacodry-arete-one-20l-luftentfeuchter-luftreiniger';
+  const twoSource = 'https://eu.meaco.com/products/meacodry-arete-two-12l-luftentfeuchter-luftreiniger';
   const comfeeSource = 'https://www.feelcomfee.com/content/dam/comfee-aem/de/produkte/klimatisieren-heizen/mddf-20den7/comfee-MDDF-20DEN7-Datenblatt.pdf#page=2';
   const requests = [
     {method:'initialize', params:{}},
@@ -416,7 +417,12 @@ test('default and compact stdio expose the same offline German cellar evidence r
   }
   assert.match(text, /60\s*%/);
   assert.match(text, /MeacoDry Arete One 20L/);
-  assert(lines.some(line => line.includes(meacoSource) && /20\.11\.2026|2026-11-20/.test(line)));
+  assert(lines.some(line => line.includes(meacoSource) && line.includes('2026-11-23')));
+  assert(lines.some(line => line.includes(twoSource) && line.includes('2026-11-23')));
+  assert(lines.some(line => /Arete Two 12L.*10 °C.*1,97 L\/Tag.*111 W/.test(line)));
+  assert(lines.some(line => /Arete Two 12L.*20 °C.*5,4 L\/Tag.*136 W/.test(line)));
+  assert.match(text, /12,5 mm Innendurchmesser/);
+  assert.match(text, /Der Two 12L steht nicht auf der Liste/);
   assert(lines.some(line => line.includes(comfeeSource) && /(?:06|20)\.11\.2026|2026-11-(?:06|20)/.test(line)));
   assert.match(text, /MDDF-20DEN7\s+ohne\s+WF[^\n]*\boffen\b/i);
   assert.match(text, /Ursache klären/);
@@ -2079,17 +2085,20 @@ test('compact lookup exposes the offline tool schema, source and guide for real 
 });
 
 test('compact finder embeds matching cellar evidence and runs the documented test-point tool', async () => {
-  const [read, listing, relevant, ...unmatched] = compactReplies([
+  const [read, listing, relevant, exactTwo, ...unmatched] = compactReplies([
     {method:'resources/read',params:{uri:cellarUri}},
     {method:'resources/list'},
     ...[
       'Was leisten Comfee MDDF-20DEN7 und Meaco Arete One 20L bei 10 °C und 60 % im Keller?',
+      'Was leistet der Arete Two 12L bei 10 °C und 60 %?',
       'Comfee MDDF-20DEN7-WF bei 10 °C',
       'Wie lange darf ich mit 72 Litern duschen?',
     ].map(frage => toolCall(compactFind,{frage})),
   ]);
   assert.equal(relevant.result.isError, false);
   assert.deepEqual(relevant.result.structuredContent.resources, listing.result.resources);
+  assert.deepEqual(exactTwo.result.structuredContent.resources, listing.result.resources);
+  assert.equal(exactTwo.result.structuredContent.tools[0].name, 'kellerentfeuchter_pruefpunkt_abgleichen');
   assert.deepEqual(relevant.result.content.filter(part => part.type === 'resource'),
     [{type:'resource',resource:read.result.contents[0]}]);
   const found = relevant.result.structuredContent.tools[0];
@@ -2104,6 +2113,12 @@ test('compact finder embeds matching cellar evidence and runs the documented tes
     [{temperatur_c:15},'wertepaar_offen',null,null],
     [{relative_feuchte_pct:59},'wertepaar_offen',null,null],
     [{modell:'comfee-mddf20'},'wertepaar_offen',null,null],
+    [{modell:'meaco-two-12'},'hersteller_pruefpunkt',1.97,111],
+    [{modell:'meaco-two-12',temperatur_c:20},'hersteller_pruefpunkt',5.4,136],
+    [{modell:'meaco-two-12',temperatur_c:10.01},'wertepaar_offen',null,null],
+    [{modell:'meaco-two-12',wiederholt_gemessen:false},'zuerst_messen',null,null],
+    [{modell:'meaco-two-12',befund:'unauffaellig'},'kein_kaufbedarf_belegt',null,null],
+    [{modell:'meaco-two-12',wiederholt_gemessen:false,befund:'wassereintritt_oder_schaden'},'ursache_klaeren',null,null],
   ];
   const inputs = cases.map(([change]) => ({...found.example_arguments,...change}));
   const decisions = compactReplies(inputs.map(eingaben => toolCall(compactRun,{name:found.name,eingaben})));
@@ -2114,10 +2129,29 @@ test('compact finder embeds matching cellar evidence and runs the documented tes
     const data = result.structuredContent;
     assert.deepEqual([data.status,data.liter_pro_tag,data.leistungsaufnahme_w], [status,litres,watts]);
     assert.equal(data.quellenmarkt, 'DE');
-    assert.equal(data.quellenpruefung, '2026-11-20');
+    const model = inputs[index].modell;
+    assert.equal(data.quellenpruefung, model === 'comfee-mddf20' ? '2026-11-20' : '2026-11-23');
+    assert.equal(data.model_guide_url, status === 'hersteller_pruefpunkt'
+      ? found.citation_url + '#modell-' + model : undefined);
+    assert.equal(data.entry_url, undefined);
+    assert.doesNotMatch(JSON.stringify(result), /amazon\.|amzn\.|[?&]tag=/i);
     assert.equal(data.citation_url, found.citation_url);
     assert.equal(data.guide_url, found.guide_url);
     assert(read.result.contents[0].text.includes(data.quelle));
+  }
+  const lookupName = 'entfeuchter_kalt_modellbeleg';
+  const lookupArgs = {model:'meaco-two-12'};
+  const [lookup] = compactReplies([toolCall(compactRun,{name:lookupName,eingaben:lookupArgs})]);
+  assert.deepEqual(lookup.result, await callTool(lookupName,lookupArgs));
+  const citation = lookup.result.structuredContent;
+  assert.match(citation.cold_evidence, /1,97 L\/Tag bei 111 W.*5,4 L\/Tag bei 136 W/);
+  assert.equal(citation.source_url, 'https://eu.meaco.com/products/meacodry-arete-two-12l-luftentfeuchter-luftreiniger');
+  assert.equal(citation.source_checked, '2026-11-23');
+  for (const modell of ['meaco-two-20','meaco-one-12','comfee-mddf20-wf']) {
+    const invalid = {...found.example_arguments,modell};
+    const [reply] = compactReplies([toolCall(compactRun,{name:found.name,eingaben:invalid})]);
+    assert.deepEqual(reply.result,await callTool(found.name,invalid));
+    assert.equal(reply.result.isError,true);
   }
   for (const {result} of unmatched) {
     assert.equal(result.isError, false);
