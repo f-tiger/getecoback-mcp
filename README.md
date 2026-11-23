@@ -24,15 +24,15 @@ The tool table below is not hand-written: `sync.mjs` rebuilds it from the live s
 
 ## Connect
 
-**[EcoBack MCPB 1.22.26 herunterladen](https://github.com/f-tiger/agi-site/releases/download/fleet-mcp-registry-2026-10-10/ecoback-local-tools-1.22.26.mcpb)**
+**[EcoBack MCPB 1.22.27 herunterladen](https://github.com/f-tiger/agi-site/releases/download/fleet-mcp-registry-2026-10-10/ecoback-local-tools-1.22.27.mcpb)**
 
 Öffne die heruntergeladene `.mcpb`-Datei über die MCPB-Installation deines Clients.
 Für den lokalen Betrieb brauchst du Node.js 22 oder neuer. Berechnungen laufen
 lokal. Nur auf Anfrage ruft EcoBack Wetterdaten oder ausgewählte Ratgeber ab.
 
 SHA-256 der verlinkten Datei
-`7360576b9ae84472b424d202bdda1ecf4203cffc69660b8690fcabd1a75e9797`.
-[Registrierte Version 1.22.26](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fecoback-local-tools/versions/1.22.26)
+`2cda8432f85d35495d17f6c51eb5efe3ceed1958b00ade821fce9e6ac22fce06`.
+[Registrierte Version 1.22.27](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fecoback-local-tools/versions/1.22.27)
 · [Aktuellste Version im offiziellen MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.f-tiger%2Fecoback-local-tools/versions/latest).
 
 <details>
@@ -161,12 +161,13 @@ node src/find-tools.mjs 'Kann ich den Abflussschlauch nach oben führen?'
 node src/find-tools.mjs 'Wie lange darf ich mit 72 Litern duschen?'
 node src/find-tools.mjs 'Wäschetrockner oder Luftentfeuchter – was kostet das Trocknen pro Ladung?'
 node src/find-tools.mjs 'Midea PortaSplit Dachfenster Halterung'
+node src/find-tools.mjs 'Im Schlafzimmer sind 20 Grad bei 60 % Luftfeuchtigkeit. Morgens hat die Innenscheibe 10 Grad. Warum wird sie nass?'
 ```
 
 The command searches the local catalogue without contacting the website. It
 returns up to five results as JSON with the tool name, input schema and any
 recorded canonical citation, guide section and example arguments. It uses the
-reviewed German ranking rules from the EcoBack site repository. [Ranking source](https://github.com/f-tiger/agi-site/blob/d3464896ede6e50fc418af2d2f67962ba55f188e/sites/getecoback/site/assets/mcp-catalog-search.mjs)
+reviewed German ranking rules from the EcoBack site repository. [Ranking source](https://github.com/f-tiger/agi-site/blob/2b7c0d64928475facd26608db9ab80092cb5c3f8/sites/getecoback/site/assets/mcp-catalog-search.mjs)
 
 Try a reviewed example offline by giving its exact tool name. The reply shows
 the sample arguments, the actual tool result and any recorded source link.
