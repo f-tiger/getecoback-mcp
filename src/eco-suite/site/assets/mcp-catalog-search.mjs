@@ -289,6 +289,32 @@ function asksAboutGlassvacFault(query) {
     /\b(?:kaputt|defekt[a-z]*|fehler|fehlersuche)\b/.test(query);
 }
 
+const windowDewPointTool = 'fenster_oberflaeche_taucheck';
+const temperatureValue = String.raw`[+−-]?\d{1,2}(?:[.,]\d+)?\s*(?:°\s*c\b|grad\b)`;
+const roomLabel = String.raw`(?:raumtemperatur|zimmertemperatur|innenraum|raum|zimmer|schlafzimmer|wohnzimmer|kinderzimmer|innen\s+sind es)`;
+const roomTemperature = new RegExp(String.raw`\b${roomLabel}\b(?:\s+(?:hat|sind|ist|beträgt|betraegt|liegt bei)){0,2}\s*[:=]?\s*${temperatureValue}|${temperatureValue}\s+(?:im|in der)\s+${roomLabel}\b`);
+const measuredSurface = String.raw`(?:glas(?:oberflaeche)?|(?:innen|fenster)?scheibe|scheibentemperatur|(?:innen|aussen)?wand(?:oberflaeche)?)`;
+const surfaceTemperature = new RegExp(String.raw`\b${measuredSurface}\b(?:\s+(?:innen|hat|misst|zeigt|ist|nur|bei|liegt bei)){0,3}\s*[:=]?\s*${temperatureValue}|${temperatureValue}\s+(?:am|an der|auf der)\s+${measuredSurface}\b`);
+const humidityField = String.raw`(?:(?:relative[rn]?)\s+(?:luft)?feucht(?:e|igkeit)|(?:raum)?luftfeucht(?:e|igkeit)|rf|rh)`;
+const humidityValue = String.raw`\b\d{1,3}(?:[.,]\d+)?\s*(?:%|prozent\b)`;
+const roomHumidity = new RegExp(String.raw`\b${humidityField}\b(?:\s+(?:ist|liegt bei|betraegt|von)){0,2}\s*[:=]?\s*${humidityValue}|${humidityValue}\s+${humidityField}\b`);
+
+function asksAboutOtherWindowSurface(query) {
+  const glassCavityOrCar = /\b(?:scheibenzwischenraum|randverbund|zwischen\s+(?:(?:den|beiden|zwei|drei)\s+){0,2}(?:\w*scheiben|glaesern)|windschutzscheibe)\b/;
+  if (glassCavityOrCar.test(query)) return true;
+  const dryExterior = /\b(?:aussen|aussenseite|aussenscheibe)\b[^,.!?;]{0,24}\b(?:trocken|nicht nass|ohne beschlag)\b/;
+  const wetExterior = /\baussenbeschlag\b|\b(?:beschlag|kondensat|kondenswasser|tauwasser|nass)\b[^,.!?;]{0,24}\b(?:aussen|aussenscheibe|aussenseite)\b|\b(?:aussen|aussenscheibe|aussenseite)\b[^,.!?;]{0,24}\b(?:beschlagen|kondensat|kondenswasser|tauwasser|nass)\b/;
+  return wetExterior.test(query) && !dryExterior.test(query);
+}
+
+function asksForMeasuredIndoorDewPoint(query) {
+  const condensation = /\b(?:taupunkt\w*|tauwasser\w*|kondens(?:at|wasser|ation|iert)\w*|beschla(?:eg|g)\w*|nass\w*)\b/;
+  const differentTask = /\b(?:auto|pkw|wohnmobil|ablaufschlauch|abluftschlauch|gummilippe|abziehlippe|saugduese|fenstersauger\w*reparatur)\b/;
+  const unmeasured = /\b(?:schaetze|geschaetzt|geraten|nicht gemessen)\b|\bgemessen\b[^,.!?;]{0,25}\bnicht\b/;
+  return condensation.test(query) && !differentTask.test(query) && !unmeasured.test(query) &&
+    roomTemperature.test(query) && roomHumidity.test(query) && surfaceTemperature.test(query);
+}
+
 export function findCatalogueTools(index, {query='', category='', name=null}={}) {
   const bounded = query.slice(0, 512);
   const exact = normalize(bounded.trim());
@@ -346,9 +372,11 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   const portaSplitLipTool = 'midea_portasplit_fensterfalz_pruefen';
   const singleLaundry = asksForSingleLaundryCost(focus.query);
   const fritzValve = asksForFritzValveAdapter(focus.query);
+  const nonIndoorGlass = asksAboutOtherWindowSurface(focus.query);
   const termCount = terms.length;
   const matches = [];
   for (const entry of index) {
+    if (entry.tool.name === windowDewPointTool && nonIndoorGlass) continue;
     if (entry.tool.name === cellarVentilationTool && !cellarVentilation) continue;
     if (entry.tool.name === narrowNozzleTool && !narrowNozzle) continue;
     if (entry.tool.name === philipsFilterTool && !philipsFilter) continue;
@@ -416,6 +444,7 @@ export function findCatalogueTools(index, {query='', category='', name=null}={})
   else if (trotecConditions) preferredName = trotecTool;
   else if (asksForDehumidifierDrainRoute(focus.query)) preferredName = 'entfeuchter_ablaufcheck';
   else if (cellarVentilation) preferredName = cellarVentilationTool;
+  else if (!nonIndoorGlass && asksForMeasuredIndoorDewPoint(focus.query)) preferredName = windowDewPointTool;
   else if (fritzValve) preferredName = fritzValveTool;
   else if (singleLaundry) preferredName = singleLaundryTool;
   else if (asksForLaundryCostComparison(tokens)) preferredName = 'waesche_trocknungskosten';

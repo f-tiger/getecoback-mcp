@@ -1858,6 +1858,22 @@ test('both offline stdio profiles resolve the German condensation question and e
     'Fenstersauger gegen Kondenswasser',
     'Hilft ein Fenstersauger gegen Kondenswasser am Fenster oder reicht ein Tuch?',
     '20 Grad 60 % Luftfeuchtigkeit und Scheibe 10 Grad: Ist Kondenswasser am Fenster plausibel?',
+    'Morgens beschlägt mein Fenster innen. Im Schlafzimmer sind 20 °C und 60 Prozent Luftfeuchte, die Scheibe hat 10 °C. Kann sich dort Tauwasser bilden?',
+    'Im Schlafzimmer sind 20 Grad bei 60 % Luftfeuchtigkeit. Morgens hat die Innenscheibe 10 Grad. Warum wird sie nass?',
+    'Ich messe am Glas 9 Grad. Innen sind es 21 Grad und 55 Prozent Luftfeuchte. Ist Tauwasser auf der Innenseite möglich?',
+    'Kann sich an der Außenwand innen bei 14 °C Tauwasser bilden, wenn im Zimmer 20 °C und 60 % relative Feuchte sind?',
+    'Im Schlafzimmer sind 20 Grad bei 60 % Luftfeuchte. Die Innenscheibe hat 10 Grad und ist nass. Die Außenseite ist trocken. Liegt die Innenscheibe unter dem Taupunkt?',
+  ];
+  const excluded = [
+    'Warum beschlägt das geschlossene Fenster morgens innen?',
+    'Reicht im Schlafzimmer mit 20 °C und 60 % Luftfeuchte der Raumwert? Die Innenscheibe habe ich noch nicht gemessen.',
+    'Im Schlafzimmer sind 20 Grad und 60 Prozent Luftfeuchte. Ich schätze, die Scheibe hat 10 Grad, gemessen habe ich sie nicht. Warum wird sie nass?',
+    'Morgens ist die Innenscheibe nass. Die Scheibe hat 10 Grad, abends 15 Grad, die Luftfeuchtigkeit liegt bei 60 Prozent. Die Raumtemperatur kenne ich nicht. Warum wird sie nass?',
+    'Das Schlafzimmer hat 20 °C. Die Innenscheibe hat 10 °C. Mein Luftentfeuchter läuft auf 60 Prozent Leistung, die Luftfeuchte habe ich nicht gemessen. Weshalb wird es nachts innen nass?',
+    'Beschlag außen: drinnen 20 Grad und 60 Prozent Luftfeuchte, die Außenscheibe hat 10 Grad.',
+    'Kondensat zwischen den Scheiben, Raumtemperatur 20 °C und 60 % Luftfeuchte. Die Scheibe hat 10 °C.',
+    'Windschutzscheibe innen: 20 °C und 60 % im Auto, Glas 10 °C. Ist das Kondenswasser?',
+    'Mein Kärcher WV 6 hinterlässt Streifen am Kondenswasser. Im Schlafzimmer sind 20 Grad und 60 Prozent Luftfeuchte, die Scheibe hat 10 Grad. Wie wechsle ich die Gummilippe?',
   ];
   const room = {room_c:20, room_rh_pct:60};
   const saturatedRoom = {room_c:23, room_rh_pct:100};
@@ -1871,6 +1887,7 @@ test('both offline stdio profiles resolve the German condensation question and e
   const inputs = [...cases.map(([measurements]) => measurements), room];
   const compact = compactReplies([
     ...questions.map(frage => toolCall(compactFind, {frage})),
+    ...excluded.map(frage => toolCall(compactFind, {frage})),
     ...inputs.map(eingaben => toolCall(compactRun, {name, eingaben})),
   ]);
   for (const [index, question] of questions.entries()) {
@@ -1878,14 +1895,21 @@ test('both offline stdio profiles resolve the German condensation question and e
     assert.equal(first?.name, name, question);
     assert.equal(first.guide_url, guide);
     assert.equal(first.citation_url, citation);
+    assert.deepEqual([...first.inputSchema.required].sort(), ['room_c','room_rh_pct','surface_c']);
     assert.deepEqual(first, findTools(question).tools[0]);
+  }
+
+  for (const [index, question] of excluded.entries()) {
+    const compactTools = compact[questions.length + index].result.structuredContent.tools;
+    assert.ok(!compactTools.some(tool => tool.name === name), question);
+    assert.ok(!findTools(question).tools.some(tool => tool.name === name), question);
   }
 
   const jobs = inputs.map((args, index) => ({jsonrpc:'2.0', id:index + 1, ...toolCall(name, args)}));
   const fullById = new Map(readStdio(jobs).map(reply => [reply.id, reply.result]));
   for (const [index, [{surface_c}, dewPoint, margin, possible, interpretation]] of cases.entries()) {
     const result = fullById.get(index + 1);
-    assert.deepEqual(result, compact[questions.length + index].result);
+    assert.deepEqual(result, compact[questions.length + excluded.length + index].result);
     assert.equal(result.isError, false);
     const output = result.structuredContent;
     assert.equal(output.dew_point_c, dewPoint, `surface ${surface_c} °C`);
