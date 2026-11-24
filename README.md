@@ -204,7 +204,7 @@ separately measured loads reach different levels of dryness.
 | `geraetewechsel_rechnen` | Compare the cost of keeping an appliance with replacing it. |
 | `waesche_trocknungskosten` | Compare measured energy costs for equally dry laundry. |
 | `luftentfeuchter_waesche_einzelkosten` | Calculate a single dehumidifier drying run without assuming a dryer reading. |
-| `fenster_oberflaeche_taucheck` | Check a measured indoor glass or wall surface against the dew point. |
+| `fenster_oberflaeche_taucheck` | Calculate dew point and optionally compare a measured indoor surface. |
 | `fenster_beschlag_einordnen` | Interpret the side on which window condensation is observed. |
 | `raumluft_wassermenge` | Estimate the grams of water in room air above a chosen relative humidity. |
 | `luftfeuchte_bei_temperaturwechsel` | Estimate changed relative humidity for a fixed air-water mass. |
