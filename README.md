@@ -6,7 +6,7 @@ Stromkosten zweier Trocknungswege pro Ladung mit deinen eigenen Messwerten.
 
 [Offline-Paket installieren](#connect) · [Erste Fragen ausprobieren](#find-tools-offline) · [VS Code einrichten](#lokales-ecoback-in-vs-code)
 
-<!-- count -->2030<!-- /count --> callable tool names for **household decisions in Germany**.
+<!-- count -->2031<!-- /count --> callable tool names for **household decisions in Germany**.
 Use measurements to assess room climate and electricity use, plan laundry and
 airflow, check model documentation, reconcile household bills, or compare an
 appliance in use. The tools also search and retrieve published guides.
@@ -244,7 +244,7 @@ separately measured loads reach different levels of dryness.
 | `heizdecke_stromkosten_nennleistung` | Estimate an electric blanket’s running cost at a supplied constant wattage. |
 | `thermostat_amortisation` | Estimate thermostat payback using your own savings assumption. |
 | `thermostat_paketkosten` | Budget radiator thermostat hardware and shared hub. |
-| `thermostat_ventilabgleich` | Check a known radiator valve against the selected model’s documentation. |
+| `thermostat_ventilabgleich` | Check a radiator valve against the selected model’s documentation. |
 | `heizkoerper_kalt_pruefen` | Triage a cold radiator from observed room and radiator behavior. |
 | `nachtabsenkung_messvergleich` | Compare heating-only meter readings before and after a schedule change. |
 | `heizstart_vorlauf_planen` | Plan morning heating lead time from measured recovery. |
@@ -2074,6 +2074,7 @@ separately measured loads reach different levels of dryness.
 | `spueler_weichwasser_ohne_salz_geraetemodell` | Use the model-specific soft-water boundary without relying on a multi-function tablet. |
 | `bosch_sks62e32eu_glastruebung_ablesbarer_beleg` | Decide which evidence branch applies without diagnosing irreversible damage. |
 | `spueler_geschirr_material_vor_einraeumen_beleg` | Screen documented dishware and material limitations before loading. |
+| `beutelstaubsauger_angebot_kosten_pruefen` | Check the German vacuum offer contents and entered totals |
 | `miele_hyclean_beutel_vollstaendige_modellzeile` | Match an exact German Miele vacuum model to its documented bag family |
 | `miele_zwei_sauger_vorrat_beutel_abluftfilter_getrennt` | Check which consumable role two Miele vacuums can share |
 | `miele_gn_packbedarf_drei_teile_aus_bestand` | Compare verified GN pack contents against actual remaining needs |
@@ -2233,7 +2234,7 @@ A gravity hose requires a continuous drop. Meaco lists a separate pump for this 
 ## What makes the answers safe to quote
 
 - **Checked examples and source links.** The hosted directory supplies exact input
-  schemas, examples and source URLs. Tests cover all <!-- count -->2030<!-- /count -->
+  schemas, examples and source URLs. Tests cover all <!-- count -->2031<!-- /count -->
   callable names and compare the deterministic examples with the hosted results.
 - **Every answer carries its source URL** and the disclosure that the site is funded by
   Amazon affiliate links, so a quoting assistant passes both along.
