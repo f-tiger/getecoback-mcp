@@ -193,13 +193,13 @@ separately measured loads reach different levels of dryness.
 | `entfeuchter_ablaufcheck` | Check a German basement dehumidifier’s hose route, pump or tank options and cite evidence for the exact model. |
 | `geraet_wahl` | Choose a next step for heat, damp/mould, cold or stale air. For damp rooms, measure first, investigate damage and compare cold-room or laundry conditions before buying; floor area alone cannot size a dehumidifier. Same decision rules as the website. |
 | `btu_empfehlung` | Estimate cooling capacity in BTU/h from room area and sun exposure, using the website's baseline of 340 BTU/h per m². Consider a detailed load calculation for large rooms. |
-| `fensterabdichtung_laenge` | Estimate the seal length for a portable air conditioner from sash measurements (perimeter = 2 × (width + height)) and identify a stock size to verify. Covers tilt-and-turn and roof windows. |
+| `fensterabdichtung_laenge` | Calculate the rectangular sash perimeter and check an example fabric size against the kit instructions. |
 | `hitzewelle_vorschau` | Live heatwave outlook for Germany: highest temperature over the next three days across Berlin, Frankfurt and Munich (open-meteo), flagged from 28 °C and 32 °C. |
 | `klimaanlage_stromkosten` | Running cost of an air conditioner or any appliance: watts × hours × electricity price × compressor duty cycle. What does it cost to run per hour, per day, per month? |
-| `heizleistung_watt` | Required heating power in watts for a room, from floor area and insulation standard (60/80/100 W/m² for new build, existing, old building), including running cost per full-load hour. |
+| `heizleistung_watt` | Rough whole-room estimate using floor area and actual insulation (60/80/100 W/m²), including cost per full-load hour. |
 | `taupunkt_lueften` | Compare outdoor dew point (Magnus approximation) with a wall estimate 2 °C below room temperature. A drying decision also needs indoor humidity and a measured coldest surface. |
 | `ratgeber_suche` | Searches published guides with a readable Markdown mirror, returning title, canonical URL and task-specific summary. Every result can be passed to ratgeber_lesen. |
-| `ratgeber_lesen` | Reads the cleaned Markdown of a published guide, with reviewed source links, assumptions and limits. Long excerpts are explicitly marked and link the full text. Pass an exact canonical path or URL from ratgeber_suche, without query or fragment. |
+| `ratgeber_lesen` | Reads editorial Markdown and reviewed sources. Pass a canonical URL or a supported section URL from ratgeber_suche, without a query. |
 | `strommessung_hochrechnen` | Project meter readings across representative days. |
 | `geraetewechsel_rechnen` | Compare the cost of keeping an appliance with replacing it. |
 | `waesche_trocknungskosten` | Compare measured energy costs for equally dry laundry. |
@@ -215,7 +215,7 @@ separately measured loads reach different levels of dryness.
 | `kellerentfeuchter_pruefpunkt_abgleichen` | Match a measured cellar condition to a documented German dehumidifier test point. |
 | `entfeuchter_kalt_modellbeleg` | Retrieve verified cold-room evidence and limitations for an exact model. |
 | `entfeuchter_tank_leerintervall` | Estimate tank-emptying interval from collected water and time. |
-| `entfeuchter_leerer_tank_check` | Troubleshoot an empty dehumidifier tank using the actual setting, temperature and drain mode. |
+| `entfeuchter_leerer_tank_check` | Troubleshoot an empty dehumidifier tank. |
 | `entfeuchter_energie_je_liter` | Calculate the actual energy and tariff cost per litre collected. |
 | `waesche_restwasser_messen` | Measure water left in textiles from wet and dry reference weights. |
 | `waesche_trocknungsziel_rate` | Check the removal rate needed to meet a laundry drying deadline. |
@@ -268,7 +268,7 @@ separately measured loads reach different levels of dryness.
 | `strombudget_verbrauchsgrenze` | Turn a monthly electricity budget into a maximum annual consumption target. |
 | `strompaket_auslastung_pruefen` | Check the cost of a prepaid kWh bundle against ordinary marginal billing. |
 | `stromschaetzung_abweichung` | Quantify the difference between an estimated bill reading and a contemporaneous actual reading. |
-| `steckdosenmessung_mindestdauer` | Estimate how long a steady low-power load needs to register on a plug meter. |
+| `steckdosenmessung_mindestdauer` | Plan a steady low-power measurement. |
 | `strommessung_a_b_messfehler` | Check whether a measured mode change exceeds the stated measurement uncertainty. |
 | `strombilanz_restverbrauch` | Reconcile a total meter reading with disjoint appliance measurements. |
 | `stromzaehler_impulsleistung` | Estimate average import power from an optical meter pulse count without touching the installation. |
@@ -486,7 +486,7 @@ separately measured loads reach different levels of dryness.
 | `strommessung_anlaufphase_getrennt` | Separate startup energy from the measured post-start phase. |
 | `raumversuch_erholungspausen_planen` | Schedule room trials with time to restore documented starting conditions. |
 | `geraetemessung_vorzyklus_nachwirkung` | Compare the same target mode after two different predecessor modes. |
-| `messung_nullanzeige_obergrenze` | Interpret an unchanged cumulative meter reading without claiming zero consumption. |
+| `messung_nullanzeige_obergrenze` | Interpret an unchanged cumulative meter reading. |
 | `geraeteverbrauch_nutzungsveraenderung` | Decompose an observed energy change into a usage-count effect and a per-task effect. |
 | `messreihe_echte_wiederholungen_zaehlen` | Count independent household trials without treating every logger sample as a replicate. |
 | `stromlogger_kurzereignis_stichprobe` | Check whether a short load episode can fall between point samples. |
