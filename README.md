@@ -191,7 +191,7 @@ separately measured loads reach different levels of dryness.
 |---|---|
 <!-- tools:start -->
 | `entfeuchter_ablaufcheck` | Check a German basement dehumidifier’s hose route, pump or tank options and cite evidence for the exact model. |
-| `geraet_wahl` | Choose a next step for heat, damp/mould, cold or stale air. For damp rooms, measure first, investigate damage and compare cold-room or laundry conditions before buying; floor area alone cannot size a dehumidifier. Same decision rules as the website. |
+| `geraet_wahl` | Choose a next step for heat, damp/mould, cold or stale air. For hot rooms, check measured temperatures, safe ventilation and shading before choosing a cooling device. For cold rooms, distinguish an example from a measured area and check heat load and circuits at higher wattages. For damp rooms, measure first, investigate damage and compare cold-room or laundry conditions before buying; floor area alone cannot size a dehumidifier. Same decision rules as the website. |
 | `btu_empfehlung` | Estimate cooling capacity in BTU/h from room area and sun exposure, using the website's baseline of 340 BTU/h per m². Consider a detailed load calculation for large rooms. |
 | `fensterabdichtung_laenge` | Calculate the rectangular sash perimeter and check an example fabric size against the kit instructions. |
 | `hitzewelle_vorschau` | Live heatwave outlook for Germany: highest temperature over the next three days across Berlin, Frankfurt and Munich (open-meteo), flagged from 28 °C and 32 °C. |
